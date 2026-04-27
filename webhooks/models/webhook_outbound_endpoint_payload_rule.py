@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 from .const import OUTBOUND_RULE_SOURCE_SELECTION
@@ -45,7 +45,7 @@ class WebhookOutboundEndpointPayloadRule(models.Model):
         for rule in self:
             if rule.source_kind != "literal" and not rule.source_expression:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Payload rules require Source Key unless the source kind is Literal."
                     )
                 )

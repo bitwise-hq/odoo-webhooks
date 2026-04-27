@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class WebhookInboundRuleExecution(models.Model):
@@ -7,7 +7,10 @@ class WebhookInboundRuleExecution(models.Model):
     _order = "create_date desc, id desc"
     _check_company_auto = True
 
-    name = fields.Char(required=True, default=lambda self: _("Inbound Rule Execution"))
+    name = fields.Char(
+        required=True,
+        default=lambda self: self.env._("Inbound Rule Execution"),
+    )
     event_id = fields.Many2one(
         "webhook.inbound.event",
         required=True,

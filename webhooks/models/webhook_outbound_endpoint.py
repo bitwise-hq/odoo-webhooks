@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 
-from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import ValidationError
 
 from ..exceptions import WebhookProcessingConfigurationError
@@ -76,14 +76,12 @@ class WebhookOutboundEndpoint(models.Model):
     )
     target_hostname = fields.Char(
         required=True,
-        string="Target Hostname",
         tracking=True,
         help="Absolute target hostname, including the URL scheme and optional port, for example https://api.example.com.",
     )
     target_path = fields.Char(
         required=True,
         default="/",
-        string="Target Path",
         tracking=True,
         help="Request path appended to the target hostname. Query parameters may be included here when needed.",
     )
@@ -180,21 +178,23 @@ class WebhookOutboundEndpoint(models.Model):
                 continue
             if user.id == SUPERUSER_ID:
                 raise WebhookProcessingConfigurationError(
-                    _(
+                    self.env._(
                         "Superuser cannot be used as the outbound endpoint execution user."
                     )
                 )
             if user.share or not user.active:
                 raise WebhookProcessingConfigurationError(
-                    _("Execution user must be an active internal user.")
+                    self.env._("Execution user must be an active internal user.")
                 )
             if not user.has_group("webhooks.group_webhooks_admin"):
                 raise WebhookProcessingConfigurationError(
-                    _("Execution user must belong to the Webhook Administrator group.")
+                    self.env._(
+                        "Execution user must belong to the Webhook Administrator group."
+                    )
                 )
             if endpoint.company_id and endpoint.company_id not in user.company_ids:
                 raise WebhookProcessingConfigurationError(
-                    _(
+                    self.env._(
                         "Execution user must have access to the outbound endpoint company."
                     )
                 )
@@ -207,39 +207,43 @@ class WebhookOutboundEndpoint(models.Model):
                 or not str(endpoint.target_hostname).strip()
             ):
                 raise WebhookProcessingConfigurationError(
-                    _("Outbound endpoints require a target hostname.")
+                    self.env._("Outbound endpoints require a target hostname.")
                 )
             parsed_hostname = urlsplit(str(endpoint.target_hostname).strip())
             if not parsed_hostname.scheme or not parsed_hostname.netloc:
                 raise WebhookProcessingConfigurationError(
-                    _(
+                    self.env._(
                         "Outbound endpoint hostnames must include a URL scheme and hostname."
                     )
                 )
             if parsed_hostname.query or parsed_hostname.fragment:
                 raise WebhookProcessingConfigurationError(
-                    _(
+                    self.env._(
                         "Outbound endpoint hostnames cannot include query parameters or URL fragments."
                     )
                 )
             hostname_path = parsed_hostname.path or ""
             if hostname_path not in ("", "/"):
                 raise WebhookProcessingConfigurationError(
-                    _(
+                    self.env._(
                         "Store the outbound request path separately from the target hostname."
                     )
                 )
             if "#" in (endpoint.target_path or ""):
                 raise WebhookProcessingConfigurationError(
-                    _("Outbound endpoint target paths cannot include URL fragments.")
+                    self.env._(
+                        "Outbound endpoint target paths cannot include URL fragments."
+                    )
                 )
             if not endpoint.target_url or not str(endpoint.target_url).strip():
                 raise WebhookProcessingConfigurationError(
-                    _("Outbound endpoints require a target URL.")
+                    self.env._("Outbound endpoints require a target URL.")
                 )
             if endpoint.timeout_seconds <= 0:
                 raise WebhookProcessingConfigurationError(
-                    _("Outbound endpoint timeout must be greater than zero seconds.")
+                    self.env._(
+                        "Outbound endpoint timeout must be greater than zero seconds."
+                    )
                 )
 
     @api.model_create_multi
@@ -277,14 +281,18 @@ class WebhookOutboundEndpoint(models.Model):
 
     def action_activate(self):
         if self.filtered(lambda endpoint: endpoint.state != "draft"):
-            raise ValidationError(_("Only draft outbound endpoints can be activated."))
+            raise ValidationError(
+                self.env._("Only draft outbound endpoints can be activated.")
+            )
         self.write({"state": "active"})
         return True
 
     def action_set_draft(self):
         if self.filtered(lambda endpoint: endpoint.state not in ("active", "archived")):
             raise ValidationError(
-                _("Only active or archived outbound endpoints can be moved to draft.")
+                self.env._(
+                    "Only active or archived outbound endpoints can be moved to draft."
+                )
             )
         self.write({"state": "draft"})
         return True
@@ -292,7 +300,7 @@ class WebhookOutboundEndpoint(models.Model):
     def action_archive(self):
         if self.filtered(lambda endpoint: endpoint.state not in ("draft", "active")):
             raise ValidationError(
-                _("Only draft or active outbound endpoints can be archived.")
+                self.env._("Only draft or active outbound endpoints can be archived.")
             )
         self.write({"state": "archived"})
         return True

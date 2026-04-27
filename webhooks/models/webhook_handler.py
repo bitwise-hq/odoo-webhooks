@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -79,7 +79,7 @@ class WebhookHandler(models.Model):
                 continue
             if not handler.python_model_name or not handler.python_method_name:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Python callback handlers require both a model name and a method name."
                     )
                 )
@@ -88,15 +88,18 @@ class WebhookHandler(models.Model):
         self.ensure_one()
         if self.direction != "inbound":
             raise ValidationError(
-                _("Outbound handlers cannot process inbound webhook events.")
+                self.env._("Outbound handlers cannot process inbound webhook events.")
             )
         if self.execution_mode == "python":
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)
             if not callback:
                 raise ValidationError(
-                    _("Python callback %s.%s could not be found.")
-                    % (self.python_model_name, self.python_method_name)
+                    self.env._(
+                        "Python callback %(model)s.%(method)s could not be found.",
+                        model=self.python_model_name,
+                        method=self.python_method_name,
+                    )
                 )
             return callback(event)
         return event._execute_model_driven_handler(self)
@@ -105,15 +108,18 @@ class WebhookHandler(models.Model):
         self.ensure_one()
         if self.direction != "outbound":
             raise ValidationError(
-                _("Inbound handlers cannot process outbound webhook deliveries.")
+                self.env._("Inbound handlers cannot process outbound webhook deliveries.")
             )
         if self.execution_mode == "python":
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)
             if not callback:
                 raise ValidationError(
-                    _("Python callback %s.%s could not be found.")
-                    % (self.python_model_name, self.python_method_name)
+                    self.env._(
+                        "Python callback %(model)s.%(method)s could not be found.",
+                        model=self.python_model_name,
+                        method=self.python_method_name,
+                    )
                 )
             return callback(delivery)
         return delivery._execute_model_driven_handler(self, request_data=request_data)

@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 from .const import (
@@ -45,7 +45,7 @@ class WebhookHandlerOutboundAssignment(models.Model):
         for assignment in self:
             if assignment.source_kind != "literal" and not assignment.source_expression:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Outbound assignments require Source Key unless the source kind is Literal."
                     )
                 )

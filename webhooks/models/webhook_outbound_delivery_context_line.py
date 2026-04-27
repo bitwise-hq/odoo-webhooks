@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 from .const import OUTBOUND_CONTEXT_SOURCE_SELECTION
@@ -45,7 +45,7 @@ class WebhookOutboundDeliveryContextLine(models.Model):
         for line in self:
             if line.source_kind != "literal" and not line.source_expression:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Context lines require Source Key unless the source kind is Literal."
                     )
                 )

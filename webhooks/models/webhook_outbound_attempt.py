@@ -1,4 +1,4 @@
-from odoo import _, fields, models
+from odoo import fields, models
 
 from .const import HTTP_METHOD_SELECTION
 
@@ -15,7 +15,8 @@ class WebhookOutboundDeliveryAttempt(models.Model):
     )
 
     name = fields.Char(
-        required=True, default=lambda self: _("Outbound Delivery Attempt")
+        required=True,
+        default=lambda self: self.env._("Outbound Delivery Attempt"),
     )
     delivery_id = fields.Many2one(
         "webhook.outbound.delivery",
@@ -75,6 +76,6 @@ class WebhookOutboundDeliveryAttempt(models.Model):
     payload_json = fields.Text(required=True, string="Payload JSON")
     response_status_code = fields.Integer(index=True, string="Response Status")
     response_headers_json = fields.Text(string="Response Headers")
-    response_body = fields.Text(string="Response Body")
+    response_body = fields.Text()
     processing_note = fields.Text()
     processing_error = fields.Text()

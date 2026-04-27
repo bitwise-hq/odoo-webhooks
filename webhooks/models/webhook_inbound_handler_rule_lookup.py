@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 from .const import INBOUND_SOURCE_KIND_SELECTION
@@ -37,7 +37,7 @@ class WebhookHandlerInboundRuleLookup(models.Model):
         for lookup in self:
             if lookup.source_kind != "literal" and not lookup.source_expression:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Lookup rows require Source Key unless the source kind is Literal."
                     )
                 )

@@ -4,7 +4,7 @@ import traceback
 
 from psycopg2 import IntegrityError
 
-from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
 
@@ -23,7 +23,10 @@ class WebhookInboundEvent(models.Model):
         "The webhook delivery has already been stored for this endpoint.",
     )
 
-    name = fields.Char(required=True, default=lambda self: _("Inbound Webhook Event"))
+    name = fields.Char(
+        required=True,
+        default=lambda self: self.env._("Inbound Webhook Event"),
+    )
     endpoint_id = fields.Many2one(
         "webhook.endpoint",
         required=True,
@@ -160,7 +163,6 @@ class WebhookInboundEvent(models.Model):
     rejection_reason = fields.Text()
     queue_job_identity_key = fields.Char(
         compute="_compute_queue_job_identity_key",
-        string="Queue Job Identity Key",
         help="Identity key used when enqueuing background processing for this event.",
     )
     queue_job_ids = fields.Many2many(
@@ -169,16 +171,14 @@ class WebhookInboundEvent(models.Model):
         string="Queue Jobs",
         help="Background queue jobs created to process this inbound event.",
     )
-    queue_job_count = fields.Integer(
-        compute="_compute_queue_job_observability", string="Queue Jobs"
-    )
+    queue_job_count = fields.Integer(compute="_compute_queue_job_observability")
     latest_queue_job_id = fields.Many2one(
         "queue.job",
         compute="_compute_queue_job_observability",
         string="Latest Queue Job",
     )
     latest_queue_job_state = fields.Char(
-        compute="_compute_queue_job_observability", string="Latest Queue Job State"
+        compute="_compute_queue_job_observability"
     )
 
     def _compute_queue_job_identity_key(self):
@@ -236,7 +236,7 @@ class WebhookInboundEvent(models.Model):
     def action_view_queue_jobs(self):
         self.ensure_one()
         action = self.env.ref("queue_job.action_queue_job").read()[0]
-        action["name"] = _("Inbound Queue Jobs")
+        action["name"] = self.env._("Inbound Queue Jobs")
         action["domain"] = self._get_queue_job_action_domain()
         return action
 
@@ -249,7 +249,7 @@ class WebhookInboundEvent(models.Model):
         except json.JSONDecodeError as err:
             if raise_on_invalid:
                 raise WebhookPayloadValidationError(
-                    _("The webhook payload must be valid JSON.")
+                    self.env._("The webhook payload must be valid JSON.")
                 ) from err
             return False
 
@@ -303,7 +303,7 @@ class WebhookInboundEvent(models.Model):
             "name": metadata.get("event_type")
             or metadata.get("topic")
             or endpoint.display_name
-            or _("Inbound Webhook Event"),
+            or self.env._("Inbound Webhook Event"),
             "endpoint_id": endpoint.id,
             "execution_user_id": self._get_runtime_execution_user_id(),
             "handler_id": handler.id if handler else False,
@@ -391,7 +391,7 @@ class WebhookInboundEvent(models.Model):
                 replay_identity_key = False
                 replay_identity_source = False
         values = {
-            "name": _("Rejected Webhook Request"),
+            "name": self.env._("Rejected Webhook Request"),
             "endpoint_id": endpoint.id if endpoint else False,
             "execution_user_id": self._get_runtime_execution_user_id(),
             "handler_id": False,
@@ -523,7 +523,7 @@ class WebhookInboundEvent(models.Model):
     def _queue_processing(self):
         if self.filtered(lambda event: event.state not in ("received", "error")):
             raise ValidationError(
-                _(
+                self.env._(
                     "Only received or failed webhook events can be queued for processing."
                 )
             )
@@ -545,7 +545,7 @@ class WebhookInboundEvent(models.Model):
         for event in self:
             if event.state not in ("error", "dead_letter"):
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "Only failed or dead-letter webhook events can be reset to received."
                     )
                 )
@@ -579,10 +579,10 @@ class WebhookInboundEvent(models.Model):
         if not matched_rule:
             return {
                 "status": "done",
-                "note": _(
-                    "No inbound model-driven rule matched on handler %s. The event was stored only."
-                )
-                % handler.display_name,
+                "note": self.env._(
+                    "No inbound model-driven rule matched on handler %(handler)s. The event was stored only.",
+                    handler=handler.display_name,
+                ),
             }
 
         execution = self.env["webhook.inbound.rule.execution"].create(
@@ -636,8 +636,10 @@ class WebhookInboundEvent(models.Model):
                 elif matched_rule.action_type == "update_record":
                     if not target_record:
                         raise ValidationError(
-                            _("No target record matched inbound update rule %s.")
-                            % matched_rule.display_name
+                            self.env._(
+                                "No target record matched inbound update rule %(rule)s.",
+                                rule=matched_rule.display_name,
+                            )
                         )
                     target_record.write(values)
                 elif target_record:
@@ -694,10 +696,10 @@ class WebhookInboundEvent(models.Model):
             execution.write({"state": "skipped"})
             return {
                 "status": "done",
-                "note": _(
-                    "Inbound rule %s is defined but its action is not executable yet."
-                )
-                % matched_rule.display_name,
+                "note": self.env._(
+                    "Inbound rule %(rule)s is defined but its action is not executable yet.",
+                    rule=matched_rule.display_name,
+                ),
                 "matched_rule_id": matched_rule.id,
             }
         except Exception:
@@ -746,7 +748,10 @@ class WebhookInboundEvent(models.Model):
         if condition.operator == "contains":
             return expected_text in actual_text
         raise ValidationError(
-            _("Unsupported inbound rule condition operator %s.") % condition.operator
+            self.env._(
+                "Unsupported inbound rule condition operator %(operator)s.",
+                operator=condition.operator,
+            )
         )
 
     def _build_inbound_lookup_domain(self, rule):
@@ -783,7 +788,7 @@ class WebhookInboundEvent(models.Model):
                     {
                         "state": "done",
                         "processed_at": fields.Datetime.now(),
-                        "processing_note": _(
+                        "processing_note": self.env._(
                             "No handler was resolved. The event was stored only."
                         ),
                         "processing_error": False,
@@ -806,7 +811,7 @@ class WebhookInboundEvent(models.Model):
                             }
                         )
                         raise RetryableJobError(
-                            note or _("Retry requested by handler."),
+                            note or self.env._("Retry requested by handler."),
                             seconds=result.get("seconds"),
                         )
                     if status == "dead_letter":
