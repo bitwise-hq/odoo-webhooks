@@ -136,7 +136,6 @@ class WebhookOutboundDelivery(models.Model):
                 messages.append(_('This delivery was created as a replay of %s. The request snapshot, templates, and template context were copied from that delivery.') % delivery.replayed_from_delivery_id.display_name)
             delivery.template_guidance = '\n'.join(messages)
 
-    @api.depends('id')
     def _compute_queue_job_identity_key(self):
         for delivery in self:
             delivery.queue_job_identity_key = delivery._get_queue_job_identity_key() if delivery.id else False

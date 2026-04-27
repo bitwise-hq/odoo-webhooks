@@ -153,7 +153,6 @@ class WebhookInboundEvent(models.Model):
             else:
                 event.operator_action_hint = False
 
-    @api.depends('id')
     def _compute_queue_job_identity_key(self):
         for event in self:
             event.queue_job_identity_key = event._get_queue_job_identity_key() if event.id else False
