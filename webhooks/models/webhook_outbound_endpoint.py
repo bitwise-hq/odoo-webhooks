@@ -84,6 +84,18 @@ class WebhookOutboundEndpoint(models.Model):
         string='Static Headers',
         help='JSON object of HTTP headers applied to every outbound delivery created from this endpoint.',
     )
+    request_headers_template_json = fields.Text(
+        required=True,
+        default='{}',
+        string='Header Template',
+        help='Optional JSON object template merged into the request headers for each outbound delivery. String values may reference delivery, endpoint, company, partner, or custom template context keys.',
+    )
+    payload_template_json = fields.Text(
+        required=True,
+        default='{}',
+        string='Payload Template',
+        help='Optional JSON template rendered into the outbound payload for each delivery. String values may reference delivery, endpoint, company, partner, or custom template context keys.',
+    )
     note = fields.Text()
     outbound_delivery_ids = fields.One2many('webhook.outbound.delivery', 'endpoint_id', string='Outbound Deliveries')
     outbound_delivery_count = fields.Integer(compute='_compute_related_counts')
@@ -124,6 +136,8 @@ class WebhookOutboundEndpoint(models.Model):
         'target_url',
         'timeout_seconds',
         'static_headers_json',
+        'request_headers_template_json',
+        'payload_template_json',
     )
     def _compute_admin_guidance(self):
         for endpoint in self:
@@ -158,6 +172,14 @@ class WebhookOutboundEndpoint(models.Model):
                 endpoint._get_static_headers_dict()
             except WebhookProcessingConfigurationError as err:
                 messages.append(str(err))
+            try:
+                endpoint._get_headers_template_dict()
+            except WebhookProcessingConfigurationError as err:
+                messages.append(str(err))
+            try:
+                endpoint._get_payload_template_value()
+            except WebhookProcessingConfigurationError as err:
+                messages.append(str(err))
 
             endpoint.configuration_warning = '\n'.join(messages) or False
 
@@ -176,7 +198,7 @@ class WebhookOutboundEndpoint(models.Model):
             if endpoint.company_id and endpoint.company_id not in user.company_ids:
                 raise WebhookProcessingConfigurationError(_('Execution user must have access to the outbound endpoint company.'))
 
-    @api.constrains('target_url', 'timeout_seconds', 'static_headers_json')
+    @api.constrains('target_url', 'timeout_seconds', 'static_headers_json', 'request_headers_template_json', 'payload_template_json')
     def _check_outbound_configuration(self):
         for endpoint in self:
             if not endpoint.target_url or not str(endpoint.target_url).strip():
@@ -184,6 +206,8 @@ class WebhookOutboundEndpoint(models.Model):
             if endpoint.timeout_seconds <= 0:
                 raise WebhookProcessingConfigurationError(_('Outbound endpoint timeout must be greater than zero seconds.'))
             endpoint._get_static_headers_dict()
+            endpoint._get_headers_template_dict()
+            endpoint._get_payload_template_value()
 
     def _get_scoped_partner(self):
         self.ensure_one()
@@ -198,6 +222,23 @@ class WebhookOutboundEndpoint(models.Model):
         if not isinstance(headers, dict):
             raise WebhookProcessingConfigurationError(_('Static Headers must be a JSON object.'))
         return {str(key): str(value) for key, value in headers.items()}
+
+    def _get_headers_template_dict(self):
+        self.ensure_one()
+        try:
+            headers = json.loads(self.request_headers_template_json or '{}')
+        except json.JSONDecodeError as err:
+            raise WebhookProcessingConfigurationError(_('Header Template must be valid JSON.')) from err
+        if not isinstance(headers, dict):
+            raise WebhookProcessingConfigurationError(_('Header Template must be a JSON object.'))
+        return headers
+
+    def _get_payload_template_value(self):
+        self.ensure_one()
+        try:
+            return json.loads(self.payload_template_json or '{}')
+        except json.JSONDecodeError as err:
+            raise WebhookProcessingConfigurationError(_('Payload Template must be valid JSON.')) from err
 
     def action_view_outbound_deliveries(self):
         self.ensure_one()

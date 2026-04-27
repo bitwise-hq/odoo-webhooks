@@ -73,7 +73,13 @@
                         </group>
                     </group>
                     <group string="Request Defaults">
-                        <field name="static_headers_json" widget="text" nolabel="1"/>
+                        <group>
+                            <field name="static_headers_json" widget="text"/>
+                        </group>
+                        <group>
+                            <field name="request_headers_template_json" widget="text"/>
+                            <field name="payload_template_json" widget="text"/>
+                        </group>
                     </group>
                     <group string="Configuration Guidance" invisible="not configuration_warning">
                         <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>

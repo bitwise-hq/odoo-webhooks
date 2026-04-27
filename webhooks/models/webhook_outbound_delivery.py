@@ -1,4 +1,6 @@
 import json
+import re
+from types import SimpleNamespace
 
 import requests
 
@@ -14,6 +16,7 @@ class WebhookOutboundDelivery(models.Model):
     _description = 'Outbound Webhook Delivery'
     _order = 'create_date desc, id desc'
     _check_company_auto = True
+    _PLACEHOLDER_ONLY_PATTERN = re.compile(r'^\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*|\[\d+\])*)\}$')
 
     _HTTP_METHOD_SELECTION = [
         ('post', 'POST'),
@@ -60,12 +63,17 @@ class WebhookOutboundDelivery(models.Model):
     target_url = fields.Char(required=True, string='Target URL')
     timeout_seconds = fields.Integer(required=True, default=30)
     request_headers_json = fields.Text(required=True, default='{}', string='Request Headers')
+    request_headers_template_json = fields.Text(required=True, default='{}', string='Header Template')
     payload_json = fields.Text(required=True, default='{}', string='Payload JSON')
+    payload_template_json = fields.Text(required=True, default='{}', string='Payload Template')
+    template_context_json = fields.Text(required=True, default='{}', string='Template Context')
     response_status_code = fields.Integer(index=True, string='Response Status')
     response_headers_json = fields.Text(string='Response Headers')
     response_body = fields.Text(string='Response Body')
     processing_note = fields.Text()
     processing_error = fields.Text()
+    attempt_ids = fields.One2many('webhook.outbound.delivery.attempt', 'delivery_id', string='Attempts')
+    attempt_count = fields.Integer(compute='_compute_attempt_count')
     operator_action_hint = fields.Text(compute='_compute_operator_action_hint', string='Operator Guidance')
     queue_job_identity_key = fields.Char(
         compute='_compute_queue_job_identity_key',
@@ -91,6 +99,11 @@ class WebhookOutboundDelivery(models.Model):
             else:
                 delivery.operator_action_hint = False
 
+    @api.depends('attempt_ids')
+    def _compute_attempt_count(self):
+        for delivery in self:
+            delivery.attempt_count = len(delivery.attempt_ids)
+
     @api.depends('id')
     def _compute_queue_job_identity_key(self):
         for delivery in self:
@@ -101,22 +114,32 @@ class WebhookOutboundDelivery(models.Model):
         return f'webhook_outbound_delivery_process:{self.id}' if self.id else False
 
     @api.model
-    def _normalize_headers_json(self, value):
+    def _normalize_headers_json(self, value, *, label='Request Headers'):
         try:
             headers = json.loads(value or '{}')
         except json.JSONDecodeError as err:
-            raise ValidationError(_('Request Headers must be valid JSON.')) from err
+            raise ValidationError(_('%s must be valid JSON.') % label) from err
         if not isinstance(headers, dict):
-            raise ValidationError(_('Request Headers must be a JSON object.'))
+            raise ValidationError(_('%s must be a JSON object.') % label)
         return json.dumps({str(key): str(header_value) for key, header_value in headers.items()}, indent=2, sort_keys=True)
 
     @api.model
-    def _normalize_payload_json(self, value):
+    def _normalize_payload_json(self, value, *, label='Payload JSON'):
         try:
             payload = json.loads(value or '{}')
         except json.JSONDecodeError as err:
-            raise ValidationError(_('Payload JSON must be valid JSON.')) from err
+            raise ValidationError(_('%s must be valid JSON.') % label) from err
         return json.dumps(payload, indent=2, sort_keys=True)
+
+    @api.model
+    def _normalize_template_context_json(self, value):
+        try:
+            context = json.loads(value or '{}')
+        except json.JSONDecodeError as err:
+            raise ValidationError(_('Template Context must be valid JSON.')) from err
+        if not isinstance(context, dict):
+            raise ValidationError(_('Template Context must be a JSON object.'))
+        return json.dumps(context, indent=2, sort_keys=True)
 
     @api.model
     def _prepare_endpoint_snapshot_vals(self, endpoint, vals):
@@ -129,7 +152,10 @@ class WebhookOutboundDelivery(models.Model):
         prepared_vals.setdefault('target_url', endpoint.target_url)
         prepared_vals.setdefault('timeout_seconds', endpoint.timeout_seconds)
         prepared_vals.setdefault('request_headers_json', endpoint.static_headers_json or '{}')
+        prepared_vals.setdefault('request_headers_template_json', endpoint.request_headers_template_json or '{}')
         prepared_vals.setdefault('payload_json', '{}')
+        prepared_vals.setdefault('payload_template_json', endpoint.payload_template_json or '{}')
+        prepared_vals.setdefault('template_context_json', '{}')
         prepared_vals.setdefault('name', '%s / %s' % (endpoint.display_name, fields.Datetime.now()))
         return prepared_vals
 
@@ -143,7 +169,16 @@ class WebhookOutboundDelivery(models.Model):
                 endpoint = self.env['webhook.outbound.endpoint'].browse(endpoint_id)
                 prepared_vals = self._prepare_endpoint_snapshot_vals(endpoint, prepared_vals)
             prepared_vals['request_headers_json'] = self._normalize_headers_json(prepared_vals.get('request_headers_json'))
+            prepared_vals['request_headers_template_json'] = self._normalize_headers_json(
+                prepared_vals.get('request_headers_template_json'),
+                label='Header Template',
+            )
             prepared_vals['payload_json'] = self._normalize_payload_json(prepared_vals.get('payload_json'))
+            prepared_vals['payload_template_json'] = self._normalize_payload_json(
+                prepared_vals.get('payload_template_json'),
+                label='Payload Template',
+            )
+            prepared_vals['template_context_json'] = self._normalize_template_context_json(prepared_vals.get('template_context_json'))
             prepared_vals_list.append(prepared_vals)
         return super().create(prepared_vals_list)
 
@@ -151,8 +186,20 @@ class WebhookOutboundDelivery(models.Model):
         prepared_vals = dict(vals)
         if 'request_headers_json' in prepared_vals:
             prepared_vals['request_headers_json'] = self._normalize_headers_json(prepared_vals.get('request_headers_json'))
+        if 'request_headers_template_json' in prepared_vals:
+            prepared_vals['request_headers_template_json'] = self._normalize_headers_json(
+                prepared_vals.get('request_headers_template_json'),
+                label='Header Template',
+            )
         if 'payload_json' in prepared_vals:
             prepared_vals['payload_json'] = self._normalize_payload_json(prepared_vals.get('payload_json'))
+        if 'payload_template_json' in prepared_vals:
+            prepared_vals['payload_template_json'] = self._normalize_payload_json(
+                prepared_vals.get('payload_template_json'),
+                label='Payload Template',
+            )
+        if 'template_context_json' in prepared_vals:
+            prepared_vals['template_context_json'] = self._normalize_template_context_json(prepared_vals.get('template_context_json'))
         return super().write(prepared_vals)
 
     def _get_request_headers(self):
@@ -169,7 +216,174 @@ class WebhookOutboundDelivery(models.Model):
         except json.JSONDecodeError as err:
             raise WebhookProcessingConfigurationError(_('Payload JSON must be valid JSON.')) from err
 
-    @api.constrains('target_url', 'timeout_seconds', 'request_headers_json', 'payload_json')
+    def _get_request_headers_template(self):
+        self.ensure_one()
+        try:
+            headers = json.loads(self.request_headers_template_json or '{}')
+        except json.JSONDecodeError as err:
+            raise WebhookProcessingConfigurationError(_('Header Template must be valid JSON.')) from err
+        if not isinstance(headers, dict):
+            raise WebhookProcessingConfigurationError(_('Header Template must be a JSON object.'))
+        return headers
+
+    def _get_payload_template(self):
+        self.ensure_one()
+        try:
+            return json.loads(self.payload_template_json or '{}')
+        except json.JSONDecodeError as err:
+            raise WebhookProcessingConfigurationError(_('Payload Template must be valid JSON.')) from err
+
+    def _get_template_context(self):
+        self.ensure_one()
+        try:
+            custom_context = json.loads(self.template_context_json or '{}')
+        except json.JSONDecodeError as err:
+            raise WebhookProcessingConfigurationError(_('Template Context must be valid JSON.')) from err
+        if not isinstance(custom_context, dict):
+            raise WebhookProcessingConfigurationError(_('Template Context must be a JSON object.'))
+        scoped_partner = self.partner_id
+        return {
+            'delivery': {
+                'id': self.id,
+                'name': self.name,
+                'state': self.state,
+                'http_method': self.http_method,
+                'target_url': self.target_url,
+            },
+            'endpoint': {
+                'id': self.endpoint_id.id,
+                'name': self.endpoint_id.name,
+                'code': self.endpoint_id.code,
+                'target_url': self.endpoint_id.target_url,
+            },
+            'company': {
+                'id': self.company_id.id,
+                'name': self.company_id.display_name,
+            },
+            'partner': {
+                'id': scoped_partner.id if scoped_partner else False,
+                'name': scoped_partner.display_name if scoped_partner else False,
+            },
+            'now': fields.Datetime.to_string(fields.Datetime.now()),
+            **custom_context,
+        }
+
+    def _wrap_template_context_value(self, value):
+        if isinstance(value, dict):
+            return SimpleNamespace(**{key: self._wrap_template_context_value(item) for key, item in value.items()})
+        if isinstance(value, list):
+            return [self._wrap_template_context_value(item) for item in value]
+        return value
+
+    def _resolve_template_expression(self, expression, context):
+        current = context
+        index = 0
+        while index < len(expression):
+            char = expression[index]
+            if char == '.':
+                index += 1
+                continue
+            if char == '[':
+                end_index = expression.find(']', index)
+                if end_index == -1:
+                    raise WebhookProcessingConfigurationError(_('Invalid template expression %s.') % expression)
+                current = current[int(expression[index + 1:end_index])]
+                index = end_index + 1
+                continue
+            start_index = index
+            while index < len(expression) and expression[index] not in '.[':
+                index += 1
+            token = expression[start_index:index]
+            if isinstance(current, dict):
+                current = current[token]
+            else:
+                current = getattr(current, token)
+        return current
+
+    def _render_template_string(self, value, context, wrapped_context):
+        placeholder_match = self._PLACEHOLDER_ONLY_PATTERN.match(value)
+        if placeholder_match:
+            try:
+                return self._resolve_template_expression(placeholder_match.group(1), context)
+            except (AttributeError, IndexError, KeyError, TypeError, ValueError) as err:
+                raise WebhookProcessingConfigurationError(_('Could not render template value %s.') % value) from err
+        try:
+            return value.format_map(wrapped_context)
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError) as err:
+            raise WebhookProcessingConfigurationError(_('Could not render template value %s.') % value) from err
+
+    def _render_template_value(self, value, context, wrapped_context):
+        if isinstance(value, dict):
+            return {
+                str(key): self._render_template_value(item, context, wrapped_context)
+                for key, item in value.items()
+            }
+        if isinstance(value, list):
+            return [self._render_template_value(item, context, wrapped_context) for item in value]
+        if isinstance(value, str):
+            return self._render_template_string(value, context, wrapped_context)
+        return value
+
+    def _has_template_content(self, value):
+        return (value or '').strip() not in ('', '{}')
+
+    def _build_request_data(self):
+        self.ensure_one()
+        headers = dict(self._get_request_headers())
+        payload = self._get_payload()
+        context = self._get_template_context()
+        wrapped_context = {
+            key: self._wrap_template_context_value(item)
+            for key, item in context.items()
+        }
+        if self._has_template_content(self.request_headers_template_json):
+            rendered_headers = self._render_template_value(self._get_request_headers_template(), context, wrapped_context)
+            if not isinstance(rendered_headers, dict):
+                raise WebhookProcessingConfigurationError(_('Header Template must render to a JSON object.'))
+            headers.update({str(key): str(value) for key, value in rendered_headers.items()})
+        if self._has_template_content(self.payload_template_json):
+            payload = self._render_template_value(self._get_payload_template(), context, wrapped_context)
+        return {
+            'target_url': self.target_url,
+            'http_method': self.http_method,
+            'headers': headers,
+            'payload': payload,
+        }
+
+    def _serialize_headers(self, headers):
+        return json.dumps({str(key): str(value) for key, value in headers.items()}, indent=2, sort_keys=True)
+
+    def _serialize_payload(self, payload):
+        return json.dumps(payload, indent=2, sort_keys=True)
+
+    def _get_next_attempt_number(self):
+        self.ensure_one()
+        return self.env['webhook.outbound.delivery.attempt'].search_count([
+            ('delivery_id', '=', self.id),
+        ]) + 1
+
+    def _create_attempt(self, request_data, *, state='processing', note=False, error=False, response_status_code=False, response_headers=None, response_body=False):
+        self.ensure_one()
+        values = {
+            'name': '%s / Attempt %s' % (self.display_name, self._get_next_attempt_number()),
+            'delivery_id': self.id,
+            'attempt_number': self._get_next_attempt_number(),
+            'state': state,
+            'http_method': request_data['http_method'],
+            'target_url': request_data['target_url'],
+            'request_headers_json': self._serialize_headers(request_data['headers']),
+            'payload_json': self._serialize_payload(request_data['payload']),
+            'processing_note': note or False,
+            'processing_error': error or False,
+            'response_status_code': response_status_code or False,
+            'response_headers_json': self._serialize_headers(response_headers or {}) if response_headers else False,
+            'response_body': response_body or False,
+        }
+        if state != 'processing':
+            values['finished_at'] = fields.Datetime.now()
+        return self.env['webhook.outbound.delivery.attempt'].create(values)
+
+    @api.constrains('target_url', 'timeout_seconds', 'request_headers_json', 'request_headers_template_json', 'payload_json', 'payload_template_json', 'template_context_json')
     def _check_delivery_configuration(self):
         for delivery in self:
             if not delivery.target_url or not str(delivery.target_url).strip():
@@ -178,6 +392,9 @@ class WebhookOutboundDelivery(models.Model):
                 raise ValidationError(_('Outbound delivery timeout must be greater than zero seconds.'))
             delivery._get_request_headers()
             delivery._get_payload()
+            delivery._get_request_headers_template()
+            delivery._get_payload_template()
+            delivery._get_template_context()
 
     def _queue_processing(self):
         for delivery in self:
@@ -247,12 +464,7 @@ class WebhookOutboundDelivery(models.Model):
             if delivery.state in ('done', 'dead_letter', 'canceled'):
                 continue
 
-            request_data = {
-                'target_url': delivery.target_url,
-                'http_method': delivery.http_method,
-                'headers': delivery._get_request_headers(),
-                'payload': delivery._get_payload(),
-            }
+            request_data = delivery._build_request_data()
             handler_note = False
             if delivery.handler_id:
                 result = delivery.handler_id.execute_outbound(delivery)
@@ -261,6 +473,7 @@ class WebhookOutboundDelivery(models.Model):
                     status = result.get('status', 'send')
                     handler_note = result.get('note') or result.get('message')
                     if status == 'cancel':
+                        delivery._create_attempt(request_data, state='canceled', note=handler_note)
                         delivery.write({
                             'state': 'canceled',
                             'processed_at': fields.Datetime.now(),
@@ -269,6 +482,7 @@ class WebhookOutboundDelivery(models.Model):
                         })
                         continue
                     if status == 'dead_letter':
+                        delivery._create_attempt(request_data, state='dead_letter', note=handler_note)
                         delivery.write({
                             'state': 'dead_letter',
                             'processed_at': fields.Datetime.now(),
@@ -277,6 +491,12 @@ class WebhookOutboundDelivery(models.Model):
                         })
                         continue
                     if status == 'retry':
+                        delivery._create_attempt(
+                            request_data,
+                            state='error',
+                            note=handler_note,
+                            error=handler_note or _('Retry requested by outbound handler.'),
+                        )
                         delivery.write({
                             'state': 'error',
                             'processing_note': handler_note or False,
@@ -284,6 +504,7 @@ class WebhookOutboundDelivery(models.Model):
                         })
                         raise RetryableJobError(handler_note or _('Retry requested by outbound handler.'), seconds=result.get('seconds'))
                 elif result is False:
+                    delivery._create_attempt(request_data, state='canceled')
                     delivery.write({
                         'state': 'canceled',
                         'processed_at': fields.Datetime.now(),
@@ -292,6 +513,7 @@ class WebhookOutboundDelivery(models.Model):
                     })
                     continue
 
+            attempt = delivery._create_attempt(request_data)
             try:
                 delivery.write({'state': 'processing', 'processing_error': False})
                 response = requests.request(
@@ -302,6 +524,12 @@ class WebhookOutboundDelivery(models.Model):
                     timeout=delivery.timeout_seconds,
                 )
             except requests.RequestException as err:
+                attempt.write({
+                    'state': 'error',
+                    'finished_at': fields.Datetime.now(),
+                    'processing_note': handler_note or False,
+                    'processing_error': str(err),
+                })
                 delivery.write({
                     'state': 'error',
                     'processing_note': handler_note or False,
@@ -317,6 +545,15 @@ class WebhookOutboundDelivery(models.Model):
                 'processing_note': handler_note or False,
             }
             if 200 <= response.status_code < 400:
+                attempt.write({
+                    'state': 'done',
+                    'finished_at': fields.Datetime.now(),
+                    'processing_note': handler_note or False,
+                    'processing_error': False,
+                    'response_status_code': response.status_code,
+                    'response_headers_json': delivery._serialize_headers(dict(response.headers.items())),
+                    'response_body': response.text,
+                })
                 delivery.write({
                     **common_values,
                     'state': 'done',
@@ -326,6 +563,15 @@ class WebhookOutboundDelivery(models.Model):
 
             error_message = _('Remote endpoint returned HTTP %s.') % response.status_code
             if 400 <= response.status_code < 500:
+                attempt.write({
+                    'state': 'dead_letter',
+                    'finished_at': fields.Datetime.now(),
+                    'processing_note': handler_note or False,
+                    'processing_error': error_message,
+                    'response_status_code': response.status_code,
+                    'response_headers_json': delivery._serialize_headers(dict(response.headers.items())),
+                    'response_body': response.text,
+                })
                 delivery.write({
                     **common_values,
                     'state': 'dead_letter',
@@ -333,6 +579,15 @@ class WebhookOutboundDelivery(models.Model):
                 })
                 continue
 
+            attempt.write({
+                'state': 'error',
+                'finished_at': fields.Datetime.now(),
+                'processing_note': handler_note or False,
+                'processing_error': error_message,
+                'response_status_code': response.status_code,
+                'response_headers_json': delivery._serialize_headers(dict(response.headers.items())),
+                'response_body': response.text,
+            })
             delivery.write({
                 **common_values,
                 'state': 'error',

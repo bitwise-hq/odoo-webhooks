@@ -48,6 +48,26 @@
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
         </record>
 
+        <record id="webhook_outbound_delivery_attempt_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Outbound Delivery Attempt operator partner scope</field>
+            <field name="model_id" ref="model_webhook_outbound_delivery_attempt"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_outbound_delivery_attempt_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Outbound Delivery Attempt admin partner override</field>
+            <field name="model_id" ref="model_webhook_outbound_delivery_attempt"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="webhook_outbound_delivery_attempt_company_rule" model="ir.rule">
+            <field name="name">Webhook Outbound Delivery Attempt multi-company</field>
+            <field name="model_id" ref="model_webhook_outbound_delivery_attempt"/>
+            <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+        </record>
+
         <record id="webhook_endpoint_operator_partner_rule" model="ir.rule">
             <field name="name">Webhook Endpoint operator partner scope</field>
             <field name="model_id" ref="model_webhook_endpoint"/>

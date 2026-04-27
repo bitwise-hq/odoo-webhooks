@@ -31,6 +31,7 @@
                 <field name="endpoint_id"/>
                 <field name="company_id"/>
                 <field name="partner_id"/>
+                <field name="attempt_count"/>
                 <field name="state"/>
                 <field name="response_status_code"/>
                 <field name="queued_at"/>
@@ -73,11 +74,22 @@
                     </group>
                     <notebook>
                         <page string="Request">
-                            <group string="Headers">
-                                <field name="request_headers_json" widget="text" nolabel="1"/>
+                            <group string="Base Request">
+                                <group>
+                                    <field name="request_headers_json" widget="text"/>
+                                </group>
+                                <group>
+                                    <field name="payload_json" widget="text"/>
+                                </group>
                             </group>
-                            <group string="Payload">
-                                <field name="payload_json" widget="text" nolabel="1"/>
+                            <group string="Templates">
+                                <group>
+                                    <field name="request_headers_template_json" widget="text"/>
+                                </group>
+                                <group>
+                                    <field name="payload_template_json" widget="text"/>
+                                    <field name="template_context_json" widget="text"/>
+                                </group>
                             </group>
                         </page>
                         <page string="Response">
@@ -86,6 +98,20 @@
                                 <field name="response_headers_json" widget="text"/>
                                 <field name="response_body" widget="text"/>
                             </group>
+                        </page>
+                        <page string="Attempts">
+                            <field name="attempt_ids" readonly="1">
+                                <list>
+                                    <field name="attempt_number"/>
+                                    <field name="started_at"/>
+                                    <field name="finished_at"/>
+                                    <field name="state"/>
+                                    <field name="http_method"/>
+                                    <field name="target_url"/>
+                                    <field name="response_status_code"/>
+                                    <field name="processing_error"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Processing">
                             <group>
