@@ -141,22 +141,6 @@ class WebhookOutboundEndpoint(models.Model):
         return target_path
 
     @api.model
-    def _split_target_url(self, target_url):
-        target_url = str(target_url or '').strip()
-        if not target_url:
-            return False, '/'
-        parsed = urlsplit(target_url)
-        if not parsed.scheme or not parsed.netloc:
-            raise WebhookProcessingConfigurationError(_('Outbound endpoints require an absolute target URL.'))
-        if parsed.fragment:
-            raise WebhookProcessingConfigurationError(_('Outbound endpoint target URLs cannot include URL fragments.'))
-        target_hostname = f'{parsed.scheme}://{parsed.netloc}'
-        target_path = parsed.path or '/'
-        if parsed.query:
-            target_path = f'{target_path}?{parsed.query}'
-        return target_hostname, target_path
-
-    @api.model
     def _join_target_url(self, target_hostname, target_path):
         target_hostname = str(target_hostname or '').strip().rstrip('/')
         if not target_hostname:
@@ -164,13 +148,8 @@ class WebhookOutboundEndpoint(models.Model):
         return f'{target_hostname}{self._normalize_target_path(target_path)}'
 
     @api.model
-    def _normalize_target_url_vals(self, vals):
+    def _normalize_target_vals(self, vals):
         normalized_vals = dict(vals)
-        if 'target_url' in normalized_vals and 'target_hostname' not in normalized_vals and 'target_path' not in normalized_vals:
-            target_hostname, target_path = self._split_target_url(normalized_vals.get('target_url'))
-            normalized_vals['target_hostname'] = target_hostname
-            normalized_vals['target_path'] = target_path
-        normalized_vals.pop('target_url', None)
         if 'target_hostname' in normalized_vals and normalized_vals.get('target_hostname'):
             normalized_vals['target_hostname'] = str(normalized_vals['target_hostname']).strip().rstrip('/')
         if 'target_path' in normalized_vals:
@@ -219,11 +198,11 @@ class WebhookOutboundEndpoint(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        normalized_vals_list = [self._normalize_target_url_vals(vals) for vals in vals_list]
+        normalized_vals_list = [self._normalize_target_vals(vals) for vals in vals_list]
         return super().create(normalized_vals_list)
 
     def write(self, vals):
-        return super().write(self._normalize_target_url_vals(vals))
+        return super().write(self._normalize_target_vals(vals))
 
     def _get_scoped_partner(self):
         self.ensure_one()

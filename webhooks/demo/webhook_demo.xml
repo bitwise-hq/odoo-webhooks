@@ -246,8 +246,9 @@
             <field name="partner_id" ref="webhook_demo_partner_alpha"/>
             <field name="execution_user_id" ref="base.user_admin"/>
             <field name="http_method">post</field>
-            <field name="target_url">http://localhost:8069/webhooks/in/demo-orders</field>
-            <field name="note">Demo loopback outbound endpoint for smoke tests. Update the target URL if your local Odoo server is not running on http://localhost:8069.</field>
+            <field name="target_hostname">http://localhost:8069</field>
+            <field name="target_path">/webhooks/in/demo-orders</field>
+            <field name="note">Demo loopback outbound endpoint for smoke tests. Update the target hostname and path if your local Odoo server is not running on http://localhost:8069.</field>
         </record>
 
         <record id="webhook_demo_outbound_header_rule_source" model="webhook.outbound.endpoint.header.rule">

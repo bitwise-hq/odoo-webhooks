@@ -121,10 +121,10 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
         self.assertTrue(updated_request_data['payload']['meta']['retry'])
 
     def test_delivery_uses_current_endpoint_target_url(self):
-        endpoint = self._create_outbound_endpoint(target_url='https://example.com/original')
+        endpoint = self._create_outbound_endpoint(target_hostname='https://example.com', target_path='/original')
         delivery = self._create_outbound_delivery(endpoint)
 
-        endpoint.write({'target_url': 'https://override.example.com/hooks/orders'})
+        endpoint.write({'target_hostname': 'https://override.example.com', 'target_path': '/hooks/orders'})
         request_data = delivery._build_request_data()
 
         self.assertEqual(endpoint.target_hostname, 'https://override.example.com')
@@ -169,3 +169,10 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
 
         with self.assertRaisesRegex(ValidationError, 'cannot process outbound'):
             handler.execute_outbound(delivery)
+
+    def test_draft_outbound_endpoint_cannot_queue_delivery(self):
+        endpoint = self._create_outbound_endpoint(state='draft')
+        delivery = self._create_outbound_delivery(endpoint)
+
+        with self.assertRaisesRegex(ValidationError, 'Draft outbound endpoint'):
+            delivery._queue_processing()

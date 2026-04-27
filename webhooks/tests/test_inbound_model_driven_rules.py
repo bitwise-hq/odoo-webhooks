@@ -124,3 +124,19 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
 
         with self.assertRaisesRegex(ValidationError, 'cannot process inbound'):
             handler.execute_inbound(event)
+
+    def test_find_active_endpoint_by_path_ignores_draft_records(self):
+        active_endpoint = self._create_inbound_endpoint(code='lookup-active')
+        self._create_inbound_endpoint(code='lookup-draft', state='draft')
+
+        found_endpoint = self.env['webhook.endpoint']._find_active_endpoint_by_path('lookup-active')
+        missing_endpoint = self.env['webhook.endpoint']._find_active_endpoint_by_path('lookup-draft')
+
+        self.assertEqual(found_endpoint, active_endpoint)
+        self.assertFalse(missing_endpoint)
+
+    def test_draft_inbound_endpoint_rejects_deliveries(self):
+        endpoint = self._create_inbound_endpoint(state='draft')
+
+        with self.assertRaisesRegex(ValidationError, 'draft'):
+            endpoint._validate_inbound_request(b'{}', {}, {}, {})

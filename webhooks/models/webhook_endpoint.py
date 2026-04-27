@@ -357,8 +357,8 @@ class WebhookEndpoint(models.Model):
         return action
 
     @api.model
-    def _find_active_endpoint_by_code(self, code):
-        return self.search([('code', '=', code), ('state', '=', 'active')], limit=1)
+    def _find_active_endpoint_by_path(self, path):
+        return self.search([('code', '=', path), ('state', '=', 'active')], limit=1)
 
     def _normalize_headers(self, headers):
         normalized = {}

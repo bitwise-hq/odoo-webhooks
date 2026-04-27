@@ -65,7 +65,8 @@ class WebhookRuleTestCase(TransactionCase):
             'execution_user_id': values.pop('execution_user_id', self.execution_user.id),
             'handler_id': values.pop('handler_id', handler.id if handler else False),
             'http_method': values.pop('http_method', 'post'),
-            'target_url': values.pop('target_url', f'https://example.com/{token}'),
+            'target_hostname': values.pop('target_hostname', 'https://example.com'),
+            'target_path': values.pop('target_path', f'/{token}'),
             'timeout_seconds': values.pop('timeout_seconds', 30),
         }
         create_vals.update(values)

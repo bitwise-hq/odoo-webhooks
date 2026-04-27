@@ -12,13 +12,13 @@ _logger = logging.getLogger(__name__)
 
 
 class WebhookController(Controller):
-    @route('/webhooks/in/<string:endpoint_code>', type='http', auth='public', methods=['POST'], csrf=False, save_session=False)
-    def inbound_webhook(self, endpoint_code, **kwargs):
+    @route('/webhooks/in/<string:endpoint_path>', type='http', auth='public', methods=['POST'], csrf=False, save_session=False)
+    def inbound_webhook(self, endpoint_path, **kwargs):
         body = request.httprequest.get_data(cache=True) or b''
         headers = request.httprequest.headers
         automated_context = dict(request.env.context, webhook_automated_execution=True)
         lookup_env = request.env(user=SUPERUSER_ID, context=automated_context)
-        endpoint = lookup_env['webhook.endpoint']._find_active_endpoint_by_code(endpoint_code)
+        endpoint = lookup_env['webhook.endpoint']._find_active_endpoint_by_path(endpoint_path)
         if not endpoint:
             raise NotFound()
 
