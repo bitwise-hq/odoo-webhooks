@@ -16,12 +16,13 @@ class WebhookController(Controller):
     def inbound_webhook(self, endpoint_code, **kwargs):
         body = request.httprequest.get_data(cache=True) or b''
         headers = request.httprequest.headers
-        lookup_env = request.env(user=SUPERUSER_ID).with_context(webhook_automated_execution=True)
+        automated_context = dict(request.env.context, webhook_automated_execution=True)
+        lookup_env = request.env(user=SUPERUSER_ID, context=automated_context)
         endpoint = lookup_env['webhook.endpoint']._find_active_endpoint_by_code(endpoint_code)
         if not endpoint:
             raise NotFound()
 
-        execution_env = request.env(user=SUPERUSER_ID).with_context(webhook_automated_execution=True)
+        execution_env = request.env(user=SUPERUSER_ID, context=automated_context)
         endpoint_execution = execution_env['webhook.endpoint'].browse(endpoint.id)
 
         try:
