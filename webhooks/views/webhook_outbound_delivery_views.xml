@@ -69,6 +69,7 @@
                             <field name="replayed_from_delivery_id"/>
                             <field name="execution_user_id"/>
                             <field name="handler_id"/>
+                            <field name="matched_outbound_rule_id" readonly="1"/>
                         </group>
                         <group>
                             <field name="http_method"/>
@@ -89,15 +90,18 @@
                                     <field name="payload_json" widget="text"/>
                                 </group>
                             </group>
-                            <group string="Templates">
-                                <group>
-                                    <field name="request_headers_template_json" widget="text"/>
-                                </group>
-                                <group>
-                                    <field name="payload_template_json" widget="text"/>
-                                    <field name="template_context_json" widget="text"/>
-                                </group>
-                            </group>
+                        </page>
+                        <page string="Context Lines">
+                            <field name="context_line_ids" nolabel="1" context="{'default_delivery_id': id}">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="active"/>
+                                    <field name="key_name"/>
+                                    <field name="source_kind"/>
+                                    <field name="source_expression"/>
+                                    <field name="literal_value"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Response">
                             <group>
@@ -133,6 +137,7 @@
                         </page>
                         <page string="Processing">
                             <group>
+                                <field name="matched_outbound_rule_id" readonly="1"/>
                                 <field name="processing_note" readonly="1"/>
                                 <field name="processing_error" readonly="1"/>
                                 <field name="queue_job_identity_key" readonly="1"/>

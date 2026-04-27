@@ -72,15 +72,6 @@
                             <field name="execution_user_id"/>
                         </group>
                     </group>
-                    <group string="Request Defaults">
-                        <group>
-                            <field name="static_headers_json" widget="text"/>
-                        </group>
-                        <group>
-                            <field name="request_headers_template_json" widget="text"/>
-                            <field name="payload_template_json" widget="text"/>
-                        </group>
-                    </group>
                     <group string="Template Guidance">
                         <field name="template_guidance" nolabel="1" widget="text" readonly="1"/>
                     </group>
@@ -91,6 +82,32 @@
                         <field name="note"/>
                     </group>
                     <notebook>
+                        <page string="Request Assembly">
+                            <group string="Header Rules">
+                                <field name="header_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
+                                    <list editable="bottom">
+                                        <field name="sequence"/>
+                                        <field name="active"/>
+                                        <field name="header_name"/>
+                                        <field name="source_kind"/>
+                                        <field name="source_expression"/>
+                                        <field name="literal_value"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Payload Rules">
+                                <field name="payload_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
+                                    <list editable="bottom">
+                                        <field name="sequence"/>
+                                        <field name="active"/>
+                                        <field name="target_path"/>
+                                        <field name="source_kind"/>
+                                        <field name="source_expression"/>
+                                        <field name="literal_value"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
                         <page string="Deliveries">
                             <field name="outbound_delivery_ids" readonly="1">
                                 <list>

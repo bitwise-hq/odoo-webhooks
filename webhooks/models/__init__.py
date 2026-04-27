@@ -1,4 +1,6 @@
 from . import res_users
+from . import webhook_inbound_rule
+from . import webhook_outbound_rule
 from . import webhook_handler
 from . import webhook_outbound_endpoint
 from . import webhook_outbound_delivery

@@ -71,6 +71,7 @@
                             <field name="partner_id" placeholder="Inherited from endpoint when set"/>
                             <field name="execution_user_id"/>
                             <field name="handler_id"/>
+                            <field name="matched_inbound_rule_id" readonly="1"/>
                             <field name="received_at"/>
                             <field name="processed_at"/>
                         </group>
@@ -119,6 +120,7 @@
                         </page>
                         <page string="Processing">
                             <group string="Outcome">
+                                <field name="matched_inbound_rule_id" readonly="1"/>
                                 <field name="processing_note" readonly="1"/>
                                 <field name="queue_job_identity_key" readonly="1"/>
                             </group>
@@ -127,6 +129,18 @@
                                 <field name="rejection_category" invisible="state != 'rejected'"/>
                                 <field name="rejection_reason" invisible="state != 'rejected'"/>
                             </group>
+                        </page>
+                        <page string="Rule Executions">
+                            <field name="rule_execution_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="create_date" string="Executed"/>
+                                    <field name="rule_id"/>
+                                    <field name="state"/>
+                                    <field name="record_reference"/>
+                                    <field name="note"/>
+                                    <field name="error"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>

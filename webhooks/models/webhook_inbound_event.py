@@ -119,6 +119,8 @@ class WebhookInboundEvent(models.Model):
     payload_json = fields.Text(required=True)
     processing_note = fields.Text()
     processing_error = fields.Text()
+    matched_inbound_rule_id = fields.Many2one('webhook.handler.inbound.rule', string='Matched Rule', ondelete='set null', index=True)
+    rule_execution_ids = fields.One2many('webhook.inbound.rule.execution', 'event_id', string='Rule Executions')
     rejection_category = fields.Char(index=True)
     rejection_reason = fields.Text()
     operator_action_hint = fields.Text(
@@ -421,15 +423,165 @@ class WebhookInboundEvent(models.Model):
                 'processing_error': False,
                 'processing_note': False,
                 'processed_at': False,
+                'matched_inbound_rule_id': False,
             })
         return True
 
     def _execute_low_code_handler(self, handler):
         self.ensure_one()
-        self.write({
-            'processing_note': _('Low-code handler %s is configured but action execution is not implemented yet.') % handler.display_name,
+        rules = handler.inbound_rule_ids.filtered('active').sorted(key=lambda record: (record.sequence, record.id))
+        matched_rule = False
+        for rule in rules:
+            if all(self._inbound_condition_matches(condition) for condition in rule.condition_ids.sorted(key=lambda record: (record.sequence, record.id))):
+                matched_rule = rule
+                break
+
+        if not matched_rule:
+            return {
+                'status': 'done',
+                'note': _('No inbound low-code rule matched on handler %s. The event was stored only.') % handler.display_name,
+            }
+
+        execution = self.env['webhook.inbound.rule.execution'].create({
+            'name': '%s / %s' % (self.display_name, matched_rule.display_name),
+            'event_id': self.id,
+            'rule_id': matched_rule.id,
+            'state': 'matched',
+            'note': matched_rule.note or False,
         })
-        return {'status': 'done'}
+
+        try:
+            if matched_rule.action_type == 'done':
+                execution.write({'state': 'done'})
+                return {
+                    'status': 'done',
+                    'note': matched_rule.note or False,
+                    'matched_rule_id': matched_rule.id,
+                }
+            if matched_rule.action_type == 'dead_letter':
+                execution.write({'state': 'done'})
+                return {
+                    'status': 'dead_letter',
+                    'note': matched_rule.note or False,
+                    'matched_rule_id': matched_rule.id,
+                }
+            if matched_rule.action_type == 'retry':
+                execution.write({'state': 'done'})
+                return {
+                    'status': 'retry',
+                    'note': matched_rule.note or False,
+                    'seconds': matched_rule.retry_seconds or False,
+                    'matched_rule_id': matched_rule.id,
+                }
+            if matched_rule.action_type in ('create_record', 'update_record', 'upsert_record'):
+                model = self.env[matched_rule.target_model_name]
+                values = self._build_inbound_assignment_values(matched_rule, target_kind='field')
+                target_record = False
+                if matched_rule.action_type in ('update_record', 'upsert_record'):
+                    domain = self._build_inbound_lookup_domain(matched_rule)
+                    target_record = model.search(domain, limit=1)
+                if matched_rule.action_type == 'create_record':
+                    target_record = model.create(values)
+                elif matched_rule.action_type == 'update_record':
+                    if not target_record:
+                        raise ValidationError(_('No target record matched inbound update rule %s.') % matched_rule.display_name)
+                    target_record.write(values)
+                elif target_record:
+                    target_record.write(values)
+                else:
+                    target_record = model.create(values)
+                record_reference = '%s:%s' % (target_record._name, target_record.id)
+                execution.write({
+                    'state': 'done',
+                    'record_reference': record_reference,
+                })
+                return {
+                    'status': 'done',
+                    'note': matched_rule.note or record_reference,
+                    'matched_rule_id': matched_rule.id,
+                }
+            if matched_rule.action_type == 'queue_outbound':
+                endpoint = matched_rule.outbound_endpoint_id
+                delivery = self.env['webhook.outbound.delivery'].create({
+                    'name': '%s / %s' % (endpoint.display_name, self.display_name),
+                    'endpoint_id': endpoint.id,
+                })
+                context_values = self._build_inbound_assignment_values(matched_rule, target_kind='context_key')
+                for key_name, value in context_values.items():
+                    self.env['webhook.outbound.delivery.context.line'].create({
+                        'delivery_id': delivery.id,
+                        'key_name': key_name,
+                        'source_kind': 'literal',
+                        'literal_value': '' if value is False or value is None else str(value),
+                    })
+                delivery.action_queue_delivery()
+                record_reference = '%s:%s' % (delivery._name, delivery.id)
+                execution.write({
+                    'state': 'done',
+                    'record_reference': record_reference,
+                })
+                return {
+                    'status': 'done',
+                    'note': matched_rule.note or record_reference,
+                    'matched_rule_id': matched_rule.id,
+                }
+            execution.write({'state': 'skipped'})
+            return {
+                'status': 'done',
+                'note': _('Inbound rule %s is defined but its action is not executable yet.') % matched_rule.display_name,
+                'matched_rule_id': matched_rule.id,
+            }
+        except Exception:
+            execution.write({
+                'state': 'error',
+                'error': traceback.format_exc(),
+            })
+            raise
+
+    def _resolve_inbound_source_value(self, source_kind, source_expression=False, literal_value=False):
+        self.ensure_one()
+        if source_kind == 'literal':
+            return literal_value
+        if source_kind == 'resolved_value':
+            return self.get_resolved_value(source_expression)
+        if source_kind in ('semantic_field', 'event_field'):
+            return getattr(self, source_expression)
+        return False
+
+    def _inbound_condition_matches(self, condition):
+        actual_value = self._resolve_inbound_source_value(condition.source_kind, condition.source_expression)
+        if condition.operator == 'is_set':
+            return actual_value not in (False, None, '')
+        if condition.operator == 'not_set':
+            return actual_value in (False, None, '')
+        actual_text = '' if actual_value in (False, None) else str(actual_value)
+        expected_text = condition.expected_value or ''
+        if condition.operator == 'equals':
+            return actual_text == expected_text
+        if condition.operator == 'not_equals':
+            return actual_text != expected_text
+        if condition.operator == 'contains':
+            return expected_text in actual_text
+        raise ValidationError(_('Unsupported inbound rule condition operator %s.') % condition.operator)
+
+    def _build_inbound_lookup_domain(self, rule):
+        self.ensure_one()
+        domain = []
+        for lookup in rule.lookup_ids.sorted(key=lambda record: (record.sequence, record.id)):
+            value = self._resolve_inbound_source_value(lookup.source_kind, lookup.source_expression, lookup.literal_value)
+            domain.append((lookup.target_field_name, '=', value))
+        return domain
+
+    def _build_inbound_assignment_values(self, rule, *, target_kind):
+        self.ensure_one()
+        values = {}
+        for assignment in rule.assignment_ids.filtered(lambda record: record.target_kind == target_kind).sorted(key=lambda record: (record.sequence, record.id)):
+            values[assignment.target_expression] = self._resolve_inbound_source_value(
+                assignment.source_kind,
+                assignment.source_expression,
+                assignment.literal_value,
+            )
+        return values
 
     def process_event(self):
         for event in self:
@@ -449,10 +601,12 @@ class WebhookInboundEvent(models.Model):
                 if isinstance(result, dict):
                     status = result.get('status', 'done')
                     note = result.get('note') or result.get('message')
+                    matched_rule_id = result.get('matched_rule_id') or False
                     if status == 'retry':
                         event.write({
                             'state': 'received',
                             'processing_note': note or False,
+                            'matched_inbound_rule_id': matched_rule_id,
                         })
                         raise RetryableJobError(note or _('Retry requested by handler.'), seconds=result.get('seconds'))
                     if status == 'dead_letter':
@@ -460,18 +614,21 @@ class WebhookInboundEvent(models.Model):
                             'state': 'dead_letter',
                             'processed_at': fields.Datetime.now(),
                             'processing_note': note or False,
+                            'matched_inbound_rule_id': matched_rule_id,
                         })
                         continue
                     if status == 'received':
                         event.write({
                             'state': 'received',
                             'processing_note': note or False,
+                            'matched_inbound_rule_id': matched_rule_id,
                         })
                         continue
                     event.write({
                         'state': 'done',
                         'processed_at': fields.Datetime.now(),
                         'processing_note': note or False,
+                        'matched_inbound_rule_id': matched_rule_id,
                     })
                     continue
                 if result is False:
