@@ -54,6 +54,7 @@ class WebhookInboundEvent(models.Model):
     version = fields.Char()
     resource_reference = fields.Char(index=True)
     handler_selector = fields.Char()
+    resolved_values_json = fields.Text(required=True, default='{}')
     body_sha256 = fields.Char(required=True, index=True)
     request_body = fields.Text(required=True)
     request_headers_json = fields.Text(required=True)
@@ -83,6 +84,23 @@ class WebhookInboundEvent(models.Model):
         return json.dumps(payload, indent=2, sort_keys=True)
 
     @api.model
+    def _serialize_resolved_values(self, metadata):
+        return json.dumps(metadata or {}, indent=2, sort_keys=True)
+
+    def get_resolved_values(self):
+        self.ensure_one()
+        if not self.resolved_values_json:
+            return {}
+        try:
+            return json.loads(self.resolved_values_json)
+        except json.JSONDecodeError:
+            return {}
+
+    def get_resolved_value(self, field_key, default=False):
+        self.ensure_one()
+        return self.get_resolved_values().get(field_key, default)
+
+    @api.model
     def _prepare_create_values_from_request(self, endpoint, handler, body, headers, payload, metadata):
         body_text = body.decode('utf-8', errors='replace')
         body_sha256 = hashlib.sha256(body).hexdigest()
@@ -106,6 +124,7 @@ class WebhookInboundEvent(models.Model):
             'version': metadata.get('version'),
             'resource_reference': metadata.get('resource_reference'),
             'handler_selector': metadata.get('handler_selector'),
+            'resolved_values_json': self._serialize_resolved_values(metadata),
             'body_sha256': body_sha256,
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),
@@ -137,6 +156,7 @@ class WebhookInboundEvent(models.Model):
             'version': metadata.get('version'),
             'resource_reference': metadata.get('resource_reference'),
             'handler_selector': metadata.get('handler_selector'),
+            'resolved_values_json': self._serialize_resolved_values(metadata),
             'body_sha256': hashlib.sha256(body).hexdigest(),
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),

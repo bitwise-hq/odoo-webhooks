@@ -85,6 +85,9 @@
                         <page string="Payload">
                             <field name="payload_json" widget="text" nolabel="1"/>
                         </page>
+                        <page string="Resolved Values">
+                            <field name="resolved_values_json" widget="text" nolabel="1"/>
+                        </page>
                         <page string="Headers">
                             <field name="request_headers_json" widget="text" nolabel="1"/>
                         </page>

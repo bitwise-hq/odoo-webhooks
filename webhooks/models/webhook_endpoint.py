@@ -14,6 +14,7 @@ from ..exceptions import (
     WebhookSignatureValidationError,
     WebhookValidationError,
 )
+from .webhook_endpoint_source import BUILTIN_METADATA_FIELD_NAMES
 
 
 class WebhookEndpoint(models.Model):
@@ -69,7 +70,7 @@ class WebhookEndpoint(models.Model):
     source_ids = fields.One2many(
         'webhook.endpoint.source',
         'endpoint_id',
-        string='Canonical Sources',
+        string='Resolved Value Sources',
         copy=True,
     )
     signature_verification_mode = fields.Selection(
@@ -289,27 +290,23 @@ class WebhookEndpoint(models.Model):
         candidates = self._extract_field_candidates(field_name, body, headers, payload)
         return candidates[0] if candidates else False
 
+    def _get_configured_field_names(self):
+        self.ensure_one()
+        field_names = {
+            (line.field_name or '').strip()
+            for line in self.source_ids.filtered('active')
+            if (line.field_name or '').strip()
+        }
+        return sorted(field_names)
+
     def _extract_inbound_metadata(self, body, headers, payload):
         self.ensure_one()
-        field_names = [
-            'topic',
-            'event_type',
-            'event_id',
-            'delivery_id',
-            'notification_id',
-            'idempotency_key',
-            'signature',
-            'signature_timestamp',
-            'occurred_at',
-            'tenant_key',
-            'version',
-            'resource_reference',
-            'handler_selector',
-        ]
-        return {
-            field_name: self._extract_field_value(field_name, body, headers, payload)
-            for field_name in field_names
-        }
+        metadata = {}
+        for field_name in self._get_configured_field_names():
+            metadata[field_name] = self._extract_field_value(field_name, body, headers, payload)
+        for field_name in BUILTIN_METADATA_FIELD_NAMES:
+            metadata.setdefault(field_name, False)
+        return metadata
 
     def _get_signature_secrets(self):
         self.ensure_one()

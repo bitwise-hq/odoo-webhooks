@@ -61,7 +61,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Canonical Sources">
+                        <page string="Resolved Value Sources">
                             <field name="source_ids" nolabel="1">
                                 <list editable="bottom">
                                     <field name="field_name"/>

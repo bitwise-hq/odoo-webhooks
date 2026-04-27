@@ -4,26 +4,27 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
+BUILTIN_METADATA_FIELD_NAMES = (
+    'topic',
+    'event_type',
+    'event_id',
+    'delivery_id',
+    'notification_id',
+    'idempotency_key',
+    'signature',
+    'signature_timestamp',
+    'occurred_at',
+    'tenant_key',
+    'version',
+    'resource_reference',
+    'handler_selector',
+)
+
+
 class WebhookEndpointSource(models.Model):
     _name = 'webhook.endpoint.source'
     _description = 'Webhook Endpoint Source'
     _order = 'field_name, candidate_sequence, sequence, id'
-
-    _FIELD_SELECTION = [
-        ('topic', 'Topic'),
-        ('event_type', 'Event Type'),
-        ('event_id', 'Event ID'),
-        ('delivery_id', 'Delivery ID'),
-        ('notification_id', 'Notification ID'),
-        ('idempotency_key', 'Idempotency Key'),
-        ('signature', 'Signature'),
-        ('signature_timestamp', 'Signature Timestamp'),
-        ('occurred_at', 'Occurred At'),
-        ('tenant_key', 'Tenant / Shop / Account'),
-        ('version', 'Version'),
-        ('resource_reference', 'Resource Reference'),
-        ('handler_selector', 'Handler Selector'),
-    ]
     _SOURCE_KIND_SELECTION = [
         ('header', 'Header'),
         ('header_param', 'Structured Header Parameter'),
@@ -47,7 +48,18 @@ class WebhookEndpointSource(models.Model):
 
     endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
     active = fields.Boolean(default=True)
-    field_name = fields.Selection(selection=_FIELD_SELECTION, required=True, index=True)
+    field_name = fields.Char(
+        required=True,
+        index=True,
+        string='Field Key',
+        help=(
+            'Free-form key for the resolved value. Built-in keys used by the framework are: '
+            'topic, event_type, event_id, delivery_id, notification_id, idempotency_key, '
+            'signature, signature_timestamp, occurred_at, tenant_key, version, '
+            'resource_reference, and handler_selector. Any other key is also allowed and '
+            'will be stored with the inbound event.'
+        ),
+    )
     candidate_sequence = fields.Integer(
         default=10,
         required=True,
@@ -111,6 +123,8 @@ class WebhookEndpointSource(models.Model):
 
     def _check_source_configuration(self):
         for line in self:
+            if not (line.field_name or '').strip():
+                raise ValidationError(_('Source lines require a field key.'))
             if line.source_kind in ('header', 'header_param') and not line.header_name:
                 raise ValidationError(_('Header-based source lines require a header name.'))
             if line.source_kind == 'header_param' and not line.header_param_name:
@@ -122,13 +136,22 @@ class WebhookEndpointSource(models.Model):
             if line.source_kind == 'computed' and not line.computed_method:
                 raise ValidationError(_('Computed source lines require a computed method name.'))
 
+    @api.model
+    def _normalize_vals(self, vals):
+        normalized_vals = dict(vals)
+        field_name = normalized_vals.get('field_name')
+        if field_name is not None:
+            normalized_vals['field_name'] = field_name.strip()
+        return normalized_vals
+
     @api.model_create_multi
     def create(self, vals_list):
+        vals_list = [self._normalize_vals(vals) for vals in vals_list]
         records = super().create(vals_list)
         records._check_source_configuration()
         return records
 
     def write(self, vals):
-        result = super().write(vals)
+        result = super().write(self._normalize_vals(vals))
         self._check_source_configuration()
         return result
