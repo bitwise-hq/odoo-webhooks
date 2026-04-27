@@ -6,5 +6,6 @@ from . import test_webhook_endpoint_source
 from . import test_webhook_inbound_event_processing
 from . import test_webhook_inbound_event_request
 from . import test_outbound_model_driven_rules
+from . import test_webhook_outbound_endpoint_core
 from . import test_webhook_outbound_delivery_lifecycle
 from . import test_webhook_outbound_delivery_processing
