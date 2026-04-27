@@ -16,13 +16,16 @@ class WebhookController(Controller):
     def inbound_webhook(self, endpoint_code, **kwargs):
         body = request.httprequest.get_data(cache=True) or b''
         headers = request.httprequest.headers
-        env = request.env(user=SUPERUSER_ID)
-        endpoint = env['webhook.endpoint']._find_active_endpoint_by_code(endpoint_code)
+        lookup_env = request.env(user=SUPERUSER_ID)
+        endpoint = lookup_env['webhook.endpoint']._find_active_endpoint_by_code(endpoint_code)
         if not endpoint:
             raise NotFound()
 
+        execution_env = request.env(user=endpoint.execution_user_id.id)
+        endpoint_execution = execution_env['webhook.endpoint'].browse(endpoint.id)
+
         try:
-            event = env['webhook.inbound.event']._receive_webhook_request(endpoint, body, headers)
+            event = execution_env['webhook.inbound.event']._receive_webhook_request(endpoint_execution, body, headers)
         except WebhookValidationError as err:
             if getattr(err, 'http_status_code', 400) == 403:
                 raise Forbidden(str(err)) from err

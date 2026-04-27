@@ -23,6 +23,14 @@ class WebhookInboundEvent(models.Model):
 
     name = fields.Char(required=True, default=lambda self: _('Inbound Webhook Event'))
     endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
+    execution_user_id = fields.Many2one(
+        'res.users',
+        required=True,
+        ondelete='restrict',
+        index=True,
+        string='Execution User',
+        help='Accepted request creation and queued processing run as this user.',
+    )
     handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True)
     company_id = fields.Many2one('res.company', required=True, index=True)
     received_at = fields.Datetime(required=True, default=fields.Datetime.now, index=True)
@@ -103,6 +111,11 @@ class WebhookInboundEvent(models.Model):
         compute='_compute_operator_action_hint',
         string='Operator Guidance',
     )
+    queue_job_identity_key = fields.Char(
+        compute='_compute_queue_job_identity_key',
+        string='Queue Job Identity Key',
+        help='Identity key used when enqueuing background processing for this event.',
+    )
 
     @api.depends('state', 'handler_id', 'delivery_kind', 'replayed_from_event_id', 'processing_note', 'processing_error', 'rejection_reason')
     def _compute_operator_action_hint(self):
@@ -125,6 +138,15 @@ class WebhookInboundEvent(models.Model):
                 event.operator_action_hint = _('This delivery was stored successfully, but no handler was resolved so no business action ran.')
             else:
                 event.operator_action_hint = False
+
+    @api.depends('id')
+    def _compute_queue_job_identity_key(self):
+        for event in self:
+            event.queue_job_identity_key = event._get_queue_job_identity_key() if event.id else False
+
+    def _get_queue_job_identity_key(self):
+        self.ensure_one()
+        return f'webhook_inbound_event_process:{self.id}' if self.id else False
 
     @api.model
     def _parse_payload(self, body_text, *, raise_on_invalid=False):
@@ -185,6 +207,7 @@ class WebhookInboundEvent(models.Model):
         return {
             'name': metadata.get('event_type') or metadata.get('topic') or endpoint.display_name or _('Inbound Webhook Event'),
             'endpoint_id': endpoint.id,
+            'execution_user_id': endpoint.execution_user_id.id,
             'handler_id': handler.id if handler else False,
             'company_id': endpoint.company_id.id,
             'topic': metadata.get('topic'),
@@ -215,11 +238,26 @@ class WebhookInboundEvent(models.Model):
         }
 
     @api.model
-    def _log_rejected_request(self, endpoint, body, headers, *, payload=None, rejection_category='validation', rejection_reason=None):
+    def _log_rejected_request(
+        self,
+        endpoint,
+        body,
+        headers,
+        *,
+        payload=None,
+        payload_parse_failed=False,
+        rejection_category='validation',
+        rejection_reason=None,
+    ):
         body_text = body.decode('utf-8', errors='replace')
         body_sha256 = hashlib.sha256(body).hexdigest()
-        payload = payload if payload is not None else self._parse_payload(body_text)
-        payload_context = payload if isinstance(payload, dict) else {}
+        if payload_parse_failed:
+            stored_payload = {}
+            payload_context = {}
+        else:
+            payload = payload if payload is not None else self._parse_payload(body_text)
+            stored_payload = payload if payload is not None else {}
+            payload_context = payload if payload is not None else {}
         resolved_values = endpoint._extract_resolved_values(body, headers, payload_context) if endpoint else {}
         metadata = endpoint._extract_inbound_metadata(body, headers, payload_context, resolved_values=resolved_values) if endpoint else {}
         delivery_identity_key = False
@@ -240,6 +278,7 @@ class WebhookInboundEvent(models.Model):
         values = {
             'name': _('Rejected Webhook Request'),
             'endpoint_id': endpoint.id if endpoint else False,
+            'execution_user_id': endpoint.execution_user_id.id if endpoint else self.env.user.id,
             'handler_id': False,
             'company_id': endpoint.company_id.id if endpoint else self.env.company.id,
             'topic': metadata.get('topic'),
@@ -265,7 +304,7 @@ class WebhookInboundEvent(models.Model):
             'body_sha256': body_sha256,
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),
-            'payload_json': self._serialize_payload(payload or {}),
+            'payload_json': self._serialize_payload(stored_payload),
             'state': 'rejected',
             'rejection_category': rejection_category,
             'rejection_reason': rejection_reason,
@@ -275,11 +314,11 @@ class WebhookInboundEvent(models.Model):
     @api.model
     def _receive_webhook_request(self, endpoint, body, headers):
         endpoint.ensure_one()
-        payload = False
+        payload = None
+        payload_was_parsed = False
         try:
             payload = self._parse_payload(body.decode('utf-8', errors='replace'), raise_on_invalid=True)
-            if not isinstance(payload, dict):
-                raise WebhookPayloadValidationError(_('The webhook payload must be a JSON object.'))
+            payload_was_parsed = True
             resolved_values = endpoint._extract_resolved_values(body, headers, payload)
             metadata = endpoint._extract_inbound_metadata(body, headers, payload, resolved_values=resolved_values)
             endpoint._validate_inbound_request(body, headers, payload, metadata)
@@ -340,7 +379,8 @@ class WebhookInboundEvent(models.Model):
                 endpoint,
                 body,
                 headers,
-                payload=payload if isinstance(payload, dict) else None,
+                payload=payload if payload_was_parsed else None,
+                payload_parse_failed=not payload_was_parsed,
                 rejection_category=getattr(err, 'rejection_category', 'validation'),
                 rejection_reason=str(err),
             )
@@ -350,7 +390,7 @@ class WebhookInboundEvent(models.Model):
         for event in self:
             if event.state not in ('received', 'error'):
                 continue
-            event.with_delay(identity_key=f'webhook_inbound_event_process:{event.id}').process_event()
+            event.with_user(event.execution_user_id).with_delay(identity_key=event._get_queue_job_identity_key()).process_event()
 
     def action_queue_processing(self):
         self._queue_processing()

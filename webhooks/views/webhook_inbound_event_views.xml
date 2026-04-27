@@ -63,6 +63,7 @@
                         <group>
                             <field name="name"/>
                             <field name="endpoint_id"/>
+                            <field name="execution_user_id"/>
                             <field name="handler_id"/>
                             <field name="company_id"/>
                             <field name="received_at"/>
@@ -114,6 +115,7 @@
                         <page string="Processing">
                             <group string="Outcome">
                                 <field name="processing_note" readonly="1"/>
+                                <field name="queue_job_identity_key" readonly="1"/>
                             </group>
                             <group string="Failure Details" invisible="not processing_error and state != 'rejected'">
                                 <field name="processing_error" readonly="1" invisible="not processing_error"/>

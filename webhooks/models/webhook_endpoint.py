@@ -5,7 +5,7 @@ import json
 import re
 from datetime import datetime, timezone
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 
 from ..exceptions import (
     WebhookFreshnessValidationError,
@@ -39,6 +39,10 @@ class WebhookEndpoint(models.Model):
         ('unix', 'Unix Seconds'),
         ('unix_ms', 'Unix Milliseconds'),
         ('iso8601', 'ISO 8601'),
+    ]
+    _PAYLOAD_CONTRACT_SELECTION = [
+        ('json_object', 'JSON Object'),
+        ('json_value', 'Any JSON Value'),
     ]
     _DELIVERY_IDENTITY_POLICY_SELECTION = [
         ('delivery_id', 'Delivery Identity'),
@@ -78,6 +82,14 @@ class WebhookEndpoint(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
+    execution_user_id = fields.Many2one(
+        'res.users',
+        required=True,
+        default=lambda self: self.env.user,
+        domain="[('share', '=', False), ('active', '=', True)]",
+        string='Execution User',
+        help='Accepted requests and queued processing run as this internal user instead of the superuser. Use a dedicated technical user with Webhook Administrator access.',
+    )
     route_path = fields.Char(
         compute='_compute_route_path',
         string='Public Route',
@@ -116,6 +128,13 @@ class WebhookEndpoint(models.Model):
         default='none',
         string='Replay Identity Policy',
         help='Optionally select which semantic links distinct deliveries of the same business event.',
+    )
+    payload_contract = fields.Selection(
+        selection=_PAYLOAD_CONTRACT_SELECTION,
+        required=True,
+        default='json_object',
+        string='Payload Contract',
+        help='JSON Object accepts only top-level JSON objects. Any JSON Value also allows arrays, scalars, booleans, and null.',
     )
     signature_verification_mode = fields.Selection(
         selection=_SIGNATURE_MODE_SELECTION,
@@ -210,8 +229,10 @@ class WebhookEndpoint(models.Model):
     @api.depends(
         'active',
         'is_paused',
+        'execution_user_id',
         'handler_id',
         'handler_id.execution_mode',
+        'payload_contract',
         'signature_verification_mode',
         'signature_secret',
         'signature_max_age_seconds',
@@ -238,6 +259,11 @@ class WebhookEndpoint(models.Model):
                 messages.append(_('Archived endpoints are not matched by the public inbound webhook route.'))
             elif endpoint.is_paused:
                 messages.append(_('Paused endpoints keep their configuration but reject new deliveries.'))
+
+            if endpoint.payload_contract == 'json_object':
+                messages.append(_('This endpoint currently accepts only top-level JSON objects.'))
+            else:
+                messages.append(_('This endpoint accepts any valid JSON value, including arrays and scalars.'))
 
             if not endpoint.handler_id:
                 messages.append(_('No default handler is configured. Requests without a resolved handler selector will be stored only.'))
@@ -299,6 +325,21 @@ class WebhookEndpoint(models.Model):
                     messages.append(_('No signature message parts are configured. The raw request body will be used as the signed message.'))
 
             endpoint.configuration_warning = '\n'.join(messages) or False
+
+    @api.constrains('execution_user_id', 'company_id')
+    def _check_execution_user_configuration(self):
+        for endpoint in self:
+            user = endpoint.execution_user_id
+            if not user:
+                continue
+            if user.id == SUPERUSER_ID:
+                raise WebhookProcessingConfigurationError(_('Superuser cannot be used as the endpoint execution user.'))
+            if user.share or not user.active:
+                raise WebhookProcessingConfigurationError(_('Execution user must be an active internal user.'))
+            if not user.has_group('webhooks.group_webhooks_admin'):
+                raise WebhookProcessingConfigurationError(_('Execution user must belong to the Webhook Administrator group.'))
+            if endpoint.company_id and endpoint.company_id not in user.company_ids:
+                raise WebhookProcessingConfigurationError(_('Execution user must have access to the endpoint company.'))
 
     @api.constrains(
         'signature_verification_mode',
@@ -689,8 +730,8 @@ class WebhookEndpoint(models.Model):
         self.ensure_one()
         if self.is_paused:
             raise WebhookValidationError(_('Endpoint %s is paused and cannot accept webhook deliveries.') % self.display_name)
-        if not isinstance(payload, dict):
-            raise WebhookPayloadValidationError(_('The webhook payload must be a JSON object.'))
+        if self.payload_contract == 'json_object' and not isinstance(payload, dict):
+            raise WebhookPayloadValidationError(_('This endpoint requires a top-level JSON object payload.'))
         self._verify_signature(body, headers, payload, metadata)
 
     def _resolve_handler(self, metadata):

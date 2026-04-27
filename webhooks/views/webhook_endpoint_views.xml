@@ -54,11 +54,13 @@
                             <field name="code"/>
                             <field name="route_path" readonly="1"/>
                             <field name="company_id"/>
+                            <field name="execution_user_id"/>
                         </group>
                         <group>
                             <field name="operational_state" readonly="1"/>
                             <field name="active"/>
                             <field name="is_paused"/>
+                            <field name="payload_contract"/>
                         </group>
                     </group>
                     <group string="Handler And Identity">
