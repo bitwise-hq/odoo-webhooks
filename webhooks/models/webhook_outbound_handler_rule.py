@@ -43,4 +43,6 @@ class WebhookHandlerOutboundRule(models.Model):
     def _check_outbound_rule_configuration(self):
         for rule in self:
             if rule.result_status == "retry" and rule.retry_seconds < 0:
-                raise ValidationError(self.env._("Retry delay must be zero or greater."))
+                raise ValidationError(
+                    self.env._("Retry delay must be zero or greater.")
+                )

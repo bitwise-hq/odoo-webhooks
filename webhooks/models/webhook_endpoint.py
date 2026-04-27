@@ -309,7 +309,9 @@ class WebhookEndpoint(models.Model):
                 )
             if endpoint.company_id and endpoint.company_id not in user.company_ids:
                 raise WebhookProcessingConfigurationError(
-                    self.env._("Execution user must have access to the endpoint company.")
+                    self.env._(
+                        "Execution user must have access to the endpoint company."
+                    )
                 )
 
     @api.constrains(

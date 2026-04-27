@@ -159,9 +159,7 @@ class WebhookOutboundDelivery(models.Model):
         compute="_compute_queue_job_observability",
         string="Latest Queue Job",
     )
-    latest_queue_job_state = fields.Char(
-        compute="_compute_queue_job_observability"
-    )
+    latest_queue_job_state = fields.Char(compute="_compute_queue_job_observability")
 
     @api.depends("attempt_ids")
     def _compute_attempt_count(self):
@@ -810,7 +808,9 @@ class WebhookOutboundDelivery(models.Model):
                                     "state": "error",
                                     "processing_note": handler_note or False,
                                     "processing_error": handler_note
-                                    or self.env._("Retry requested by outbound handler."),
+                                    or self.env._(
+                                        "Retry requested by outbound handler."
+                                    ),
                                 }
                             )
                             raise RetryableJobError(

@@ -177,9 +177,7 @@ class WebhookInboundEvent(models.Model):
         compute="_compute_queue_job_observability",
         string="Latest Queue Job",
     )
-    latest_queue_job_state = fields.Char(
-        compute="_compute_queue_job_observability"
-    )
+    latest_queue_job_state = fields.Char(compute="_compute_queue_job_observability")
 
     def _compute_queue_job_identity_key(self):
         for event in self:

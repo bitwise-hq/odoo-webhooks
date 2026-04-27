@@ -97,7 +97,9 @@ class WebhookEndpointSignaturePart(models.Model):
                 )
             if line.source_kind == "computed" and not line.computed_method:
                 raise ValidationError(
-                    self.env._("Computed signature parts require a computed method name.")
+                    self.env._(
+                        "Computed signature parts require a computed method name."
+                    )
                 )
 
     @api.model_create_multi

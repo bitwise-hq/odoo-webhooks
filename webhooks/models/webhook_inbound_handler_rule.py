@@ -67,7 +67,9 @@ class WebhookHandlerInboundRule(models.Model):
     def _check_rule_configuration(self):
         for rule in self:
             if rule.action_type == "retry" and rule.retry_seconds < 0:
-                raise ValidationError(self.env._("Retry delay must be zero or greater."))
+                raise ValidationError(
+                    self.env._("Retry delay must be zero or greater.")
+                )
             if (
                 rule.action_type in ("create_record", "update_record", "upsert_record")
                 and not rule.target_model_name
@@ -79,5 +81,7 @@ class WebhookHandlerInboundRule(models.Model):
                 )
             if rule.action_type == "queue_outbound" and not rule.outbound_endpoint_id:
                 raise ValidationError(
-                    self.env._("Outbound Endpoint is required for queue-outbound rules.")
+                    self.env._(
+                        "Outbound Endpoint is required for queue-outbound rules."
+                    )
                 )

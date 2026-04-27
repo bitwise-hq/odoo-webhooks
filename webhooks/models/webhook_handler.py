@@ -108,7 +108,9 @@ class WebhookHandler(models.Model):
         self.ensure_one()
         if self.direction != "outbound":
             raise ValidationError(
-                self.env._("Inbound handlers cannot process outbound webhook deliveries.")
+                self.env._(
+                    "Inbound handlers cannot process outbound webhook deliveries."
+                )
             )
         if self.execution_mode == "python":
             model = self.env[self.python_model_name]
