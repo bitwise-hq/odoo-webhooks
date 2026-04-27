@@ -61,10 +61,11 @@
                             <field name="is_paused"/>
                         </group>
                     </group>
-                    <group string="Handler Resolution">
+                    <group string="Handler And Identity">
                         <group>
                             <field name="handler_id"/>
-                            <field name="acceptance_key_policy"/>
+                            <field name="delivery_identity_policy"/>
+                            <field name="replay_identity_policy"/>
                         </group>
                     </group>
                     <group string="Configuration Guidance" invisible="not configuration_warning">
@@ -139,7 +140,8 @@
                                     <field name="event_id"/>
                                     <field name="delivery_id"/>
                                     <field name="idempotency_key"/>
-                                    <field name="accepted_identity_source"/>
+                                    <field name="delivery_identity_source"/>
+                                    <field name="delivery_kind"/>
                                     <field name="handler_id"/>
                                     <field name="state"/>
                                 </list>

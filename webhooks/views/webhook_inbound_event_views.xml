@@ -12,7 +12,8 @@
                 <field name="delivery_id"/>
                 <field name="notification_id"/>
                 <field name="idempotency_key"/>
-                <field name="accepted_identity_source"/>
+                <field name="delivery_identity_source"/>
+                <field name="delivery_kind"/>
                 <field name="endpoint_id"/>
                 <field name="handler_id"/>
                 <separator/>
@@ -37,7 +38,8 @@
                 <field name="event_id"/>
                 <field name="delivery_id"/>
                 <field name="idempotency_key"/>
-                <field name="accepted_identity_source"/>
+                <field name="delivery_identity_source"/>
+                <field name="delivery_kind"/>
                 <field name="state"/>
             </list>
         </field>
@@ -78,7 +80,12 @@
                             <field name="delivery_id"/>
                             <field name="notification_id"/>
                             <field name="idempotency_key"/>
-                            <field name="accepted_identity_source"/>
+                            <field name="delivery_identity_key"/>
+                            <field name="delivery_identity_source"/>
+                            <field name="delivery_kind"/>
+                            <field name="replay_identity_key"/>
+                            <field name="replay_identity_source"/>
+                            <field name="replayed_from_event_id"/>
                             <field name="tenant_key"/>
                             <field name="version"/>
                             <field name="handler_selector"/>

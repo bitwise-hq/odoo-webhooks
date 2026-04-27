@@ -40,12 +40,15 @@ class WebhookEndpoint(models.Model):
         ('unix_ms', 'Unix Milliseconds'),
         ('iso8601', 'ISO 8601'),
     ]
-    _ACCEPTANCE_KEY_POLICY_SELECTION = [
-        ('legacy_fallback', 'Legacy Fallback Chain'),
-        ('idempotency_key', 'Explicit Idempotency Key'),
+    _DELIVERY_IDENTITY_POLICY_SELECTION = [
         ('delivery_id', 'Delivery Identity'),
-        ('event_id', 'Business Event Identity'),
+        ('idempotency_key', 'Explicit Idempotency Key'),
         ('body_sha256', 'Raw Body SHA256'),
+    ]
+    _REPLAY_IDENTITY_POLICY_SELECTION = [
+        ('none', 'None'),
+        ('event_id', 'Business Event Identity'),
+        ('idempotency_key', 'Explicit Idempotency Key'),
     ]
 
     _code_uniq = models.Constraint(
@@ -100,12 +103,19 @@ class WebhookEndpoint(models.Model):
         copy=True,
         help='Maps built-in webhook semantics such as signature, delivery identity, and handler selector to resolved keys from the Value Resolution rules.',
     )
-    acceptance_key_policy = fields.Selection(
-        selection=_ACCEPTANCE_KEY_POLICY_SELECTION,
+    delivery_identity_policy = fields.Selection(
+        selection=_DELIVERY_IDENTITY_POLICY_SELECTION,
         required=True,
-        default='legacy_fallback',
-        string='Acceptance Key Policy',
-        help='Select which semantic determines accepted-delivery deduplication. Legacy fallback keeps the previous idempotency_key -> delivery_id -> event_id -> body hash behavior.',
+        default='delivery_id',
+        string='Delivery Identity Policy',
+        help='Select which semantic identifies an exact delivery for duplicate detection.',
+    )
+    replay_identity_policy = fields.Selection(
+        selection=_REPLAY_IDENTITY_POLICY_SELECTION,
+        required=True,
+        default='none',
+        string='Replay Identity Policy',
+        help='Optionally select which semantic links distinct deliveries of the same business event.',
     )
     signature_verification_mode = fields.Selection(
         selection=_SIGNATURE_MODE_SELECTION,
@@ -206,7 +216,8 @@ class WebhookEndpoint(models.Model):
         'signature_secret',
         'signature_max_age_seconds',
         'signature_max_future_skew_seconds',
-        'acceptance_key_policy',
+        'delivery_identity_policy',
+        'replay_identity_policy',
         'source_ids.active',
         'source_ids.field_name',
         'semantic_binding_ids.semantic_name',
@@ -234,19 +245,32 @@ class WebhookEndpoint(models.Model):
                 messages.append(_('The selected default handler uses model-driven execution, which is still a placeholder in this version.'))
 
             binding_map = endpoint._get_semantic_binding_map()
-            if endpoint.acceptance_key_policy == 'legacy_fallback':
-                messages.append(_('Accepted-delivery deduplication is still using the legacy fallback chain. Bind semantics explicitly and choose a dedicated acceptance key policy when the provider contract is known.'))
-            elif endpoint.acceptance_key_policy != 'body_sha256':
-                acceptance_key = binding_map.get(endpoint.acceptance_key_policy)
-                if not acceptance_key:
+            if endpoint.delivery_identity_policy != 'body_sha256':
+                delivery_key = binding_map.get(endpoint.delivery_identity_policy)
+                if not delivery_key:
                     messages.append(
-                        _('Acceptance key policy %s needs a semantic binding before deduplication becomes explicit.')
-                        % dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy]
+                        _('Delivery identity policy %s needs a semantic binding before duplicate detection can work.')
+                        % dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy]
                     )
-                elif not endpoint._has_active_source_for_key(acceptance_key):
+                elif not endpoint._has_active_source_for_key(delivery_key):
                     messages.append(
-                        _('Acceptance key policy %s is bound to %s, but no active value resolution rule currently produces that key.')
-                        % (dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy], acceptance_key)
+                        _('Delivery identity policy %s is bound to %s, but no active value resolution rule currently produces that key.')
+                        % (dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy], delivery_key)
+                    )
+            elif endpoint.replay_identity_policy == 'none':
+                messages.append(_('Replay detection is disabled, so only exact duplicate deliveries will be linked automatically.'))
+
+            if endpoint.replay_identity_policy != 'none':
+                replay_key = binding_map.get(endpoint.replay_identity_policy)
+                if not replay_key:
+                    messages.append(
+                        _('Replay identity policy %s needs a semantic binding before distinct deliveries of the same event can be linked.')
+                        % dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy]
+                    )
+                elif not endpoint._has_active_source_for_key(replay_key):
+                    messages.append(
+                        _('Replay identity policy %s is bound to %s, but no active value resolution rule currently produces that key.')
+                        % (dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy], replay_key)
                     )
 
             if endpoint.signature_verification_mode == 'hmac':
@@ -283,25 +307,35 @@ class WebhookEndpoint(models.Model):
         'signature_max_future_skew_seconds',
         'source_ids',
         'semantic_binding_ids',
-        'acceptance_key_policy',
+        'delivery_identity_policy',
+        'replay_identity_policy',
     )
     def _check_signature_configuration(self):
         for endpoint in self:
             binding_map = endpoint._get_semantic_binding_map()
-            if endpoint.signature_verification_mode != 'hmac':
-                if endpoint.acceptance_key_policy == 'body_sha256':
-                    continue
-            if endpoint.acceptance_key_policy not in ('legacy_fallback', 'body_sha256'):
-                acceptance_key = binding_map.get(endpoint.acceptance_key_policy)
-                if not acceptance_key:
+            if endpoint.delivery_identity_policy != 'body_sha256':
+                delivery_key = binding_map.get(endpoint.delivery_identity_policy)
+                if not delivery_key:
                     raise WebhookProcessingConfigurationError(
-                        _('Acceptance key policy %s requires a semantic binding.')
-                        % dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy]
+                        _('Delivery identity policy %s requires a semantic binding.')
+                        % dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy]
                     )
-                if not endpoint._has_active_source_for_key(acceptance_key):
+                if not endpoint._has_active_source_for_key(delivery_key):
                     raise WebhookProcessingConfigurationError(
-                        _('Acceptance key policy %s is bound to %s, but no active value resolution rule produces that key.')
-                        % (dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy], acceptance_key)
+                        _('Delivery identity policy %s is bound to %s, but no active value resolution rule produces that key.')
+                        % (dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy], delivery_key)
+                    )
+            if endpoint.replay_identity_policy != 'none':
+                replay_key = binding_map.get(endpoint.replay_identity_policy)
+                if not replay_key:
+                    raise WebhookProcessingConfigurationError(
+                        _('Replay identity policy %s requires a semantic binding.')
+                        % dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy]
+                    )
+                if not endpoint._has_active_source_for_key(replay_key):
+                    raise WebhookProcessingConfigurationError(
+                        _('Replay identity policy %s is bound to %s, but no active value resolution rule produces that key.')
+                        % (dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy], replay_key)
                     )
             if endpoint.signature_verification_mode != 'hmac':
                 continue
@@ -543,21 +577,31 @@ class WebhookEndpoint(models.Model):
             for semantic_name in WEBHOOK_SEMANTIC_NAMES
         }
 
-    def _resolve_acceptance_key(self, body_sha256, metadata):
+    def _resolve_delivery_identity(self, body_sha256, metadata):
         self.ensure_one()
-        policy = self.acceptance_key_policy or 'legacy_fallback'
-        if policy == 'legacy_fallback':
-            for semantic_name in ('idempotency_key', 'delivery_id', 'event_id'):
-                candidate = metadata.get(semantic_name)
-                if candidate:
-                    return candidate, semantic_name
-            return body_sha256, 'body_sha256'
+        policy = self.delivery_identity_policy or 'delivery_id'
         if policy == 'body_sha256':
             return body_sha256, 'body_sha256'
         candidate = metadata.get(policy)
         if candidate:
             return candidate, policy
-        return body_sha256, 'body_sha256'
+        raise WebhookValidationError(
+            _('The configured delivery identity %s could not be resolved.')
+            % dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[policy]
+        )
+
+    def _resolve_replay_identity(self, metadata):
+        self.ensure_one()
+        policy = self.replay_identity_policy or 'none'
+        if policy == 'none':
+            return False, False
+        candidate = metadata.get(policy)
+        if candidate:
+            return candidate, policy
+        raise WebhookValidationError(
+            _('The configured replay identity %s could not be resolved.')
+            % dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[policy]
+        )
 
     def _get_signature_secrets(self):
         self.ensure_one()

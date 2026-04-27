@@ -17,7 +17,7 @@ class WebhookInboundEvent(models.Model):
     _order = 'received_at desc, id desc'
 
     _endpoint_dedupe_uniq = models.Constraint(
-        'unique(endpoint_id, accepted_idempotency_key)',
+        'unique(endpoint_id, delivery_identity_key)',
         'The webhook delivery has already been stored for this endpoint.',
     )
 
@@ -49,17 +49,36 @@ class WebhookInboundEvent(models.Model):
         index=True,
         help='Resolved explicit idempotency key semantic, when configured by the endpoint.',
     )
-    accepted_idempotency_key = fields.Char(index=True, help='Internal accepted-delivery identity key used for deduplication.')
-    accepted_identity_source = fields.Selection(
+    delivery_identity_key = fields.Char(index=True, help='Internal exact-delivery identity key used for duplicate detection.')
+    delivery_identity_source = fields.Selection(
         selection=[
-            ('idempotency_key', 'Explicit Idempotency Key'),
             ('delivery_id', 'Delivery Identity'),
-            ('event_id', 'Business Event Identity'),
+            ('idempotency_key', 'Explicit Idempotency Key'),
             ('body_sha256', 'Raw Body SHA256'),
         ],
         index=True,
-        help='Which semantic actually supplied the accepted-delivery identity for this record.',
+        help='Which semantic actually supplied the exact-delivery identity for this record.',
     )
+    replay_identity_key = fields.Char(index=True, help='Business-event identity used to link distinct deliveries of the same event.')
+    replay_identity_source = fields.Selection(
+        selection=[
+            ('event_id', 'Business Event Identity'),
+            ('idempotency_key', 'Explicit Idempotency Key'),
+        ],
+        index=True,
+        help='Which semantic supplied the replay identity for this record, when replay linking is enabled.',
+    )
+    delivery_kind = fields.Selection(
+        selection=[
+            ('primary', 'Primary Delivery'),
+            ('replay', 'Replay Delivery'),
+        ],
+        required=True,
+        default='primary',
+        index=True,
+        help='Whether this record is the first stored delivery for its replay identity or a later replay/redelivery.',
+    )
+    replayed_from_event_id = fields.Many2one('webhook.inbound.event', string='Replay Of', ondelete='set null', index=True)
     signature = fields.Char()
     signature_timestamp_raw = fields.Char(string='Signature Timestamp')
     occurred_at_raw = fields.Char(string='Occurred At')
@@ -85,10 +104,14 @@ class WebhookInboundEvent(models.Model):
         string='Operator Guidance',
     )
 
-    @api.depends('state', 'handler_id', 'processing_note', 'processing_error', 'rejection_reason')
+    @api.depends('state', 'handler_id', 'delivery_kind', 'replayed_from_event_id', 'processing_note', 'processing_error', 'rejection_reason')
     def _compute_operator_action_hint(self):
         for event in self:
-            if event.state == 'received':
+            if event.state == 'received' and event.delivery_kind == 'replay' and event.replayed_from_event_id:
+                event.operator_action_hint = _(
+                    'This delivery is a replay or redelivery of event %s. Queue processing only if reprocessing is safe for the downstream handler.'
+                ) % event.replayed_from_event_id.display_name
+            elif event.state == 'received':
                 event.operator_action_hint = _('Queue processing to hand this delivery to the background worker.')
             elif event.state == 'processing':
                 event.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
@@ -140,10 +163,25 @@ class WebhookInboundEvent(models.Model):
         return self.get_resolved_values().get(field_key, default)
 
     @api.model
-    def _prepare_create_values_from_request(self, endpoint, handler, body, headers, payload, resolved_values, metadata):
+    def _prepare_create_values_from_request(
+        self,
+        endpoint,
+        handler,
+        body,
+        headers,
+        payload,
+        resolved_values,
+        metadata,
+        *,
+        delivery_identity_key,
+        delivery_identity_source,
+        replay_identity_key,
+        replay_identity_source,
+        delivery_kind,
+        replayed_from_event,
+    ):
         body_text = body.decode('utf-8', errors='replace')
         body_sha256 = hashlib.sha256(body).hexdigest()
-        acceptance_key, acceptance_source = endpoint._resolve_acceptance_key(body_sha256, metadata)
         return {
             'name': metadata.get('event_type') or metadata.get('topic') or endpoint.display_name or _('Inbound Webhook Event'),
             'endpoint_id': endpoint.id,
@@ -155,8 +193,12 @@ class WebhookInboundEvent(models.Model):
             'delivery_id': metadata.get('delivery_id'),
             'notification_id': metadata.get('notification_id'),
             'idempotency_key': metadata.get('idempotency_key'),
-            'accepted_idempotency_key': acceptance_key,
-            'accepted_identity_source': acceptance_source,
+            'delivery_identity_key': delivery_identity_key,
+            'delivery_identity_source': delivery_identity_source,
+            'replay_identity_key': replay_identity_key,
+            'replay_identity_source': replay_identity_source,
+            'delivery_kind': delivery_kind,
+            'replayed_from_event_id': replayed_from_event.id if replayed_from_event else False,
             'signature': metadata.get('signature'),
             'signature_timestamp_raw': metadata.get('signature_timestamp'),
             'occurred_at_raw': metadata.get('occurred_at'),
@@ -175,10 +217,26 @@ class WebhookInboundEvent(models.Model):
     @api.model
     def _log_rejected_request(self, endpoint, body, headers, *, payload=None, rejection_category='validation', rejection_reason=None):
         body_text = body.decode('utf-8', errors='replace')
+        body_sha256 = hashlib.sha256(body).hexdigest()
         payload = payload if payload is not None else self._parse_payload(body_text)
         payload_context = payload if isinstance(payload, dict) else {}
         resolved_values = endpoint._extract_resolved_values(body, headers, payload_context) if endpoint else {}
         metadata = endpoint._extract_inbound_metadata(body, headers, payload_context, resolved_values=resolved_values) if endpoint else {}
+        delivery_identity_key = False
+        delivery_identity_source = False
+        replay_identity_key = False
+        replay_identity_source = False
+        if endpoint:
+            try:
+                delivery_identity_key, delivery_identity_source = endpoint._resolve_delivery_identity(body_sha256, metadata)
+            except ValidationError:
+                delivery_identity_key = False
+                delivery_identity_source = False
+            try:
+                replay_identity_key, replay_identity_source = endpoint._resolve_replay_identity(metadata)
+            except ValidationError:
+                replay_identity_key = False
+                replay_identity_source = False
         values = {
             'name': _('Rejected Webhook Request'),
             'endpoint_id': endpoint.id if endpoint else False,
@@ -190,8 +248,12 @@ class WebhookInboundEvent(models.Model):
             'delivery_id': metadata.get('delivery_id'),
             'notification_id': metadata.get('notification_id'),
             'idempotency_key': metadata.get('idempotency_key'),
-            'accepted_idempotency_key': False,
-            'accepted_identity_source': False,
+            'delivery_identity_key': delivery_identity_key,
+            'delivery_identity_source': delivery_identity_source,
+            'replay_identity_key': replay_identity_key,
+            'replay_identity_source': replay_identity_source,
+            'delivery_kind': 'primary',
+            'replayed_from_event_id': False,
             'signature': metadata.get('signature'),
             'signature_timestamp_raw': metadata.get('signature_timestamp'),
             'occurred_at_raw': metadata.get('occurred_at'),
@@ -200,7 +262,7 @@ class WebhookInboundEvent(models.Model):
             'resource_reference': metadata.get('resource_reference'),
             'handler_selector': metadata.get('handler_selector'),
             'resolved_values_json': self._serialize_resolved_values(resolved_values),
-            'body_sha256': hashlib.sha256(body).hexdigest(),
+            'body_sha256': body_sha256,
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),
             'payload_json': self._serialize_payload(payload or {}),
@@ -223,25 +285,51 @@ class WebhookInboundEvent(models.Model):
             endpoint._validate_inbound_request(body, headers, payload, metadata)
 
             body_sha256 = hashlib.sha256(body).hexdigest()
-            accepted_identity_key, __ = endpoint._resolve_acceptance_key(body_sha256, metadata)
+            delivery_identity_key, delivery_identity_source = endpoint._resolve_delivery_identity(body_sha256, metadata)
+            replay_identity_key, replay_identity_source = endpoint._resolve_replay_identity(metadata)
             existing = self.search([
                 ('endpoint_id', '=', endpoint.id),
-                ('accepted_idempotency_key', '=', accepted_identity_key),
+                ('delivery_identity_key', '=', delivery_identity_key),
             ], limit=1)
             if existing:
                 if existing.state in ('received', 'error'):
                     existing._queue_processing()
                 return existing
 
+            replayed_from_event = False
+            delivery_kind = 'primary'
+            if replay_identity_key:
+                replayed_from_event = self.search([
+                    ('endpoint_id', '=', endpoint.id),
+                    ('replay_identity_key', '=', replay_identity_key),
+                    ('state', '!=', 'rejected'),
+                ], order='received_at asc, id asc', limit=1)
+                if replayed_from_event:
+                    delivery_kind = 'replay'
+
             handler = endpoint._resolve_handler(metadata)
-            values = self._prepare_create_values_from_request(endpoint, handler, body, headers, payload, resolved_values, metadata)
+            values = self._prepare_create_values_from_request(
+                endpoint,
+                handler,
+                body,
+                headers,
+                payload,
+                resolved_values,
+                metadata,
+                delivery_identity_key=delivery_identity_key,
+                delivery_identity_source=delivery_identity_source,
+                replay_identity_key=replay_identity_key,
+                replay_identity_source=replay_identity_source,
+                delivery_kind=delivery_kind,
+                replayed_from_event=replayed_from_event,
+            )
             try:
                 with self.env.cr.savepoint():
                     event = self.create(values)
             except IntegrityError:
                 event = self.search([
                     ('endpoint_id', '=', endpoint.id),
-                    ('accepted_idempotency_key', '=', accepted_identity_key),
+                    ('delivery_identity_key', '=', delivery_identity_key),
                 ], limit=1)
 
             if event and event.state in ('received', 'error'):
