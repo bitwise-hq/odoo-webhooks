@@ -13,6 +13,15 @@ class WebhookHandler(models.Model):
         'The webhook handler code must be unique.',
     )
 
+    def init(self):
+        self.env.cr.execute(
+            """
+            UPDATE webhook_handler
+               SET execution_mode = 'model_driven'
+             WHERE execution_mode = 'low_code'
+            """
+        )
+
     name = fields.Char(required=True)
     code = fields.Char(required=True, copy=False, index=True)
     active = fields.Boolean(default=True, help='Archived handlers stay available for audit history but are no longer selectable for new work.')
@@ -26,11 +35,11 @@ class WebhookHandler(models.Model):
     outbound_enabled = fields.Boolean(default=False, help='Reserve this handler for future outbound webhook processing.')
     execution_mode = fields.Selection(
         selection=[
-            ('low_code', 'Model Driven'),
+            ('model_driven', 'Model Driven'),
             ('python', 'Python Callback'),
         ],
         required=True,
-        default='low_code',
+        default='model_driven',
         help='Python callbacks execute custom model methods. Model-driven handlers use inbound and outbound rule rows instead of authored JSON configuration.',
     )
     python_model_name = fields.Char(
@@ -64,19 +73,19 @@ class WebhookHandler(models.Model):
     def _compute_configuration_warning(self):
         for handler in self:
             messages = []
-            if handler.execution_mode == 'low_code':
+            if handler.execution_mode == 'model_driven':
                 inbound_rule_count = len(handler.inbound_rule_ids.filtered('active'))
                 outbound_rule_count = len(handler.outbound_rule_ids.filtered('active'))
                 if handler.inbound_enabled:
                     if inbound_rule_count:
-                        messages.append(_('Inbound low-code execution is configured through %s active inbound rule(s).') % inbound_rule_count)
+                        messages.append(_('Inbound model-driven execution is configured through %s active inbound rule(s).') % inbound_rule_count)
                     else:
-                        messages.append(_('Inbound low-code execution is enabled but no active inbound rules are configured yet.'))
+                        messages.append(_('Inbound model-driven execution is enabled but no active inbound rules are configured yet.'))
                 if handler.outbound_enabled:
                     if outbound_rule_count:
-                        messages.append(_('Outbound low-code execution is configured through %s active outbound rule(s).') % outbound_rule_count)
+                        messages.append(_('Outbound model-driven execution is configured through %s active outbound rule(s).') % outbound_rule_count)
                     else:
-                        messages.append(_('Outbound low-code execution is enabled but no active outbound rules are configured yet.'))
+                        messages.append(_('Outbound model-driven execution is enabled but no active outbound rules are configured yet.'))
             else:
                 if not handler.python_model_name or not handler.python_method_name:
                     messages.append(_('Python callback mode requires both a technical model name and a method name.'))
@@ -105,7 +114,7 @@ class WebhookHandler(models.Model):
                     % (self.python_model_name, self.python_method_name)
                 )
             return callback(event)
-        return event._execute_low_code_handler(self)
+        return event._execute_model_driven_handler(self)
 
     def execute_outbound(self, delivery, request_data=None):
         self.ensure_one()
@@ -118,4 +127,4 @@ class WebhookHandler(models.Model):
                     % (self.python_model_name, self.python_method_name)
                 )
             return callback(delivery)
-        return delivery._execute_low_code_handler(self, request_data=request_data)
+        return delivery._execute_model_driven_handler(self, request_data=request_data)

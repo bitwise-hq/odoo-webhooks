@@ -98,7 +98,7 @@ class WebhookOutboundDelivery(models.Model):
             elif delivery.state == 'processing':
                 delivery.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
             elif delivery.state == 'error':
-                delivery.operator_action_hint = _('Review the delivery error, adjust the endpoint, templates, or low-code handler if needed, then reset to draft or create a replay when the remote system allows another send.')
+                delivery.operator_action_hint = _('Review the delivery error, adjust the endpoint, templates, or model-driven handler if needed, then reset to draft or create a replay when the remote system allows another send.')
             elif delivery.state == 'dead_letter':
                 delivery.operator_action_hint = _('The remote endpoint returned a non-retryable failure. Confirm replay is safe before resetting this delivery or creating a new replay copy.')
             elif delivery.state == 'canceled':
@@ -433,7 +433,7 @@ class WebhookOutboundDelivery(models.Model):
             delivery.write({'state': 'canceled'})
         return True
 
-    def _execute_low_code_handler(self, handler, request_data=None):
+    def _execute_model_driven_handler(self, handler, request_data=None):
         self.ensure_one()
         request_data = dict(request_data or self._build_request_data())
         context_values = self._get_context_values()

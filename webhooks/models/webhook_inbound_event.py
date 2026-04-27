@@ -427,7 +427,7 @@ class WebhookInboundEvent(models.Model):
             })
         return True
 
-    def _execute_low_code_handler(self, handler):
+    def _execute_model_driven_handler(self, handler):
         self.ensure_one()
         rules = handler.inbound_rule_ids.filtered('active').sorted(key=lambda record: (record.sequence, record.id))
         matched_rule = False
@@ -439,7 +439,7 @@ class WebhookInboundEvent(models.Model):
         if not matched_rule:
             return {
                 'status': 'done',
-                'note': _('No inbound low-code rule matched on handler %s. The event was stored only.') % handler.display_name,
+                'note': _('No inbound model-driven rule matched on handler %s. The event was stored only.') % handler.display_name,
             }
 
         execution = self.env['webhook.inbound.rule.execution'].create({

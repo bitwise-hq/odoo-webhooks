@@ -1,7 +1,7 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-from .webhook_inbound_rule_common import INBOUND_SOURCE_KIND_SELECTION
+from .const import INBOUND_SOURCE_KIND_SELECTION
 
 
 class WebhookHandlerInboundRuleLookup(models.Model):

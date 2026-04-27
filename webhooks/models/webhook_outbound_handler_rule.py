@@ -1,7 +1,7 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-from .webhook_outbound_rule_common import OUTBOUND_RULE_STATUS_SELECTION
+from .const import OUTBOUND_RULE_STATUS_SELECTION
 
 
 class WebhookHandlerOutboundRule(models.Model):

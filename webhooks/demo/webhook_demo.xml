@@ -15,7 +15,7 @@
             <field name="name">Demo Basic Handler</field>
             <field name="code">demo_basic_handler</field>
             <field name="company_id" ref="base.main_company"/>
-            <field name="execution_mode">low_code</field>
+            <field name="execution_mode">model_driven</field>
             <field name="note">Smoke-test handler for regular JSON object deliveries.</field>
         </record>
 
@@ -23,7 +23,7 @@
             <field name="name">Demo Signed Handler</field>
             <field name="code">demo_signed_handler</field>
             <field name="company_id" ref="base.main_company"/>
-            <field name="execution_mode">low_code</field>
+            <field name="execution_mode">model_driven</field>
             <field name="note">Smoke-test handler for partner-scoped signed deliveries.</field>
         </record>
 

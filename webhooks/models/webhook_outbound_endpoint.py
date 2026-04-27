@@ -147,8 +147,8 @@ class WebhookOutboundEndpoint(models.Model):
             else:
                 messages.append(_('This outbound endpoint is company-scoped only. Deliveries do not store a partner from endpoint scope.'))
 
-            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'low_code':
-                messages.append(_('The selected outbound handler uses relational low-code rules and can mutate, cancel, dead-letter, or retry deliveries without authored JSON.'))
+            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'model_driven':
+                messages.append(_('The selected outbound handler uses model-driven rules and can mutate, cancel, dead-letter, or retry deliveries without authored JSON.'))
 
             if not endpoint.header_rule_ids.filtered('active'):
                 messages.append(_('No active Header Rules are configured on this endpoint yet.'))
@@ -169,8 +169,8 @@ class WebhookOutboundEndpoint(models.Model):
             ]
             if not endpoint.partner_id:
                 messages.append(_('Partner-derived rule values resolve false when the endpoint is company-scoped only.'))
-            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'low_code':
-                messages.append(_('Low-code outbound handler rules can inspect delivery fields, endpoint fields, delivery context keys, and the pre-send request snapshot built from these endpoint rules.'))
+            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'model_driven':
+                messages.append(_('Model-driven outbound handler rules can inspect delivery fields, endpoint fields, delivery context keys, and the pre-send request snapshot built from these endpoint rules.'))
             endpoint.template_guidance = '\n'.join(messages)
 
     @api.constrains('execution_user_id', 'company_id')

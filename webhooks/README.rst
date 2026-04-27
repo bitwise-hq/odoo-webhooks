@@ -13,5 +13,5 @@ Current scope
 * durable inbound event storage with idempotency protection
 * queue-backed Python handler execution
 
-Follow-up slices will extend the low-code action layer, outbound delivery, and
+Follow-up slices will extend the model-driven action layer, outbound delivery, and
 provider presets.

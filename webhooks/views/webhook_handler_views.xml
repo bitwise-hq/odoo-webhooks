@@ -58,7 +58,7 @@
                         <field name="python_model_name"/>
                         <field name="python_method_name"/>
                     </group>
-                    <notebook invisible="execution_mode != 'low_code'">
+                    <notebook invisible="execution_mode != 'model_driven'">
                         <page string="Inbound Rules" invisible="not inbound_enabled">
                             <field name="inbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
                                 <list editable="bottom">

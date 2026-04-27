@@ -1,6 +1,6 @@
 from odoo import fields, models
 
-from .webhook_outbound_rule_common import OUTBOUND_RULE_CONDITION_OPERATOR_SELECTION, OUTBOUND_RULE_SOURCE_SELECTION
+from .const import OUTBOUND_RULE_CONDITION_OPERATOR_SELECTION, OUTBOUND_RULE_SOURCE_SELECTION
 
 
 class WebhookHandlerOutboundRuleCondition(models.Model):

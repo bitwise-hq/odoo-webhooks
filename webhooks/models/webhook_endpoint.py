@@ -289,8 +289,8 @@ class WebhookEndpoint(models.Model):
 
             if not endpoint.handler_id:
                 messages.append(_('No default handler is configured. Requests without a resolved handler selector will be stored only.'))
-            elif endpoint.handler_id.execution_mode == 'low_code':
-                messages.append(_('The selected default handler uses model-driven execution, which is still a placeholder in this version.'))
+            elif endpoint.handler_id.execution_mode == 'model_driven':
+                messages.append(_('The selected default handler uses model-driven execution through the configured inbound rules.'))
 
             if endpoint.delivery_identity_policy != 'body_sha256':
                 delivery_key = binding_map.get(endpoint.delivery_identity_policy)
