@@ -191,3 +191,17 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
 
         endpoint.action_set_draft()
         self.assertEqual(endpoint.state, 'draft')
+
+    def test_reset_to_draft_rejects_non_resettable_states(self):
+        endpoint = self._create_outbound_endpoint()
+        delivery = self._create_outbound_delivery(endpoint, state='done')
+
+        with self.assertRaisesRegex(ValidationError, 'Only failed, dead-letter, or canceled'):
+            delivery.action_reset_to_draft()
+
+    def test_cancel_delivery_rejects_non_cancelable_states(self):
+        endpoint = self._create_outbound_endpoint()
+        delivery = self._create_outbound_delivery(endpoint, state='queued')
+
+        with self.assertRaisesRegex(ValidationError, 'Only draft or failed deliveries'):
+            delivery.action_cancel_delivery()

@@ -457,8 +457,8 @@ class WebhookInboundEvent(models.Model):
 
     def action_reset_to_received(self):
         for event in self:
-            if event.state == 'rejected':
-                raise ValidationError(_('Rejected webhook events cannot be reset to received.'))
+            if event.state not in ('error', 'dead_letter'):
+                raise ValidationError(_('Only failed or dead-letter webhook events can be reset to received.'))
             event.write({
                 'state': 'received',
                 'processing_error': False,

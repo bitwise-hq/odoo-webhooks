@@ -424,8 +424,8 @@ class WebhookOutboundDelivery(models.Model):
 
     def action_reset_to_draft(self):
         for delivery in self:
-            if delivery.state == 'processing':
-                raise ValidationError(_('Processing deliveries cannot be reset to draft.'))
+            if delivery.state not in ('error', 'dead_letter', 'canceled'):
+                raise ValidationError(_('Only failed, dead-letter, or canceled deliveries can be reset to draft.'))
             delivery.write({
                 'state': 'draft',
                 'queued_at': False,
@@ -462,8 +462,8 @@ class WebhookOutboundDelivery(models.Model):
 
     def action_cancel_delivery(self):
         for delivery in self:
-            if delivery.state in ('done', 'processing'):
-                raise ValidationError(_('Completed or processing deliveries cannot be canceled.'))
+            if delivery.state not in ('draft', 'error'):
+                raise ValidationError(_('Only draft or failed deliveries can be canceled.'))
             delivery.write({'state': 'canceled'})
         return True
 

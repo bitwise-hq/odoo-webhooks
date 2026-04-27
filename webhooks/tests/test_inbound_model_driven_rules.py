@@ -155,3 +155,10 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
 
         endpoint.action_set_draft()
         self.assertEqual(endpoint.state, 'draft')
+
+    def test_reset_to_received_rejects_non_retriable_states(self):
+        endpoint = self._create_inbound_endpoint()
+        event = self._create_inbound_event(endpoint, state='done')
+
+        with self.assertRaisesRegex(ValidationError, 'Only failed or dead-letter'):
+            event.action_reset_to_received()
