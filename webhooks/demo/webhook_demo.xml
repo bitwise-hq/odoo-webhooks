@@ -3,7 +3,7 @@
     <data noupdate="1">
 
         <record id="base.user_admin" model="res.users">
-            <field name="groups_id" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="group_ids" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
         </record>
 
         <record id="webhook_demo_partner_alpha" model="res.partner">

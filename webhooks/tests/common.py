@@ -17,7 +17,7 @@ class WebhookRuleTestCase(TransactionCase):
             'email': 'webhook.test@example.com',
             'company_id': self.company.id,
             'company_ids': [(6, 0, [self.company.id])],
-            'groups_id': [(6, 0, [self.internal_user_group.id, self.webhook_admin_group.id])],
+            'group_ids': [(6, 0, [self.internal_user_group.id, self.webhook_admin_group.id])],
         })
 
     def _next_token(self, prefix):
