@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_handler_form_outbound" model="ir.ui.view">
+    <field name="name">webhook.handler.form.outbound</field>
+    <field name="model">bwt.webhook.handler</field>
+    <field name="inherit_id" ref="bwt_webhooks_core.view_webhook_handler_form" />
+    <field name="arch" type="xml">
+      <notebook name="rules" position="inside">
+        <page string="Outbound Rules" invisible="direction != 'outbound'">
+          <field name="outbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
+            <list editable="bottom">
+              <field name="sequence" />
+              <field name="active" />
+              <field name="name" />
+              <field name="result_status" />
+              <field name="retry_seconds" />
+            </list>
+            <form>
+              <sheet>
+                <group>
+                  <group>
+                    <field name="name" />
+                    <field name="sequence" />
+                    <field name="active" />
+                  </group>
+                  <group>
+                    <field name="result_status" />
+                    <field name="retry_seconds" invisible="result_status != 'retry'" />
+                  </group>
+                </group>
+                <group string="Notes">
+                  <field name="note" nolabel="1" widget="text" />
+                </group>
+                <notebook>
+                  <page string="Conditions">
+                    <field name="condition_ids" nolabel="1">
+                      <list editable="bottom">
+                        <field name="sequence" />
+                        <field name="source_kind" />
+                        <field name="source_expression" />
+                        <field name="operator" />
+                        <field name="expected_value" />
+                      </list>
+                    </field>
+                  </page>
+                  <page string="Assignments">
+                    <field name="assignment_ids" nolabel="1">
+                      <list editable="bottom">
+                        <field name="sequence" />
+                        <field name="target_scope" />
+                        <field name="target_expression" />
+                        <field name="source_kind" />
+                        <field name="source_expression" />
+                        <field name="literal_value" />
+                      </list>
+                    </field>
+                  </page>
+                </notebook>
+              </sheet>
+            </form>
+          </field>
+        </page>
+      </notebook>
+    </field>
+  </record>
+</odoo>

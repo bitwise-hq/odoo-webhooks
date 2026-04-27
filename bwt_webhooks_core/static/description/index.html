@@ -1,0 +1,186 @@
+
+<section class="oe_container" style="background:#F5F4FF; padding:40px 0 32px;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <img src="cover.png" alt="Webhooks Framework - Core Orchestration cover" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
+      <h2 class="oe_slogan" style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; margin-top:20px;">Webhooks Framework - Core Orchestration</h2>
+      <h3 class="oe_slogan" style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-weight:400;">Production-grade webhook orchestration for Odoo.</h3>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding:40px 0;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Key Features</h2>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+        <li>Unified handler model with clear inbound/outbound separation.</li>
+        <li>Rule-driven execution or Python callbacks for advanced logic.</li>
+        <li>Queue-backed job definitions and async execution primitives.</li>
+        <li>Security groups and access rules for webhook administration.</li>
+        <li>Stable primitives for connector-backed integrations.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark" style="background:#E6E5F2; padding:32px 0; text-align:center;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <img src="diagrams/webhooks-core-entities.svg" alt="Core data model" style="max-width:720px; width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(91,79,232,0.10);"/>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Usage</h2>
+      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+        <li>Install this addon alongside <code>bwt_webhooks_inbound</code> and/or</li>
+        <li>Go to <code>Webhooks > Handlers</code> and create a handler for each flow.</li>
+        <li>Choose an execution mode:</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="background:#5B4FE8; padding:36px 0; text-align:center;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <p style="color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:16px; margin:0;">Looking for turnkey integrations? Pair this framework with premium connector addons (e.g., Stripe) to launch faster.</p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Operator Guide</h2>
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Core - Operator Guide</h2>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the shared foundation of the webhook framework: installing the addon stack, assigning access roles, and creating handler records that both the inbound and outbound gateway addons depend on.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Prerequisites</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Install the following addons in order:</p>
+      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:8px;"><code>queue_job</code> - background job execution engine (OCA connector queue).</li>
+        <li style="margin-bottom:8px;"><code>bwt_webhooks_core</code> - shared handler registry and services.</li>
+        <li style="margin-bottom:8px;"><code>bwt_webhooks_inbound</code> (optional) - inbound endpoint gateway.</li>
+        <li style="margin-bottom:8px;"><code>bwt_webhooks_outbound</code> (optional) - outbound delivery engine.</li>
+      </ol>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Confirm the <code>queue_job</code> worker process is active on the server before routing live traffic through any endpoint.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Access Roles</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Navigate to <strong>Settings -> Users & Companies -> Users</strong>, open a user record, and locate the <strong>Webhooks</strong> privilege under the access rights tab.</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Operator</strong> - view events, deliveries, and audit records; trigger reprocess and dead-letter actions on individual records.</li>
+        <li style="margin-bottom:6px;"><strong>Administrator</strong> - full read/write on all webhook configuration (handlers, endpoints, rules, signature parts); implies Operator.</li>
+      </ul>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Odoo system administrators receive the <strong>Administrator</strong> role automatically.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Creating a Handler</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">A handler defines <em>how</em> inbound events or outbound deliveries are processed. It is the shared execution definition consumed by both gateway addons.</p>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Go to <strong>Webhooks -> Handlers -> New</strong> and fill in:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Name</strong> - human-readable label.</li>
+        <li style="margin-bottom:6px;"><strong>Code</strong> - stable, unique technical identifier (lowercase slug; no spaces).</li>
+        <li style="margin-bottom:6px;"><strong>Direction</strong> - <code>Inbound</code> for events, <code>Outbound</code> for deliveries.</li>
+        <li style="margin-bottom:6px;"><strong>Execution Mode</strong> - choose one:</li>
+      </ul>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Model Driven</strong> - configure rule rows directly on the handler form; no Python code required.</li>
+        <li style="margin-bottom:6px;"><strong>Python Callback</strong> - the framework calls a specific method on a specific Odoo model at processing time; requires <strong>Python Model</strong> and <strong>Python Method</strong> to be set.</li>
+      </ul>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Company</strong> - defaults to the current company.</li>
+      </ul>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Save the handler. It is now available to attach to inbound endpoints or outbound endpoint configurations.</p>
+      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Python Callback Setup</h4>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">When <strong>Python Callback</strong> is selected:</p>
+      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:8px;">Set <strong>Python Model</strong> to the technical model name (e.g. <code>sale.order</code>).</li>
+        <li style="margin-bottom:8px;">Set <strong>Python Method</strong> to the method that will be called (e.g. <code>handle_webhook_event</code>).</li>
+      </ol>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Both fields are required; the handler form enforces this before saving.</p>
+      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Archiving Handlers</h4>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Archived handlers remain visible in historical audit records but are no longer selectable for new work. Use <strong>Action -> Archive</strong> from the handler list or form.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Troubleshooting Checklist</h3>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Handler not selectable on an inbound endpoint</strong>: verify <strong>Direction</strong> is set to <code>Inbound</code>.</li>
+        <li style="margin-bottom:6px;"><strong>Handler not selectable on an outbound endpoint</strong>: verify <strong>Direction</strong> is set to <code>Outbound</code>.</li>
+        <li style="margin-bottom:6px;"><strong>Python callback raises "method not found"</strong>: confirm the addon that defines the model is installed and the method name is spelled correctly.</li>
+        <li style="margin-bottom:6px;"><strong>Jobs are not processing</strong>: check that the <code>queue_job</code> worker is running and that no job channel is paused or at capacity.</li>
+        <li style="margin-bottom:6px;"><strong>Company mismatch errors</strong>: the handler, endpoint, and all target records must share the same company.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="background:#ffffff; padding:40px 0;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Developer Guide</h2>
+      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Core - Developer Guide</h2>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the core data model, handler execution contract, and service layer. It is the foundation for understanding both the inbound and outbound gateway addons.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Data Model</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The core addon defines one primary model:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><code>bwt.webhook.handler</code> - execution definition shared by both gateway addons. Carries direction, execution mode, and optional Python callback pointers.</li>
+      </ul>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The gateway addons extend the graph with these models:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><code>bwt.webhook.inbound.endpoint</code> - public HTTP receiver (inbound addon).</li>
+        <li style="margin-bottom:6px;"><code>bwt.webhook.inbound.event</code> - audit record for each received request.</li>
+        <li style="margin-bottom:6px;"><code>bwt.webhook.inbound.handler.rule</code> - declarative rule row on a handler.</li>
+        <li style="margin-bottom:6px;"><code>bwt.webhook.outbound.endpoint</code> - target HTTP configuration (outbound addon).</li>
+        <li style="margin-bottom:6px;"><code>bwt.webhook.outbound.delivery</code> - queued outbound request snapshot.</li>
+        <li style="margin-bottom:6px;"><code>bwt.webhook.outbound.delivery.attempt</code> - per-attempt HTTP execution log.</li>
+      </ul>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Handler Execution Modes</h3>
+      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Model Driven</h4>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Rules on the handler are evaluated in ascending <code>sequence</code> order. Each rule carries:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><strong>Conditions</strong> - zero or more field-path comparisons against the event or delivery payload; all conditions must pass for the rule to fire.</li>
+        <li style="margin-bottom:6px;"><strong>Action</strong> - one of <code>done</code>, <code>dead_letter</code>, <code>retry</code>, <code>create_record</code>, <code>update_record</code>, <code>upsert_record</code>.</li>
+        <li style="margin-bottom:6px;"><strong>Assignments</strong> - field path -> value mappings written to the target record on create/update/upsert actions.</li>
+        <li style="margin-bottom:6px;"><strong>Lookup Keys</strong> - field path -> value mappings that locate the existing record for <code>update_record</code> and <code>upsert_record</code>.</li>
+      </ul>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The first matching rule wins. If no rule matches, the event or delivery is marked <code>done</code> by default.</p>
+      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Python Callback</h4>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Inbound callback signature</p>
+      <pre>def handle_inbound_event(self, event):
+    payload = event.get_payload()
+    # ... your logic ...
+    return event.webhook_done()</pre>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Outbound callback signature</p>
+      <pre>def handle_outbound_delivery(self, delivery):
+    # ... your logic ...
+    return delivery._build_outbound_delivery_result(outcome=&quot;send&quot;)</pre>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Returning <code>None</code> from either callback produces a framework-level <code>dead_letter</code>. Use the helper methods on the event or delivery record to return well-formed results: <code>webhook_done()</code>, <code>webhook_dead_letter()</code>, <code>webhook_retry(seconds=N)</code>.</p>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Service Layer</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;"><code>bwt_webhooks_core</code> ships pure-Python service modules that the ORM models delegate to. These can be imported and tested without the ORM:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><code>services/signature.py</code> - HMAC computation and constant-time verification. Algorithms: <code>sha1</code>, <code>sha256</code>, <code>sha512</code>. Encodings: <code>hex</code>, <code>base64</code>.</li>
+        <li style="margin-bottom:6px;"><code>services/transport.py</code> - translates <code>OutboundRequest</code> value objects to <code>requests.request</code> kwargs. Handles <code>json</code>, <code>form_urlencoded</code>, and <code>multipart</code> body modes.</li>
+        <li style="margin-bottom:6px;"><code>services/identity.py</code> - delivery identity and replay identity resolution, keyed by a configurable header or payload path.</li>
+        <li style="margin-bottom:6px;"><code>services/conditions.py</code> - condition evaluation engine used by model-driven rule processing.</li>
+        <li style="margin-bottom:6px;"><code>services/value_objects.py</code> - <code>InboundMetadata</code>, <code>OutboundRequest</code>, and <code>HandlerOutcome</code> data classes that keep the processing pipeline explicit.</li>
+      </ul>
+      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Exceptions</h4>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">All framework exceptions live in <code>bwt_webhooks_core.exceptions</code>:</p>
+      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:6px;"><code>WebhookValidationError</code> - base class.</li>
+        <li style="margin-bottom:6px;"><code>WebhookSignatureValidationError</code> - HMAC mismatch.</li>
+        <li style="margin-bottom:6px;"><code>WebhookFreshnessValidationError</code> - timestamp outside the allowed window.</li>
+        <li style="margin-bottom:6px;"><code>WebhookPayloadValidationError</code> - unexpected payload shape.</li>
+        <li style="margin-bottom:6px;"><code>WebhookProcessingConfigurationError</code> - misconfigured handler or endpoint.</li>
+      </ul>
+      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Extending the Framework</h3>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To add a custom processing step:</p>
+      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
+        <li style="margin-bottom:8px;">Create a model with a method matching the callback contract above.</li>
+        <li style="margin-bottom:8px;">Create a <code>bwt.webhook.handler</code> record pointing to that model and method via <strong>Webhooks -> Handlers</strong>.</li>
+        <li style="margin-bottom:8px;">Attach the handler to an inbound endpoint or outbound endpoint record.</li>
+      </ol>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To expose a new value in model-driven rule assignments, extend <code>bwt.webhook.inbound.event</code> or <code>bwt.webhook.outbound.delivery</code> with a stored field and make it accessible via the value-extraction path used in assignments.</p>
+      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">No core file edits are required; the framework is designed to be extended through standard Odoo model inheritance and configuration records.</p>
+    </div>
+  </div>
+</section>

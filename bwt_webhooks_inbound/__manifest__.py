@@ -1,0 +1,28 @@
+{
+    "name": "Webhooks Framework - Inbound Gateway",
+    "version": "19.0.1.0.0",
+    "category": "Tools",
+    "summary": "Secure inbound webhook endpoints with signature validation and rule-based processing.",
+    "development_status": "Production",
+    "depends": ["bwt_webhooks_core"],
+    "data": [
+        "security/ir.model.access.csv",
+        "security/webhook_security.xml",
+        "data/queue_job_function_data.xml",
+        "views/webhook_endpoint_views.xml",
+        "views/webhook_handler_views.xml",
+        "views/webhook_inbound_event_views.xml",
+        "views/webhook_menu_views.xml",
+    ],
+    "demo": [
+        "demo/webhook_demo_endpoints.xml",
+        "demo/webhook_demo_rules_inbound.xml",
+    ],
+    "author": "Bitwise Technologies LLC",
+    "contributors": ["Youssef Egla"],
+    "license": "OPL-1",
+    "price": 0.0,
+    "currency": "USD",
+    "images": ["static/description/banner.png", "static/description/icon.png"],
+    "installable": True,
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="job_function_webhook_outbound_delivery_process_delivery" model="queue.job.function">
+    <field name="model_id" ref="model_bwt_webhook_outbound_delivery" />
+    <field name="method">process_delivery</field>
+    <field name="channel_id" ref="bwt_webhooks_core.channel_webhooks" />
+    <field name="retry_pattern" eval="{1: 30, 3: 120, 5: 600}" />
+  </record>
+</odoo>

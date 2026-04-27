@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_test_connector_backend_inbound,access_test_connector_backend_inbound,model_bwt_test_connector_webhook_backend_inbound,base.group_system,1,1,1,1
+access_test_connector_backend_inbound_bare,access_test_connector_backend_inbound_bare,model_bwt_test_connector_webhook_backend_inbound_bare,base.group_system,1,1,1,1

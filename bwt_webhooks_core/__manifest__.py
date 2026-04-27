@@ -1,0 +1,27 @@
+{
+    "name": "Webhooks Framework - Orchestration",
+    "version": "19.0.1.0.0",
+    "category": "Tools",
+    "summary": "Production-grade webhook orchestration with rule-driven handlers and async execution.",
+    "development_status": "Production",
+    "depends": ["mail", "queue_job"],
+    "pre_init_hook": "pre_init_hook",
+    "data": [
+        "security/webhook_groups.xml",
+        "security/ir.model.access.csv",
+        "security/webhook_security.xml",
+        "data/queue_job_function_data.xml",
+        "views/webhook_handler_views.xml",
+        "views/webhook_menu_views.xml",
+    ],
+    "demo": [
+        "demo/webhook_demo_handlers.xml",
+    ],
+    "author": "Bitwise Technologies LLC",
+    "contributors": ["Youssef Egla"],
+    "license": "OPL-1",
+    "price": 0.0,
+    "currency": "USD",
+    "images": ["static/description/banner.png", "static/description/icon.png"],
+    "installable": True,
+}

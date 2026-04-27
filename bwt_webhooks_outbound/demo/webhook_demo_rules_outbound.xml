@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <record id="webhook_demo_outbound_handler_rule_loopback" model="bwt.webhook.outbound.handler.rule">
+      <field name="handler_id" ref="bwt_webhooks_core.webhook_demo_handler_outbound_loopback" />
+      <field name="name">Annotate Demo Loopback Delivery</field>
+      <field name="result_status">send</field>
+      <field name="note">Adds demo-specific headers and payload metadata through the relational outbound handler rule path.</field>
+    </record>
+
+    <record id="webhook_demo_outbound_handler_rule_loopback_condition" model="bwt.webhook.outbound.handler.rule.condition">
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">topic</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">demo.orders.created</field>
+    </record>
+
+    <record id="webhook_demo_outbound_handler_rule_loopback_assignment_header" model="bwt.webhook.outbound.handler.rule.assignment">
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="target_scope">header</field>
+      <field name="target_expression">X-Demo-Handler</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">loopback-relational-handler</field>
+    </record>
+
+    <record id="webhook_demo_outbound_handler_rule_loopback_assignment_payload" model="bwt.webhook.outbound.handler.rule.assignment">
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="target_scope">payload</field>
+      <field name="target_expression">meta.handler_rule</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">loopback-relational-handler</field>
+    </record>
+  </data>
+</odoo>

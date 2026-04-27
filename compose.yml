@@ -1,0 +1,151 @@
+name: webhooks
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL (shared for dev and test)
+  #   - Single container used by both the dev Odoo and the CI test runner
+  #   - Creates both databases on first start via init scripts
+  # ---------------------------------------------------------------------------
+  postgres:
+    profiles: [dev, test]
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./.docker/initdb:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  # ---------------------------------------------------------------------------
+  # CI / automated test runner  [profile: test]
+  # ---------------------------------------------------------------------------
+  test:
+    profiles: [test]
+    image: bitwise-odoo:ee-19
+    pull_policy: never
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /mnt/repo
+    volumes:
+      - type: bind
+        source: .
+        target: /mnt/repo
+      - type: bind
+        source: d:/Projects/OCA/odoo-oca-queue
+        target: /mnt/deps/queue
+      - type: bind
+        source: d:/Projects/OCA/odoo-oca-connector
+        target: /mnt/deps/connector
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      PGDATABASE: odoo-test
+      OCA_ENABLE_CHECKLOG_ODOO: "1"
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        # Reset odoo.cfg to avoid duplicate addons_path lines confusing manifestoo
+        printf "[options]\n" > /etc/odoo.cfg
+        rm -f test-constraints.txt test-requirements.txt
+        pip install --quiet cachetools
+        export ADDONS_PATH="${ADDONS_PATH:+${ADDONS_PATH},}/mnt/deps/queue,/mnt/deps/connector"
+        oca_install_addons
+        dropdb --if-exists "$$PGDATABASE"
+        # queue_job and connector are runtime deps but intentionally NOT in
+        # depends/ for Apps Store compatibility; pre-install them so the
+        # pre_init_hook checks pass when our addons load.
+        odoo -d "$$PGDATABASE" -i queue_job,connector --stop-after-init \
+            --with-demo --http-interface=127.0.0.1
+        oca_init_test_database
+        oca_run_tests
+        python -m coverage html -d /mnt/repo/htmlcov
+        echo ""
+        echo "HTML coverage report written to htmlcov/"
+
+  # ---------------------------------------------------------------------------
+  # Odoo dev server  [profile: dev]
+  #
+  # First start installs base modules; subsequent starts run the server.
+  # ---------------------------------------------------------------------------
+  odoo:
+    profiles: [dev]
+    image: bitwise-odoo:ee-19
+    pull_policy: never
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    working_dir: /mnt/repo
+    volumes:
+      - type: bind
+        source: .
+        target: /mnt/repo
+      - type: bind
+        source: d:/Projects/OCA/odoo-oca-queue
+        target: /mnt/deps/queue
+      - type: bind
+        source: d:/Projects/OCA/odoo-oca-connector
+        target: /mnt/deps/connector
+      - odoo-filestore:/var/lib/odoo
+      - odoo-sessions:/var/lib/odoo-sessions
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      PGDATABASE: ${PGDATABASE:-odoo-dev}
+      ODOO_QUEUE_JOB_SCHEME: http
+      ODOO_QUEUE_JOB_HOST: localhost
+      ODOO_QUEUE_JOB_PORT: "8069"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8069/web/health > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        # Remove any pre-existing addons_path and without-demo lines
+        sed -i '/^addons_path/d' /etc/odoo.cfg
+        sed -i '/^server_wide_modules/d' /etc/odoo.cfg
+        sed -i '/^data_dir/d' /etc/odoo.cfg
+        echo 'addons_path=/opt/odoo/addons,/mnt/deps/queue,/mnt/deps/connector,/mnt/repo' >> /etc/odoo.cfg
+        echo 'server_wide_modules=base,web,bus,queue_job' >> /etc/odoo.cfg
+        echo 'data_dir=/var/lib/odoo' >> /etc/odoo.cfg
+        pip install --quiet cachetools
+
+        # One-time, truly fresh install: base, web, mail, and all webhooks modules including demo
+          odoo -d "$$PGDATABASE" --stop-after-init --with-demo -i base,web,mail
+
+        exec odoo -d "$$PGDATABASE" \
+            --with-demo \
+            --load=base,web,bus,queue_job \
+            --http-interface=0.0.0.0 \
+            --http-port=8069 \
+            --limit-time-real=1200 \
+            --limit-time-cpu=600 \
+            --workers=2
+
+volumes:
+  pgdata:
+  odoo-filestore:
+  odoo-sessions:

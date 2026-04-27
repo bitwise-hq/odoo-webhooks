@@ -1,0 +1,14 @@
+# Force LF line endings for all text files on checkout
+* text=auto eol=lf
+
+# Generated files — always LF so pre-commit hooks don't perpetually modify them
+**/README.rst text eol=lf
+**/static/description/index.html text eol=lf
+
+# Binary files — no line-ending conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf

@@ -1,0 +1,68 @@
+<section class="oe_container" style="background:#F5F4FF; padding:24px 0 16px;">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <img src="banner.png" alt="Bitwise Connector Webhooks Inbound banner" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12 text-center">
+      <h2 class="oe_slogan" style="color: #4F46E5;">Bitwise Connector Webhooks Inbound</h2>
+      <h3 class="oe_slogan">Inbound webhook integration for connector backends.</h3>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2>Overview</h2>
+      <p>
+        <strong>Bitwise Connector Webhooks Inbound</strong> provides an opt-in mixin
+        (<code>bwt.connector.webhook.inbound.mixin</code>) that connector backends inherit to
+        gain fully automated inbound webhook provisioning. Endpoints and handlers are created,
+        updated, and linked to the backend record without manual configuration.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2>Key Features</h2>
+      <ul>
+        <li>Adds <code>connector_backend_ref</code> on inbound endpoints and a computed <code>webhook_endpoint_id</code> on the backend</li>
+        <li>Inbound callback dispatcher (<code>_handle_inbound_webhook_event</code>) routed via the framework's <code>_invoke_inbound_dispatch</code> hook</li>
+        <li>JSON payload decoder with configurable depth and error handling</li>
+        <li>Form action to navigate directly to the linked inbound endpoint</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2>Dependencies</h2>
+      <ul>
+        <li><code>bwt_connector_webhooks_core</code></li>
+        <li><code>bwt_webhooks_inbound</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2>Author</h2>
+      <p>
+        Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
+        Contributors: Youssef Egla.
+      </p>
+    </div>
+  </div>
+</section>

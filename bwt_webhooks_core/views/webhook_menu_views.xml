@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_queue_job_search_webhooks" model="ir.ui.view">
+    <field name="name">queue.job.search.webhooks</field>
+    <field name="model">queue.job</field>
+    <field name="inherit_id" ref="queue_job.view_queue_job_search" />
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='done']" position="after">
+        <filter name="not_done" string="Not Done" domain="[('state', '!=', 'done')]" />
+      </xpath>
+    </field>
+  </record>
+
+  <menuitem id="menu_webhooks_root" name="Webhooks" parent="base.menu_custom" sequence="90" groups="bwt_webhooks_core.group_webhooks_operator,bwt_webhooks_core.group_webhooks_admin" />
+</odoo>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <record id="webhook_demo_outbound_delivery_loopback_orders" model="bwt.webhook.outbound.delivery">
+      <field name="name">Demo Loopback Order Created Delivery</field>
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="processing_note">Seeded demo delivery. Queue it after install to smoke-test the canonical order.created loopback flow.</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_delivery_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">10</field>
+      <field name="key_name">delivery_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-delivery-0001</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_topic" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">20</field>
+      <field name="key_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo.orders.created</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_event_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">30</field>
+      <field name="key_name">event_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-event-0001</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_event_type" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">40</field>
+      <field name="key_name">event_type</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">order.created</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_order_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">50</field>
+      <field name="key_name">order_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">SO-DEMO-0001</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_order_total" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">60</field>
+      <field name="key_name">order_total</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">149.99</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_currency" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">70</field>
+      <field name="key_name">currency</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">USD</field>
+    </record>
+
+    <record id="webhook_demo_outbound_context_customer" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">80</field>
+      <field name="key_name">customer</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">Webhook Smoke Tenant Alpha</field>
+    </record>
+
+    <record id="webhook_demo_outbound_delivery_loopback_product" model="bwt.webhook.outbound.delivery">
+      <field name="name">Demo Loopback Product Created Delivery</field>
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="processing_note">Seeded demo delivery for product.created using the same canonical loopback endpoint.</field>
+    </record>
+
+    <record id="webhook_demo_outbound_product_context_delivery_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_product" />
+      <field name="sequence">10</field>
+      <field name="key_name">delivery_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-delivery-0002</field>
+    </record>
+
+    <record id="webhook_demo_outbound_product_context_topic" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_product" />
+      <field name="sequence">20</field>
+      <field name="key_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo.product.created</field>
+    </record>
+
+    <record id="webhook_demo_outbound_product_context_event_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_product" />
+      <field name="sequence">30</field>
+      <field name="key_name">event_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-event-0002</field>
+    </record>
+
+    <record id="webhook_demo_outbound_product_context_event_type" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_product" />
+      <field name="sequence">40</field>
+      <field name="key_name">event_type</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">product.created</field>
+    </record>
+
+    <record id="webhook_demo_outbound_product_context_customer" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_product" />
+      <field name="sequence">80</field>
+      <field name="key_name">customer</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">Webhook Smoke Tenant Alpha</field>
+    </record>
+
+    <record id="webhook_demo_outbound_delivery_loopback_customer" model="bwt.webhook.outbound.delivery">
+      <field name="name">Demo Loopback Customer Updated Delivery</field>
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="processing_note">Seeded demo delivery for customer.updated using the same canonical loopback endpoint.</field>
+    </record>
+
+    <record id="webhook_demo_outbound_customer_context_delivery_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_customer" />
+      <field name="sequence">10</field>
+      <field name="key_name">delivery_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-delivery-0003</field>
+    </record>
+
+    <record id="webhook_demo_outbound_customer_context_topic" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_customer" />
+      <field name="sequence">20</field>
+      <field name="key_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo.customer.updated</field>
+    </record>
+
+    <record id="webhook_demo_outbound_customer_context_event_id" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_customer" />
+      <field name="sequence">30</field>
+      <field name="key_name">event_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-event-0003</field>
+    </record>
+
+    <record id="webhook_demo_outbound_customer_context_event_type" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_customer" />
+      <field name="sequence">40</field>
+      <field name="key_name">event_type</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">customer.updated</field>
+    </record>
+
+    <record id="webhook_demo_outbound_customer_context_customer" model="bwt.webhook.outbound.delivery.context.line">
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_customer" />
+      <field name="sequence">80</field>
+      <field name="key_name">customer</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">Webhook Smoke Tenant Alpha</field>
+    </record>
+  </data>
+</odoo>

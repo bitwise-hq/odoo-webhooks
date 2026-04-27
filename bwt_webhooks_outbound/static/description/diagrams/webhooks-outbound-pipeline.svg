@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 820" width="100%" style="max-width:780px;background:#ffffff;">
+  <defs>
+    <marker id="plp-arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L6,4 L0,7 Z" fill="#6E6B88"/>
+    </marker>
+    <marker id="plp-arr-g" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L6,4 L0,7 Z" fill="#27AE60"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="390" y="24" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="16" font-weight="700" fill="#5B4FE8">
+    Outbound Processing Pipeline
+  </text>
+
+  <!-- ============================================================ -->
+  <!-- MAIN COLUMN ARROWS                                            -->
+  <!-- ============================================================ -->
+
+  <!-- process_delivery (bottom y=80) -> _process_one (top y=108) -->
+  <line x1="390" y1="80"  x2="390" y2="105" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- _process_one (bottom y=152) -> _build_outbound_request (top y=198) -->
+  <line x1="390" y1="152" x2="390" y2="195" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- _build_outbound_request (bottom y=242) -> handler (top y=298) -->
+  <line x1="390" y1="242" x2="390" y2="295" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- handler (bottom y=344) -> diamond top (y=404) -->
+  <line x1="390" y1="344" x2="390" y2="401" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- diamond bottom (y=500) -> _create_attempt (top y=574) -->
+  <line x1="390" y1="500" x2="390" y2="571" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- _create_attempt (bottom y=618) -> _dispatch (top y=664) -->
+  <line x1="390" y1="618" x2="390" y2="661" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- _dispatch (bottom y=708) -> _record_response (top y=758) -->
+  <line x1="390" y1="708" x2="390" y2="755" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+
+  <!-- ============================================================ -->
+  <!-- DECISION SIDE EXITS                                           -->
+  <!-- ============================================================ -->
+
+  <!-- left corner (288,452) -> terminal box right edge (210,452) -->
+  <line x1="288" y1="452" x2="213" y2="452" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+  <!-- right corner (492,452) -> retry box left edge (590,452) -->
+  <line x1="492" y1="452" x2="587" y2="452" stroke="#6E6B88" stroke-width="1.5" marker-end="url(#plp-arr)"/>
+
+  <!-- ============================================================ -->
+  <!-- VALUE OBJECT SIDE ARROWS                                      -->
+  <!-- ============================================================ -->
+
+  <!-- _build_outbound_request right (520,220) -> OutboundRequest badge left (560,220) -->
+  <line x1="520" y1="220" x2="557" y2="220" stroke="#27AE60" stroke-width="1.5" marker-end="url(#plp-arr-g)"/>
+  <!-- handler right (525,321) -> HandlerOutcome badge left (560,321) -->
+  <line x1="525" y1="321" x2="557" y2="321" stroke="#27AE60" stroke-width="1.5" marker-end="url(#plp-arr-g)"/>
+  <!-- _dispatch right (510,686) -> HTTP Response badge left (560,686) -->
+  <line x1="510" y1="686" x2="557" y2="686" stroke="#27AE60" stroke-width="1.5" marker-end="url(#plp-arr-g)"/>
+
+  <!-- ============================================================ -->
+  <!-- NODES                                                         -->
+  <!-- ============================================================ -->
+
+  <!-- 1. process_delivery  (entry pill, brand primary) -->
+  <!-- rect: x=280 y=36 w=220 h=44 center=(390,58) -->
+  <rect x="280" y="36" width="220" height="44" rx="22" fill="#5B4FE8"/>
+  <text x="390" y="63" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="14" font-weight="600" fill="#ffffff">
+    process_delivery
+  </text>
+
+  <!-- 2. _process_one -->
+  <!-- rect: x=280 y=108 w=220 h=44 center=(390,130) -->
+  <rect x="280" y="108" width="220" height="44" rx="6" fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="135" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="14" fill="#16142B">
+    _process_one
+  </text>
+
+  <!-- 3. _build_outbound_request (slightly wider: w=240, x=270) -->
+  <!-- rect: x=270 y=198 w=240 h=44 center=(390,220) -->
+  <rect x="270" y="198" width="240" height="44" rx="6" fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="224" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="13" fill="#16142B">
+    _build_outbound_request
+  </text>
+
+  <!-- Badge: OutboundRequest -->
+  <!-- rect: x=560 y=202 w=158 h=36 center=(639,220) -->
+  <rect x="560" y="202" width="158" height="36" rx="4" fill="#F0FFF4" stroke="#27AE60" stroke-width="1.5"/>
+  <text x="639" y="218" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="11" font-weight="600" fill="#1E8449">
+    OutboundRequest
+  </text>
+  <text x="639" y="231" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#27AE60">
+    value object
+  </text>
+
+  <!-- 4. handler.execute_outbound  (optional, dashed border, w=250, x=265) -->
+  <!-- rect: x=265 y=298 w=250 h=46 center=(390,321) -->
+  <rect x="265" y="298" width="250" height="46" rx="6"
+        fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="390" y="317" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="12.5" fill="#16142B">
+    handler.execute_outbound
+  </text>
+  <text x="390" y="334" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" font-style="italic" fill="#6E6B88">
+    optional - if handler attached
+  </text>
+
+  <!-- Badge: HandlerOutcome -->
+  <!-- rect: x=560 y=303 w=158 h=36 center=(639,321) -->
+  <rect x="560" y="303" width="158" height="36" rx="4" fill="#F0FFF4" stroke="#27AE60" stroke-width="1.5"/>
+  <text x="639" y="319" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="11" font-weight="600" fill="#1E8449">
+    HandlerOutcome
+  </text>
+  <text x="639" y="332" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#27AE60">
+    value object
+  </text>
+
+  <!-- 5. Decision diamond -->
+  <!-- center=(390,452) half-w=102 half-h=48 -->
+  <!-- corners: top(390,404) right(492,452) bottom(390,500) left(288,452) -->
+  <polygon points="390,404 492,452 390,500 288,452"
+           fill="#E6E5F2" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="456" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="12" font-weight="600" fill="#16142B">
+    outcome?
+  </text>
+
+  <!-- Decision edge labels -->
+  <text x="249" y="443" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" fill="#6E6B88">terminal</text>
+  <text x="543" y="443" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" fill="#6E6B88">retry</text>
+  <text x="403" y="543" text-anchor="start"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" fill="#6E6B88">send</text>
+
+  <!-- Terminal outcome box: x=40 y=412 w=170 h=80 center=(125,452) -->
+  <rect x="40" y="412" width="170" height="80" rx="6" fill="#FFF8F0" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="125" y="441" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" font-weight="700" fill="#D35400">
+    terminal
+  </text>
+  <text x="125" y="457" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#16142B">
+    write delivery state
+  </text>
+  <text x="125" y="471" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#16142B">
+    return (no HTTP call)
+  </text>
+
+  <!-- Retry outcome box: x=590 y=412 w=170 h=80 center=(675,452) -->
+  <rect x="590" y="412" width="170" height="80" rx="6" fill="#FFF8F0" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="675" y="441" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="11" font-weight="700" fill="#D35400">
+    retry
+  </text>
+  <text x="675" y="457" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#16142B">
+    raise
+  </text>
+  <text x="675" y="471" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="10" fill="#16142B">
+    RetryableJobError
+  </text>
+
+  <!-- 6. _create_attempt -->
+  <!-- rect: x=280 y=574 w=220 h=44 center=(390,596) -->
+  <rect x="280" y="574" width="220" height="44" rx="6" fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="601" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="14" fill="#16142B">
+    _create_attempt
+  </text>
+
+  <!-- 7. _dispatch -->
+  <!-- rect: x=280 y=664 w=220 h=44 center=(390,686) -->
+  <rect x="280" y="664" width="220" height="44" rx="6" fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="691" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="14" fill="#16142B">
+    _dispatch
+  </text>
+
+  <!-- Badge: HTTP Response -->
+  <!-- rect: x=560 y=668 w=155 h=36 center=(637,686) -->
+  <rect x="560" y="668" width="155" height="36" rx="4" fill="#F0FFF4" stroke="#27AE60" stroke-width="1.5"/>
+  <text x="637" y="684" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="11" font-weight="600" fill="#1E8449">
+    HTTP response
+  </text>
+  <text x="637" y="697" text-anchor="middle"
+        font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#27AE60">
+    raw result
+  </text>
+
+  <!-- 8. _record_response -->
+  <!-- rect: x=280 y=758 w=220 h=44 center=(390,780) -->
+  <rect x="280" y="758" width="220" height="44" rx="6" fill="#F5F4FF" stroke="#5B4FE8" stroke-width="1.5"/>
+  <text x="390" y="785" text-anchor="middle"
+        font-family="'IBM Plex Mono','Courier New',monospace" font-size="14" fill="#16142B">
+    _record_response
+  </text>
+
+  <!-- ============================================================ -->
+  <!-- LEGEND (bottom-left, below terminal box)                      -->
+  <!-- ============================================================ -->
+  <rect x="40" y="506" width="210" height="42" rx="4" fill="none" stroke="#E6E5F2" stroke-width="1"/>
+  <line x1="54" y1="520" x2="86" y2="520" stroke="#5B4FE8" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="92" y="524" font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#6E6B88">optional step</text>
+  <rect x="54" y="531" width="11" height="11" rx="2" fill="#F0FFF4" stroke="#27AE60" stroke-width="1"/>
+  <text x="71" y="541" font-family="'IBM Plex Sans',Arial,sans-serif" font-size="10" fill="#6E6B88">produces value object</text>
+</svg>

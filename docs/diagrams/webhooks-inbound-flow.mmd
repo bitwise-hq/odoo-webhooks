@@ -1,0 +1,14 @@
+flowchart TD
+  A["Inbound HTTP Request"] --> B{"Endpoint Found?"}
+  B -- No --> Z["Reject (not configured)"]
+  B -- Yes --> C["Validate Signature + Timestamp"]
+  C -- Fail --> D["Reject Request"]
+  C -- Pass --> E["Check Replay / Idempotency"]
+  E -- Duplicate --> F["Mark Replay"]
+  E -- New --> G["Create Inbound Event"]
+  G --> H["Resolve Semantic Fields"]
+  H --> I{"Match Rules?"}
+  I -- No --> J["Mark Done or Dead Letter"]
+  I -- Yes --> K["Queue Job: Execute Action"]
+  K --> L["Create/Update/Upsert Records"]
+  L --> M["Update Event State + Audit"]

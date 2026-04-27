@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <record id="webhook_demo_handler_basic_rule_done" model="bwt.webhook.inbound.handler.rule">
+      <field name="handler_id" ref="bwt_webhooks_core.webhook_demo_handler_basic" />
+      <field name="name">Complete Created Orders</field>
+      <field name="action_type">done</field>
+      <field name="note">Marks demo order-created events as processed through the model-based inbound rule path.</field>
+    </record>
+
+    <record id="webhook_demo_handler_basic_rule_done_condition" model="bwt.webhook.inbound.handler.rule.condition">
+      <field name="rule_id" ref="webhook_demo_handler_basic_rule_done" />
+      <field name="source_kind">semantic_field</field>
+      <field name="source_expression">event_type</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">order.created</field>
+    </record>
+
+    <record id="webhook_demo_handler_signed_rule_done" model="bwt.webhook.inbound.handler.rule">
+      <field name="handler_id" ref="bwt_webhooks_core.webhook_demo_handler_signed" />
+      <field name="name">Complete Partner Sync</field>
+      <field name="action_type">done</field>
+      <field name="note">Marks signed partner sync events as processed through the model-based inbound rule path.</field>
+    </record>
+
+    <record id="webhook_demo_handler_signed_rule_done_condition" model="bwt.webhook.inbound.handler.rule.condition">
+      <field name="rule_id" ref="webhook_demo_handler_signed_rule_done" />
+      <field name="source_kind">semantic_field</field>
+      <field name="source_expression">topic</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">partner.sync</field>
+    </record>
+  </data>
+</odoo>

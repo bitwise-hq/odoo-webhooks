@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_inbound_event_search" model="ir.ui.view">
+    <field name="name">webhook.inbound.event.search</field>
+    <field name="model">bwt.webhook.inbound.event</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name" />
+        <field name="received_at" />
+        <field name="processed_at" />
+        <field name="event_type" />
+        <field name="event_id" />
+        <field name="delivery_id" />
+        <field name="notification_id" />
+        <field name="idempotency_key" />
+        <field name="delivery_identity_source" />
+        <field name="delivery_kind" />
+        <field name="endpoint_id" />
+        <field name="company_id" />
+        <field name="handler_id" />
+        <separator />
+        <filter name="not_done" string="Not Done" domain="[('state', '!=', 'done')]" />
+        <filter name="needs_attention" string="Needs Attention" domain="[('state', 'in', ('error', 'dead_letter', 'rejected'))]" />
+        <filter name="last_24_hours" string="Last 24 Hours" domain="[('received_at', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))]" />
+        <filter name="today" string="Today" domain="[('received_at', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]" />
+        <filter name="last_7_days" string="Last 7 Days" domain="[('received_at', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d 00:00:00'))]" />
+        <filter name="slow_processing" string="Slow Processing (&gt;5m)" domain="[('processing_seconds', '&gt;', 300)]" />
+        <separator />
+        <filter name="received" string="Received" domain="[('state', '=', 'received')]" />
+        <filter name="done" string="Done" domain="[('state', '=', 'done')]" />
+        <filter name="error" string="Error" domain="[('state', '=', 'error')]" />
+        <filter name="dead_letter" string="Dead Letter" domain="[('state', '=', 'dead_letter')]" />
+        <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]" />
+        <separator />
+        <filter name="group_by_endpoint" string="By Endpoint" context="{'group_by':'endpoint_id'}" />
+        <filter name="group_by_status" string="By Status" context="{'group_by':'state'}" />
+        <filter name="group_by_day" string="By Day" context="{'group_by':'received_at:day'}" />
+        <filter name="group_by_company" string="By Company" context="{'group_by':'company_id'}" />
+        <filter name="group_by_handler" string="By Handler" context="{'group_by':'handler_id'}" />
+        <filter name="group_by_event_type" string="By Event Type" context="{'group_by':'event_type'}" />
+        <filter name="group_by_latest_job_state" string="By Latest Job State" context="{'group_by':'latest_queue_job_state'}" />
+      </search>
+    </field>
+  </record>
+
+  <record id="view_webhook_inbound_event_pivot" model="ir.ui.view">
+    <field name="name">webhook.inbound.event.pivot</field>
+    <field name="model">bwt.webhook.inbound.event</field>
+    <field name="arch" type="xml">
+      <pivot string="Inbound Event Insights">
+        <field name="endpoint_id" type="row" />
+        <field name="state" type="col" />
+        <field name="event_type" type="row" />
+        <field name="received_at" interval="day" type="col" />
+        <field name="processing_seconds" type="measure" />
+      </pivot>
+    </field>
+  </record>
+
+  <record id="view_webhook_inbound_event_graph" model="ir.ui.view">
+    <field name="name">webhook.inbound.event.graph</field>
+    <field name="model">bwt.webhook.inbound.event</field>
+    <field name="arch" type="xml">
+      <graph string="Inbound Event Trends" type="bar" sample="1" stacked="True">
+        <field name="received_at" interval="day" />
+        <field name="state" />
+      </graph>
+    </field>
+  </record>
+
+  <record id="view_webhook_inbound_event_list" model="ir.ui.view">
+    <field name="name">webhook.inbound.event.list</field>
+    <field name="model">bwt.webhook.inbound.event</field>
+    <field name="arch" type="xml">
+      <list decoration-danger="state in ('error','dead_letter','rejected')" decoration-warning="state == 'received'" decoration-success="state == 'done'">
+        <field name="received_at" />
+        <field name="endpoint_id" />
+        <field name="company_id" />
+        <field name="handler_id" />
+        <field name="event_type" />
+        <field name="event_id" />
+        <field name="delivery_id" />
+        <field name="idempotency_key" />
+        <field name="delivery_identity_source" />
+        <field name="delivery_kind" />
+        <field name="state" />
+        <field name="processing_seconds" optional="hide" />
+        <field name="queue_job_count" string="Jobs" />
+        <field name="latest_queue_job_state" string="Latest Job State" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_webhook_inbound_event_form" model="ir.ui.view">
+    <field name="name">webhook.inbound.event.form</field>
+    <field name="model">bwt.webhook.inbound.event</field>
+    <field name="arch" type="xml">
+      <form create="false" delete="false" edit="false">
+        <header>
+          <button name="action_queue_processing" type="object" string="Queue Processing" class="oe_highlight" invisible="state not in ['received', 'error']" />
+          <button name="action_reset_to_received" type="object" string="Reset To Received" invisible="state not in ['error', 'dead_letter']" />
+          <field name="state" widget="statusbar" statusbar_visible="received,processing,done" options="{'clickable': 0}" />
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" type="object" name="action_view_queue_jobs" icon="fa-tasks">
+              <field name="queue_job_count" widget="statinfo" string="Jobs" />
+            </button>
+          </div>
+          <group string="Context">
+            <group>
+              <field name="name" />
+              <field name="endpoint_id" />
+              <field name="company_id" />
+              <field name="handler_id" />
+              <field name="matched_inbound_rule_id" readonly="1" />
+              <field name="received_at" />
+              <field name="processed_at" />
+            </group>
+            <group>
+              <field name="latest_queue_job_id" readonly="1" />
+              <field name="latest_queue_job_state" readonly="1" />
+              <field name="queue_job_count" readonly="1" />
+            </group>
+          </group>
+          <group string="Resolved Metadata">
+            <group>
+              <field name="topic" />
+              <field name="event_type" />
+              <field name="event_id" />
+              <field name="resource_reference" />
+            </group>
+            <group>
+              <field name="delivery_id" />
+              <field name="notification_id" />
+              <field name="idempotency_key" />
+              <field name="delivery_identity_key" />
+              <field name="delivery_identity_source" />
+              <field name="delivery_kind" />
+              <field name="replay_identity_key" />
+              <field name="replay_identity_source" />
+              <field name="replayed_from_event_id" />
+              <field name="tenant_key" />
+              <field name="version" />
+              <field name="handler_selector" />
+            </group>
+          </group>
+          <notebook>
+            <page string="Security">
+              <group>
+                <field name="signature" />
+                <field name="signature_timestamp_raw" />
+                <field name="body_sha256" />
+              </group>
+            </page>
+            <page string="Payload">
+              <field name="payload_json" widget="text" nolabel="1" />
+            </page>
+            <page string="Resolved Values">
+              <field name="resolved_values_json" widget="text" nolabel="1" />
+            </page>
+            <page string="Headers">
+              <field name="request_headers_json" widget="text" nolabel="1" />
+            </page>
+            <page string="Raw Body">
+              <field name="request_body" widget="text" nolabel="1" />
+            </page>
+            <page string="Processing">
+              <group string="Outcome">
+                <field name="matched_inbound_rule_id" readonly="1" />
+                <field name="processing_note" readonly="1" />
+                <field name="queue_job_identity_key" readonly="1" />
+                <field name="latest_queue_job_id" readonly="1" />
+                <field name="latest_queue_job_state" readonly="1" />
+              </group>
+              <group string="Failure Details" invisible="not processing_error and state != 'rejected'">
+                <field name="processing_error" readonly="1" invisible="not processing_error" />
+                <field name="rejection_category" invisible="state != 'rejected'" />
+                <field name="rejection_reason" invisible="state != 'rejected'" />
+              </group>
+            </page>
+            <page string="Jobs">
+              <field name="queue_job_ids" nolabel="1" readonly="1">
+                <list>
+                  <field name="date_created" />
+                  <field name="name" />
+                  <field name="uuid" />
+                  <field name="state" />
+                  <field name="retry" />
+                  <field name="max_retries" />
+                  <field name="date_done" />
+                </list>
+              </field>
+            </page>
+            <page string="Rule Executions">
+              <field name="rule_execution_ids" nolabel="1" readonly="1">
+                <list>
+                  <field name="create_date" string="Executed" />
+                  <field name="rule_id" />
+                  <field name="state" />
+                  <field name="record_reference" />
+                  <field name="note" />
+                  <field name="error" />
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="action_webhook_inbound_event" model="ir.actions.act_window">
+    <field name="name">Inbound Events</field>
+    <field name="res_model">bwt.webhook.inbound.event</field>
+    <field name="view_mode">list,pivot,graph,form</field>
+    <field name="search_view_id" ref="view_webhook_inbound_event_search" />
+    <field name="context">{'search_default_not_done': 1, 'search_default_group_by_day': 1}</field>
+  </record>
+
+  <record id="action_webhook_inbound_event_reporting" model="ir.actions.act_window">
+    <field name="name">Inbound Reporting</field>
+    <field name="res_model">bwt.webhook.inbound.event</field>
+    <field name="view_mode">pivot,graph,list</field>
+    <field name="search_view_id" ref="view_webhook_inbound_event_search" />
+    <field name="context">{'search_default_last_24_hours': 1, 'search_default_group_by_day': 1}</field>
+  </record>
+</odoo>

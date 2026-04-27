@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant Sender
+  participant Odoo as Odoo HTTP
+  participant Endpoint as Inbound Endpoint
+  participant Event as Inbound Event
+  participant Handler as Webhook Handler
+  participant Queue as Queue Job
+
+  Sender->>Odoo: POST /webhook/path
+  Odoo->>Endpoint: Resolve endpoint + config
+  Endpoint->>Endpoint: Verify signature + timestamp
+  Endpoint->>Event: Create event record
+  Event->>Handler: Evaluate rules
+  Handler->>Queue: Enqueue action job
+  Queue->>Handler: Execute action
+  Handler->>Event: Update state + audit
+  Odoo-->>Sender: 2xx / 4xx response

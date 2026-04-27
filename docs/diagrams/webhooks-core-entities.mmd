@@ -1,0 +1,32 @@
+erDiagram
+  WEBHOOK_HANDLER {
+    string name
+    string direction
+    string execution_mode
+  }
+  INBOUND_ENDPOINT {
+    string name
+    string path
+  }
+  INBOUND_EVENT {
+    string state
+    string identity_key
+  }
+  OUTBOUND_ENDPOINT {
+    string code
+    string target_path
+  }
+  OUTBOUND_DELIVERY {
+    string state
+    datetime next_retry_at
+  }
+  OUTBOUND_ATTEMPT {
+    int status_code
+    datetime sent_at
+  }
+
+  WEBHOOK_HANDLER ||--o{ INBOUND_ENDPOINT : handles
+  WEBHOOK_HANDLER ||--o{ OUTBOUND_ENDPOINT : handles
+  INBOUND_ENDPOINT ||--o{ INBOUND_EVENT : receives
+  OUTBOUND_ENDPOINT ||--o{ OUTBOUND_DELIVERY : sends
+  OUTBOUND_DELIVERY ||--o{ OUTBOUND_ATTEMPT : attempts

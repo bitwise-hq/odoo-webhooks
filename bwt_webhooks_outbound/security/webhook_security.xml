@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <record id="webhook_outbound_endpoint_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Endpoint multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_endpoint" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_endpoint_header_rule_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Endpoint Header Rule multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_endpoint_header_rule" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_endpoint_payload_rule_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Endpoint Payload Rule multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_endpoint_payload_rule" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_delivery_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Delivery multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_delivery" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_delivery_context_line_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Delivery Context Line multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_delivery_context_line" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_delivery_attempt_company_rule" model="ir.rule">
+      <field name="name">Webhook Outbound Delivery Attempt multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_delivery_attempt" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_handler_rule_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Outbound Rule multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_handler_rule" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_handler_rule_condition_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Outbound Rule Condition multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_handler_rule_condition" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_outbound_handler_rule_assignment_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Outbound Assignment multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_outbound_handler_rule_assignment" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+  </data>
+</odoo>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <!-- Basic company-scoped object endpoint: X-Delivery-Id header + event_id in payload. -->
+    <record id="webhook_demo_endpoint_orders" model="bwt.webhook.inbound.endpoint">
+      <field name="name">Demo Orders Endpoint</field>
+      <field name="path">demo-orders</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="handler_id" ref="bwt_webhooks_core.webhook_demo_handler_basic" />
+      <field name="payload_contract">json_object</field>
+      <field name="delivery_identity_policy">body_sha256</field>
+      <field name="replay_identity_policy">none</field>
+    </record>
+
+    <record id="webhook_demo_orders_source_delivery_id" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">delivery_id</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Delivery-Id</field>
+    </record>
+
+    <record id="webhook_demo_orders_source_event_id" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">event_id</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">event_id</field>
+    </record>
+
+    <record id="webhook_demo_orders_source_event_type" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">event_type</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">type</field>
+    </record>
+
+    <record id="webhook_demo_orders_source_topic" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">topic</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Topic</field>
+    </record>
+
+    <record id="webhook_demo_orders_binding_delivery_id" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">delivery_id</field>
+      <field name="value_key">delivery_id</field>
+    </record>
+
+    <record id="webhook_demo_orders_binding_event_id" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">event_id</field>
+      <field name="value_key">event_id</field>
+    </record>
+
+    <record id="webhook_demo_orders_binding_event_type" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">event_type</field>
+      <field name="value_key">event_type</field>
+    </record>
+
+    <record id="webhook_demo_orders_binding_topic" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">topic</field>
+      <field name="value_key">topic</field>
+    </record>
+
+    <!-- Finalize identity policies for orders endpoint -->
+    <record id="webhook_demo_endpoint_orders" model="bwt.webhook.inbound.endpoint">
+      <field name="delivery_identity_policy">delivery_id</field>
+      <field name="replay_identity_policy">event_id</field>
+    </record>
+
+    <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
+    <record id="webhook_demo_endpoint_signed_partner" model="bwt.webhook.inbound.endpoint">
+      <field name="name">Demo Signed Partner Endpoint</field>
+      <field name="path">demo-signed-partner</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="handler_id" ref="bwt_webhooks_core.webhook_demo_handler_signed" />
+      <field name="payload_contract">json_object</field>
+      <field name="delivery_identity_policy">body_sha256</field>
+      <field name="replay_identity_policy">none</field>
+      <field name="signature_verification_mode">none</field>
+      <field name="signature_max_age_seconds">0</field>
+      <field name="signature_max_future_skew_seconds">0</field>
+    </record>
+
+    <record id="webhook_demo_signed_source_signature" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">signature</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Signature</field>
+    </record>
+
+    <record id="webhook_demo_signed_source_idempotency" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">idempotency_key</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Idempotency-Key</field>
+    </record>
+
+    <record id="webhook_demo_signed_source_event_id" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">event_id</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">event.id</field>
+    </record>
+
+    <record id="webhook_demo_signed_source_event_type" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">event_type</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Event-Type</field>
+    </record>
+
+    <record id="webhook_demo_signed_source_topic" model="bwt.webhook.inbound.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">partner.sync</field>
+    </record>
+
+    <record id="webhook_demo_signed_binding_signature" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">signature</field>
+      <field name="value_key">signature</field>
+    </record>
+
+    <record id="webhook_demo_signed_binding_idempotency" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">idempotency_key</field>
+      <field name="value_key">idempotency_key</field>
+    </record>
+
+    <record id="webhook_demo_signed_binding_event_id" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">event_id</field>
+      <field name="value_key">event_id</field>
+    </record>
+
+    <record id="webhook_demo_signed_binding_event_type" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">event_type</field>
+      <field name="value_key">event_type</field>
+    </record>
+
+    <record id="webhook_demo_signed_binding_topic" model="bwt.webhook.inbound.endpoint.semantic.binding">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">topic</field>
+      <field name="value_key">topic</field>
+    </record>
+
+    <record id="webhook_demo_endpoint_signed_partner" model="bwt.webhook.inbound.endpoint">
+      <field name="delivery_identity_policy">idempotency_key</field>
+      <field name="replay_identity_policy">event_id</field>
+      <field name="signature_verification_mode">hmac</field>
+      <field name="signature_secret">demo-shared-secret</field>
+    </record>
+  </data>
+</odoo>

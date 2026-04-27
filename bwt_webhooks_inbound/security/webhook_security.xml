@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <record id="webhook_inbound_handler_rule_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_handler_rule" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_handler_rule_condition_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule Condition multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_handler_rule_condition" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_handler_rule_lookup_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule Lookup multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_handler_rule_lookup" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_handler_rule_assignment_company_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule Assignment multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_handler_rule_assignment" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_rule_execution_company_rule" model="ir.rule">
+      <field name="name">Webhook Inbound Rule Execution multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_rule_execution" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_endpoint_company_rule" model="ir.rule">
+      <field name="name">Webhook Endpoint multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_endpoint" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_endpoint_source_company_rule" model="ir.rule">
+      <field name="name">Webhook Endpoint Source multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_endpoint_source" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_endpoint_semantic_binding_company_rule" model="ir.rule">
+      <field name="name">Webhook Endpoint Semantic Binding multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_endpoint_semantic_binding" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_endpoint_signature_part_company_rule" model="ir.rule">
+      <field name="name">Webhook Endpoint Signature Part multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_endpoint_signature_part" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_inbound_event_company_rule" model="ir.rule">
+      <field name="name">Webhook Inbound Event multi-company</field>
+      <field name="model_id" ref="model_bwt_webhook_inbound_event" />
+      <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+  </data>
+</odoo>

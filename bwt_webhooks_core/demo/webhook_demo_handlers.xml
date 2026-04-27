@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data noupdate="1">
+    <!-- Grant Webhooks Admin to the admin user for easy smoke tests -->
+    <record id="base.user_admin" model="res.users">
+      <field name="group_ids" eval="[(4, ref('bwt_webhooks_core.group_webhooks_admin'))]" />
+    </record>
+
+    <!-- Handlers used by inbound and outbound demo setups -->
+    <record id="webhook_demo_handler_basic" model="bwt.webhook.handler">
+      <field name="name">Demo Basic Handler</field>
+      <field name="code">demo_basic_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_mode">model_driven</field>
+      <field name="note">Smoke-test handler for regular inbound object deliveries.</field>
+    </record>
+
+    <record id="webhook_demo_handler_signed" model="bwt.webhook.handler">
+      <field name="name">Demo Signed Handler</field>
+      <field name="code">demo_signed_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_mode">model_driven</field>
+      <field name="note">Smoke-test handler for partner-scoped signed deliveries.</field>
+    </record>
+
+    <record id="webhook_demo_handler_outbound_loopback" model="bwt.webhook.handler">
+      <field name="name">Demo Outbound Loopback Handler</field>
+      <field name="code">demo_outbound_loopback_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="direction">outbound</field>
+      <field name="execution_mode">model_driven</field>
+      <field name="note">Smoke-test handler for partner-scoped outbound loopback deliveries.</field>
+    </record>
+  </data>
+</odoo>

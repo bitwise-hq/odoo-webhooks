@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_endpoint_list_connector_backend" model="ir.ui.view">
+    <field name="name">bwt.webhook.inbound.endpoint.list.connector.backend</field>
+    <field name="model">bwt.webhook.inbound.endpoint</field>
+    <field name="inherit_id" ref="bwt_webhooks_inbound.view_webhook_endpoint_list" />
+    <field name="arch" type="xml">
+      <xpath expr="//list/field[@name='handler_id']" position="after">
+        <field name="connector_backend_ref" string="Backend" />
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_webhook_endpoint_form_connector_backend" model="ir.ui.view">
+    <field name="name">bwt.webhook.inbound.endpoint.form.connector.backend</field>
+    <field name="model">bwt.webhook.inbound.endpoint</field>
+    <field name="inherit_id" ref="bwt_webhooks_inbound.view_webhook_endpoint_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//group/field[@name='company_id']" position="after">
+        <field name="connector_backend_ref" />
+      </xpath>
+    </field>
+  </record>
+</odoo>

@@ -1,0 +1,23 @@
+[run]
+branch = True
+source =
+    bwt_webhooks_core
+    bwt_webhooks_inbound
+    bwt_webhooks_outbound
+    bwt_connector_webhooks_core
+    bwt_connector_webhooks_inbound
+    bwt_connector_webhooks_outbound
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+omit =
+    */tests/*
+    */__manifest__.py
+    */migrations/*
+    */docs/*
+show_missing = True
+skip_covered = False
+fail_under = 100

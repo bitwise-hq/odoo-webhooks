@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="action_webhook_inbound_queue_job" model="ir.actions.act_window">
+    <field name="name">Inbound Event Jobs</field>
+    <field name="res_model">queue.job</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="bwt_webhooks_core.view_queue_job_search_webhooks" />
+    <field name="domain">[("model_name", '=', 'bwt.webhook.inbound.event'), ('method_name', '=', 'process_event')]</field>
+    <field name="context">{'search_default_not_done': 1}</field>
+  </record>
+
+  <menuitem id="menu_webhooks_endpoints" name="Inbound Endpoints" parent="bwt_webhooks_core.menu_webhooks_root" action="action_webhook_endpoint" sequence="10" groups="bwt_webhooks_core.group_webhooks_operator,bwt_webhooks_core.group_webhooks_admin" />
+  <menuitem id="menu_webhooks_inbound_events" name="Inbound Events" parent="bwt_webhooks_core.menu_webhooks_root" action="action_webhook_inbound_event" sequence="30" groups="bwt_webhooks_core.group_webhooks_operator,bwt_webhooks_core.group_webhooks_admin" />
+  <menuitem id="menu_webhooks_inbound_jobs" name="Inbound Event Jobs" parent="bwt_webhooks_core.menu_webhooks_root" action="action_webhook_inbound_queue_job" sequence="50" groups="bwt_webhooks_core.group_webhooks_operator,bwt_webhooks_core.group_webhooks_admin" />
+  <menuitem id="menu_webhooks_inbound_reporting" name="Inbound Reporting" parent="bwt_webhooks_core.menu_webhooks_root" action="action_webhook_inbound_event_reporting" sequence="70" groups="bwt_webhooks_core.group_webhooks_operator,bwt_webhooks_core.group_webhooks_admin" />
+</odoo>

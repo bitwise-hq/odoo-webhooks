@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant Odoo as Odoo Process
+  participant Handler
+  participant Endpoint
+  participant Delivery
+  participant Queue
+  participant API as External API
+
+  Odoo->>Handler: Trigger outbound hook
+  Handler->>Endpoint: Resolve endpoint + context
+  Handler->>Delivery: Create delivery record
+  Handler->>Queue: Enqueue send job
+  Queue->>API: Send request
+  API-->>Queue: Response
+  Queue->>Delivery: Log attempt + status
+  Queue->>Handler: Notify response hook

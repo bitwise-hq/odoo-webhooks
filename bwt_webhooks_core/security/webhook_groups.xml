@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="module_category_webhooks" model="ir.module.category">
+    <field name="name">Webhooks</field>
+    <field name="sequence">38</field>
+  </record>
+
+  <record id="res_groups_privilege_webhooks" model="res.groups.privilege">
+    <field name="name">Webhooks</field>
+    <field name="category_id" ref="bwt_webhooks_core.module_category_webhooks" />
+  </record>
+
+  <record id="group_webhooks_operator" model="res.groups">
+    <field name="name">Operator</field>
+    <field name="privilege_id" ref="bwt_webhooks_core.res_groups_privilege_webhooks" />
+  </record>
+
+  <record id="group_webhooks_admin" model="res.groups">
+    <field name="name">Administrator</field>
+    <field name="privilege_id" ref="bwt_webhooks_core.res_groups_privilege_webhooks" />
+    <field name="implied_ids" eval="[(4, ref('bwt_webhooks_core.group_webhooks_operator'))]" />
+  </record>
+
+  <!-- Grant Webhooks Administrator to all System Administrators so the
+       Settings → Technical → Webhooks menu is visible to admin users
+       out of the box. -->
+  <record id="base.group_system" model="res.groups">
+    <field name="implied_ids" eval="[(4, ref('bwt_webhooks_core.group_webhooks_admin'))]" />
+  </record>
+</odoo>

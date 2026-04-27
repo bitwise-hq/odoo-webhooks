@@ -1,0 +1,11 @@
+flowchart TD
+  A["Business Event"] --> B["Select Outbound Handler"]
+  B --> C["Resolve Endpoint + Context"]
+  C --> D["Build Request: Path + Headers + Payload"]
+  D --> E["Queue Job: Send Delivery"]
+  E --> F["HTTP Attempt"]
+  F --> G{"Response OK?"}
+  G -- Yes --> H["Mark Delivery Done"]
+  G -- Retryable --> I["Schedule Retry"]
+  G -- Fail --> J["Dead Letter"]
+  F --> K["Log Attempt + Response"]
