@@ -1,5 +1,6 @@
 import json
 import re
+import traceback
 from types import SimpleNamespace
 
 import requests
@@ -72,16 +73,26 @@ class WebhookOutboundDelivery(models.Model):
     response_body = fields.Text(string='Response Body')
     processing_note = fields.Text()
     processing_error = fields.Text()
+    replayed_from_delivery_id = fields.Many2one(
+        'webhook.outbound.delivery',
+        string='Replay Of',
+        ondelete='set null',
+        index=True,
+        check_company=True,
+    )
+    replay_delivery_ids = fields.One2many('webhook.outbound.delivery', 'replayed_from_delivery_id', string='Replay Deliveries')
+    replay_count = fields.Integer(compute='_compute_replay_count')
     attempt_ids = fields.One2many('webhook.outbound.delivery.attempt', 'delivery_id', string='Attempts')
     attempt_count = fields.Integer(compute='_compute_attempt_count')
     operator_action_hint = fields.Text(compute='_compute_operator_action_hint', string='Operator Guidance')
+    template_guidance = fields.Text(compute='_compute_template_guidance', string='Template Guidance')
     queue_job_identity_key = fields.Char(
         compute='_compute_queue_job_identity_key',
         string='Queue Job Identity Key',
         help='Identity key used when enqueuing background delivery processing for this outbound delivery.',
     )
 
-    @api.depends('state', 'handler_id', 'processing_note', 'processing_error', 'response_status_code')
+    @api.depends('state', 'handler_id', 'replayed_from_delivery_id', 'processing_note', 'processing_error', 'response_status_code')
     def _compute_operator_action_hint(self):
         for delivery in self:
             if delivery.state == 'draft':
@@ -91,11 +102,16 @@ class WebhookOutboundDelivery(models.Model):
             elif delivery.state == 'processing':
                 delivery.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
             elif delivery.state == 'error':
-                delivery.operator_action_hint = _('Review the delivery error, adjust the endpoint or payload if needed, then requeue the delivery.')
+                delivery.operator_action_hint = _('Review the delivery error, adjust the endpoint, templates, or low-code handler if needed, then reset to draft or create a replay when the remote system allows another send.')
             elif delivery.state == 'dead_letter':
-                delivery.operator_action_hint = _('The remote endpoint returned a non-retryable failure. Confirm replay is safe before resetting this delivery.')
+                delivery.operator_action_hint = _('The remote endpoint returned a non-retryable failure. Confirm replay is safe before resetting this delivery or creating a new replay copy.')
             elif delivery.state == 'canceled':
-                delivery.operator_action_hint = _('This delivery was canceled before sending. Reset it to draft if you need to send it again.')
+                delivery.operator_action_hint = _('This delivery was canceled before sending. Reset it to draft or create a replay copy if you need a fresh audited send.')
+            elif delivery.state == 'done':
+                if delivery.replayed_from_delivery_id:
+                    delivery.operator_action_hint = _('This delivery is a replay of %s. Create another replay only if the downstream system accepts duplicates.') % delivery.replayed_from_delivery_id.display_name
+                else:
+                    delivery.operator_action_hint = _('This delivery completed successfully. Use Create Replay only when the downstream system allows a new audited send of the same business event.')
             else:
                 delivery.operator_action_hint = False
 
@@ -103,6 +119,22 @@ class WebhookOutboundDelivery(models.Model):
     def _compute_attempt_count(self):
         for delivery in self:
             delivery.attempt_count = len(delivery.attempt_ids)
+
+    @api.depends('replay_delivery_ids')
+    def _compute_replay_count(self):
+        for delivery in self:
+            delivery.replay_count = len(delivery.replay_delivery_ids)
+
+    @api.depends('handler_id', 'handler_id.execution_mode', 'replayed_from_delivery_id', 'request_headers_template_json', 'payload_template_json', 'template_context_json')
+    def _compute_template_guidance(self):
+        for delivery in self:
+            messages = [
+                _('Templates can reference {delivery.id}, {delivery.name}, {endpoint.code}, {company.name}, {partner.name}, {now}, and any top-level keys from Template Context.'),
+                _('Low-code outbound handlers use the same template context and can additionally inspect {request.target_url}, {request.http_method}, {request.headers}, and {request.payload} after endpoint and delivery templates render.'),
+            ]
+            if delivery.replayed_from_delivery_id:
+                messages.append(_('This delivery was created as a replay of %s. The request snapshot, templates, and template context were copied from that delivery.') % delivery.replayed_from_delivery_id.display_name)
+            delivery.template_guidance = '\n'.join(messages)
 
     @api.depends('id')
     def _compute_queue_job_identity_key(self):
@@ -112,6 +144,12 @@ class WebhookOutboundDelivery(models.Model):
     def _get_queue_job_identity_key(self):
         self.ensure_one()
         return f'webhook_outbound_delivery_process:{self.id}' if self.id else False
+
+    def _get_next_replay_number(self):
+        self.ensure_one()
+        return self.env['webhook.outbound.delivery'].search_count([
+            ('replayed_from_delivery_id', '=', self.id),
+        ]) + 1
 
     @api.model
     def _normalize_headers_json(self, value, *, label='Request Headers'):
@@ -327,15 +365,40 @@ class WebhookOutboundDelivery(models.Model):
     def _has_template_content(self, value):
         return (value or '').strip() not in ('', '{}')
 
-    def _build_request_data(self):
+    def _get_template_rendering_context(self, request_data=None):
         self.ensure_one()
-        headers = dict(self._get_request_headers())
-        payload = self._get_payload()
         context = self._get_template_context()
+        context['attempt_count'] = len(self.attempt_ids)
+        context['replay_count'] = len(self.replay_delivery_ids)
+        if request_data is not None:
+            context['request'] = {
+                'target_url': request_data['target_url'],
+                'http_method': request_data['http_method'],
+                'headers': request_data['headers'],
+                'payload': request_data['payload'],
+            }
         wrapped_context = {
             key: self._wrap_template_context_value(item)
             for key, item in context.items()
         }
+        return context, wrapped_context
+
+    def _merge_json_objects(self, base_value, updates, *, label):
+        if not isinstance(base_value, dict) or not isinstance(updates, dict):
+            raise WebhookProcessingConfigurationError(_('%s merge requires both values to be JSON objects.') % label)
+        merged = dict(base_value)
+        for key, value in updates.items():
+            if isinstance(value, dict) and isinstance(merged.get(key), dict):
+                merged[key] = self._merge_json_objects(merged[key], value, label=label)
+            else:
+                merged[key] = value
+        return merged
+
+    def _build_request_data(self):
+        self.ensure_one()
+        headers = dict(self._get_request_headers())
+        payload = self._get_payload()
+        context, wrapped_context = self._get_template_rendering_context()
         if self._has_template_content(self.request_headers_template_json):
             rendered_headers = self._render_template_value(self._get_request_headers_template(), context, wrapped_context)
             if not isinstance(rendered_headers, dict):
@@ -431,6 +494,28 @@ class WebhookOutboundDelivery(models.Model):
             })
         return True
 
+    def action_create_replay_delivery(self):
+        self.ensure_one()
+        if self.state in ('queued', 'processing'):
+            raise ValidationError(_('Queued or processing deliveries cannot be replayed.'))
+        replay_delivery = self.copy({
+            'name': '%s / Replay %s' % (self.display_name, self._get_next_replay_number()),
+            'state': 'draft',
+            'queued_at': False,
+            'processed_at': False,
+            'processing_note': False,
+            'processing_error': False,
+            'response_status_code': False,
+            'response_headers_json': False,
+            'response_body': False,
+            'replayed_from_delivery_id': self.id,
+        })
+        action = self.env.ref('webhooks.action_webhook_outbound_delivery').read()[0]
+        action['res_id'] = replay_delivery.id
+        action['view_mode'] = 'form'
+        action['views'] = [(self.env.ref('webhooks.view_webhook_outbound_delivery_form').id, 'form')]
+        return action
+
     def action_cancel_delivery(self):
         for delivery in self:
             if delivery.state in ('done', 'processing'):
@@ -438,12 +523,65 @@ class WebhookOutboundDelivery(models.Model):
             delivery.write({'state': 'canceled'})
         return True
 
-    def _execute_low_code_handler(self, handler):
+    def _execute_low_code_handler(self, handler, request_data=None):
         self.ensure_one()
-        return {
-            'status': 'send',
-            'note': _('Model-driven outbound handler %s is configured but request customization is not implemented yet. Sending the stored request unchanged.') % handler.display_name,
+        request_data = dict(request_data or self._build_request_data())
+        outbound_config = handler._get_low_code_outbound_config()
+        if not outbound_config:
+            return {
+                'status': 'send',
+                'note': _('No outbound low-code instructions were configured on handler %s. Sending the rendered request unchanged.') % handler.display_name,
+            }
+
+        context, wrapped_context = self._get_template_rendering_context(request_data=request_data)
+        result = {
+            'status': outbound_config.get('status') or 'send',
         }
+        if result['status'] not in ('send', 'cancel', 'dead_letter', 'retry'):
+            raise WebhookProcessingConfigurationError(_('Outbound low-code handler status %s is not supported.') % result['status'])
+
+        if outbound_config.get('note'):
+            result['note'] = str(self._render_template_value(outbound_config['note'], context, wrapped_context))
+
+        if outbound_config.get('target_url'):
+            result['target_url'] = str(self._render_template_value(outbound_config['target_url'], context, wrapped_context))
+
+        if outbound_config.get('http_method'):
+            rendered_http_method = str(self._render_template_value(outbound_config['http_method'], context, wrapped_context)).lower()
+            if rendered_http_method not in dict(self._HTTP_METHOD_SELECTION):
+                raise WebhookProcessingConfigurationError(_('Outbound low-code handler HTTP method %s is not supported.') % rendered_http_method)
+            result['http_method'] = rendered_http_method
+
+        headers = dict(request_data['headers'])
+        if 'headers' in outbound_config:
+            rendered_headers = self._render_template_value(outbound_config['headers'], context, wrapped_context)
+            if not isinstance(rendered_headers, dict):
+                raise WebhookProcessingConfigurationError(_('Outbound low-code handler headers must render to a JSON object.'))
+            headers = {str(key): str(value) for key, value in rendered_headers.items()}
+        if outbound_config.get('headers_update') is not None:
+            rendered_headers_update = self._render_template_value(outbound_config['headers_update'], context, wrapped_context)
+            if not isinstance(rendered_headers_update, dict):
+                raise WebhookProcessingConfigurationError(_('Outbound low-code handler headers_update must render to a JSON object.'))
+            headers.update({str(key): str(value) for key, value in rendered_headers_update.items()})
+        if headers != request_data['headers']:
+            result['headers'] = headers
+
+        payload = request_data['payload']
+        if 'payload' in outbound_config:
+            payload = self._render_template_value(outbound_config['payload'], context, wrapped_context)
+        if outbound_config.get('payload_update') is not None:
+            rendered_payload_update = self._render_template_value(outbound_config['payload_update'], context, wrapped_context)
+            payload = self._merge_json_objects(payload, rendered_payload_update, label=_('Outbound handler payload update'))
+        if payload != request_data['payload']:
+            result['payload'] = payload
+
+        if outbound_config.get('seconds') is not None:
+            try:
+                result['seconds'] = int(self._render_template_value(outbound_config['seconds'], context, wrapped_context))
+            except (TypeError, ValueError) as err:
+                raise WebhookProcessingConfigurationError(_('Outbound low-code handler seconds must render to an integer.')) from err
+
+        return result
 
     def _apply_handler_result(self, result, request_data):
         if not isinstance(result, dict):
@@ -464,54 +602,73 @@ class WebhookOutboundDelivery(models.Model):
             if delivery.state in ('done', 'dead_letter', 'canceled'):
                 continue
 
-            request_data = delivery._build_request_data()
+            request_data = False
             handler_note = False
-            if delivery.handler_id:
-                result = delivery.handler_id.execute_outbound(delivery)
-                result, request_data = delivery._apply_handler_result(result, request_data)
-                if isinstance(result, dict):
-                    status = result.get('status', 'send')
-                    handler_note = result.get('note') or result.get('message')
-                    if status == 'cancel':
-                        delivery._create_attempt(request_data, state='canceled', note=handler_note)
+            try:
+                request_data = delivery._build_request_data()
+                if delivery.handler_id:
+                    result = delivery.handler_id.execute_outbound(delivery, request_data=request_data)
+                    result, request_data = delivery._apply_handler_result(result, request_data)
+                    if isinstance(result, dict):
+                        status = result.get('status', 'send')
+                        handler_note = result.get('note') or result.get('message')
+                        if status == 'cancel':
+                            delivery._create_attempt(request_data, state='canceled', note=handler_note)
+                            delivery.write({
+                                'state': 'canceled',
+                                'processed_at': fields.Datetime.now(),
+                                'processing_note': handler_note or False,
+                                'processing_error': False,
+                            })
+                            continue
+                        if status == 'dead_letter':
+                            delivery._create_attempt(request_data, state='dead_letter', note=handler_note)
+                            delivery.write({
+                                'state': 'dead_letter',
+                                'processed_at': fields.Datetime.now(),
+                                'processing_note': handler_note or False,
+                                'processing_error': False,
+                            })
+                            continue
+                        if status == 'retry':
+                            delivery._create_attempt(
+                                request_data,
+                                state='error',
+                                note=handler_note,
+                                error=handler_note or _('Retry requested by outbound handler.'),
+                            )
+                            delivery.write({
+                                'state': 'error',
+                                'processing_note': handler_note or False,
+                                'processing_error': handler_note or _('Retry requested by outbound handler.'),
+                            })
+                            raise RetryableJobError(handler_note or _('Retry requested by outbound handler.'), seconds=result.get('seconds'))
+                    elif result is False:
+                        delivery._create_attempt(request_data, state='canceled')
                         delivery.write({
                             'state': 'canceled',
                             'processed_at': fields.Datetime.now(),
-                            'processing_note': handler_note or False,
+                            'processing_note': False,
                             'processing_error': False,
                         })
                         continue
-                    if status == 'dead_letter':
-                        delivery._create_attempt(request_data, state='dead_letter', note=handler_note)
-                        delivery.write({
-                            'state': 'dead_letter',
-                            'processed_at': fields.Datetime.now(),
-                            'processing_note': handler_note or False,
-                            'processing_error': False,
-                        })
-                        continue
-                    if status == 'retry':
-                        delivery._create_attempt(
-                            request_data,
-                            state='error',
-                            note=handler_note,
-                            error=handler_note or _('Retry requested by outbound handler.'),
-                        )
-                        delivery.write({
-                            'state': 'error',
-                            'processing_note': handler_note or False,
-                            'processing_error': handler_note or _('Retry requested by outbound handler.'),
-                        })
-                        raise RetryableJobError(handler_note or _('Retry requested by outbound handler.'), seconds=result.get('seconds'))
-                elif result is False:
-                    delivery._create_attempt(request_data, state='canceled')
-                    delivery.write({
-                        'state': 'canceled',
-                        'processed_at': fields.Datetime.now(),
-                        'processing_note': False,
-                        'processing_error': False,
-                    })
-                    continue
+            except RetryableJobError:
+                raise
+            except Exception:
+                processing_error = traceback.format_exc()
+                if request_data:
+                    delivery._create_attempt(
+                        request_data,
+                        state='error',
+                        note=handler_note or False,
+                        error=processing_error,
+                    )
+                delivery.write({
+                    'state': 'error',
+                    'processing_note': handler_note or False,
+                    'processing_error': processing_error,
+                })
+                raise
 
             attempt = delivery._create_attempt(request_data)
             try:

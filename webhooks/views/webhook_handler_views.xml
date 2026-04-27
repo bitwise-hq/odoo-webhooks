@@ -54,6 +54,9 @@
                     <group string="Configuration Guidance" invisible="not configuration_warning">
                         <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
                     </group>
+                    <group string="Low-Code Configuration" invisible="execution_mode != 'low_code'">
+                        <field name="low_code_config_json" widget="text" nolabel="1"/>
+                    </group>
                     <group string="Python Callback" invisible="execution_mode != 'python'">
                         <field name="python_model_name"/>
                         <field name="python_method_name"/>

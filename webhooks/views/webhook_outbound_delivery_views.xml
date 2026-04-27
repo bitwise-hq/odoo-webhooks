@@ -32,6 +32,7 @@
                 <field name="company_id"/>
                 <field name="partner_id"/>
                 <field name="attempt_count"/>
+                <field name="replay_count"/>
                 <field name="state"/>
                 <field name="response_status_code"/>
                 <field name="queued_at"/>
@@ -48,6 +49,7 @@
                 <header>
                     <button name="action_queue_delivery" type="object" string="Queue Delivery" invisible="state not in ['draft', 'error']"/>
                     <button name="action_reset_to_draft" type="object" string="Reset To Draft" invisible="state not in ['error', 'dead_letter', 'canceled']"/>
+                    <button name="action_create_replay_delivery" type="object" string="Create Replay" invisible="state in ['draft', 'queued', 'processing']"/>
                     <button name="action_cancel_delivery" type="object" string="Cancel" invisible="state not in ['draft', 'error']"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,done,error,dead_letter,canceled"/>
                 </header>
@@ -55,12 +57,16 @@
                     <group string="Operator Guidance" invisible="not operator_action_hint">
                         <field name="operator_action_hint" nolabel="1" widget="text" readonly="1"/>
                     </group>
+                    <group string="Template Guidance">
+                        <field name="template_guidance" nolabel="1" widget="text" readonly="1"/>
+                    </group>
                     <group string="Context">
                         <group>
                             <field name="name"/>
                             <field name="endpoint_id"/>
                             <field name="company_id"/>
                             <field name="partner_id" placeholder="Inherited from endpoint when set"/>
+                            <field name="replayed_from_delivery_id"/>
                             <field name="execution_user_id"/>
                             <field name="handler_id"/>
                         </group>
@@ -68,6 +74,7 @@
                             <field name="http_method"/>
                             <field name="target_url" widget="url"/>
                             <field name="timeout_seconds"/>
+                            <field name="replay_count" readonly="1"/>
                             <field name="queued_at"/>
                             <field name="processed_at"/>
                         </group>
@@ -110,6 +117,17 @@
                                     <field name="target_url"/>
                                     <field name="response_status_code"/>
                                     <field name="processing_error"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Replays">
+                            <field name="replay_delivery_ids" readonly="1">
+                                <list>
+                                    <field name="create_date" string="Created"/>
+                                    <field name="name"/>
+                                    <field name="state"/>
+                                    <field name="response_status_code"/>
+                                    <field name="processed_at"/>
                                 </list>
                             </field>
                         </page>

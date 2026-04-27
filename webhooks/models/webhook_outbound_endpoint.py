@@ -113,6 +113,10 @@ class WebhookOutboundEndpoint(models.Model):
         compute='_compute_admin_guidance',
         string='Configuration Guidance',
     )
+    template_guidance = fields.Text(
+        compute='_compute_template_guidance',
+        string='Template Guidance',
+    )
 
     def _compute_related_counts(self):
         delivery_model = self.env['webhook.outbound.delivery']
@@ -163,7 +167,7 @@ class WebhookOutboundEndpoint(models.Model):
                 messages.append(_('This outbound endpoint is company-scoped only. Deliveries do not store a partner from endpoint scope.'))
 
             if endpoint.handler_id and endpoint.handler_id.execution_mode == 'low_code':
-                messages.append(_('The selected outbound handler uses model-driven execution, which currently sends the stored request unchanged.'))
+                messages.append(_('The selected outbound handler uses model-driven execution and can mutate, cancel, dead-letter, or retry deliveries from its Low-Code Configuration JSON.'))
 
             if endpoint.timeout_seconds <= 0:
                 messages.append(_('Outbound timeout should be greater than zero seconds.'))
@@ -182,6 +186,19 @@ class WebhookOutboundEndpoint(models.Model):
                 messages.append(str(err))
 
             endpoint.configuration_warning = '\n'.join(messages) or False
+
+    @api.depends('partner_id', 'handler_id', 'handler_id.execution_mode', 'request_headers_template_json', 'payload_template_json')
+    def _compute_template_guidance(self):
+        for endpoint in self:
+            messages = [
+                _('Templates can reference {delivery.id}, {delivery.name}, {endpoint.code}, {company.name}, {partner.name}, {now}, and any top-level keys provided by a delivery Template Context.'),
+                _('Header Template must render to a JSON object. Payload Template may render any JSON value, including nested objects and lists.'),
+            ]
+            if not endpoint.partner_id:
+                messages.append(_('Partner placeholders render false when the endpoint is company-scoped only.'))
+            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'low_code':
+                messages.append(_('Low-code outbound handlers render with the same template context and can additionally inspect {request.target_url}, {request.http_method}, {request.headers}, and {request.payload}.'))
+            endpoint.template_guidance = '\n'.join(messages)
 
     @api.constrains('execution_user_id', 'company_id')
     def _check_execution_user_configuration(self):
