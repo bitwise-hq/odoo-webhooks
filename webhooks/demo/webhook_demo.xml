@@ -197,5 +197,35 @@
             <field name="value_key">topic</field>
         </record>
 
+        <!-- Outbound loopback endpoint: drafts can be queued to the demo inbound orders endpoint for smoke tests. -->
+        <record id="webhook_demo_outbound_endpoint_loopback_orders" model="webhook.outbound.endpoint">
+            <field name="name">Demo Outbound Loopback Orders Endpoint</field>
+            <field name="code">demo-outbound-loopback-orders</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="partner_id" ref="webhook_demo_partner_alpha"/>
+            <field name="execution_user_id" ref="base.user_admin"/>
+            <field name="http_method">post</field>
+            <field name="target_url">http://localhost:8069/webhooks/in/demo-orders</field>
+            <field name="static_headers_json"><![CDATA[
+{"X-Demo-Source": "odoo-webhooks-demo"}
+            ]]></field>
+            <field name="request_headers_template_json"><![CDATA[
+{"X-Delivery-Id": "{delivery_id}", "X-Topic": "{topic}"}
+            ]]></field>
+            <field name="payload_template_json"><![CDATA[
+{"event_id": "{event_id}", "type": "{event_type}", "data": "{order}", "meta": {"delivery_name": "{delivery.name}", "source_endpoint": "{endpoint.code}", "company": "{company.name}", "partner": "{partner.name}", "rendered_at": "{now}"}}
+            ]]></field>
+            <field name="note">Demo loopback outbound endpoint for smoke tests. Update the target URL if your local Odoo server is not running on http://localhost:8069.</field>
+        </record>
+
+        <record id="webhook_demo_outbound_delivery_loopback_orders" model="webhook.outbound.delivery">
+            <field name="name">Demo Loopback Order Delivery</field>
+            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
+            <field name="template_context_json"><![CDATA[
+{"delivery_id": "demo-outbound-delivery-0001", "topic": "demo.orders.created", "event_id": "demo-outbound-event-0001", "event_type": "order.created", "order": {"id": "SO-DEMO-0001", "total": 149.99, "currency": "USD", "customer": "Webhook Smoke Tenant Alpha"}}
+            ]]></field>
+            <field name="processing_note">Seeded demo delivery. Queue it after install to smoke-test outbound templating against the demo inbound orders endpoint.</field>
+        </record>
+
     </data>
 </odoo>
