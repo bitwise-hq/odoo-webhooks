@@ -83,3 +83,16 @@ class WebhookHandler(models.Model):
                 )
             return callback(event)
         return event._execute_low_code_handler(self)
+
+    def execute_outbound(self, delivery):
+        self.ensure_one()
+        if self.execution_mode == 'python':
+            model = self.env[self.python_model_name]
+            callback = getattr(model, self.python_method_name, None)
+            if not callback:
+                raise ValidationError(
+                    _('Python callback %s.%s could not be found.')
+                    % (self.python_model_name, self.python_method_name)
+                )
+            return callback(delivery)
+        return delivery._execute_low_code_handler(self)

@@ -14,6 +14,8 @@
         'views/webhook_handler_views.xml',
         'views/webhook_endpoint_views.xml',
         'views/webhook_inbound_event_views.xml',
+        'views/webhook_outbound_endpoint_views.xml',
+        'views/webhook_outbound_delivery_views.xml',
         'views/webhook_menu_views.xml',
     ],
     'demo': [

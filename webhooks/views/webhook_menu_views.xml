@@ -7,6 +7,8 @@
 
     <menuitem id="menu_webhooks_handlers" name="Handlers" parent="menu_webhooks_configuration" action="action_webhook_handler" sequence="10" groups="webhooks.group_webhooks_admin"/>
     <menuitem id="menu_webhooks_endpoints" name="Endpoints" parent="menu_webhooks_configuration" action="action_webhook_endpoint" sequence="20" groups="webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_outbound_endpoints" name="Outbound Endpoints" parent="menu_webhooks_configuration" action="action_webhook_outbound_endpoint" sequence="30" groups="webhooks.group_webhooks_admin"/>
     <menuitem id="menu_webhooks_inbound_events" name="Inbound Events" parent="menu_webhooks_operations" action="action_webhook_inbound_event" sequence="10" groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_outbound_deliveries" name="Outbound Deliveries" parent="menu_webhooks_operations" action="action_webhook_outbound_delivery" sequence="20" groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"/>
 
 </odoo>
