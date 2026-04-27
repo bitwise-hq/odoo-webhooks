@@ -12,6 +12,7 @@
                 <field name="delivery_id"/>
                 <field name="notification_id"/>
                 <field name="idempotency_key"/>
+                <field name="accepted_identity_source"/>
                 <field name="endpoint_id"/>
                 <field name="handler_id"/>
                 <separator/>
@@ -36,6 +37,7 @@
                 <field name="event_id"/>
                 <field name="delivery_id"/>
                 <field name="idempotency_key"/>
+                <field name="accepted_identity_source"/>
                 <field name="state"/>
             </list>
         </field>
@@ -45,14 +47,17 @@
         <field name="name">webhook.inbound.event.form</field>
         <field name="model">webhook.inbound.event</field>
         <field name="arch" type="xml">
-            <form>
+            <form create="false" delete="false" edit="false">
                 <header>
-                    <button name="action_queue_processing" type="object" string="Queue" invisible="state not in ['received', 'error']"/>
-                    <button name="action_reset_to_received" type="object" string="Reset" invisible="state not in ['error', 'dead_letter']"/>
+                    <button name="action_queue_processing" type="object" string="Queue Processing" invisible="state not in ['received', 'error']"/>
+                    <button name="action_reset_to_received" type="object" string="Replay" invisible="state not in ['error', 'dead_letter']"/>
                     <field name="state" widget="statusbar" statusbar_visible="received,processing,done,error,dead_letter,rejected"/>
                 </header>
                 <sheet>
-                    <group>
+                    <group string="Operator Guidance" invisible="not operator_action_hint">
+                        <field name="operator_action_hint" nolabel="1" widget="text" readonly="1"/>
+                    </group>
+                    <group string="Context">
                         <group>
                             <field name="name"/>
                             <field name="endpoint_id"/>
@@ -61,16 +66,21 @@
                             <field name="received_at"/>
                             <field name="processed_at"/>
                         </group>
+                    </group>
+                    <group string="Resolved Metadata">
                         <group>
                             <field name="topic"/>
                             <field name="event_type"/>
                             <field name="event_id"/>
+                            <field name="resource_reference"/>
+                        </group>
+                        <group>
                             <field name="delivery_id"/>
                             <field name="notification_id"/>
                             <field name="idempotency_key"/>
+                            <field name="accepted_identity_source"/>
                             <field name="tenant_key"/>
                             <field name="version"/>
-                            <field name="resource_reference"/>
                             <field name="handler_selector"/>
                         </group>
                     </group>
@@ -95,9 +105,11 @@
                             <field name="request_body" widget="text" nolabel="1"/>
                         </page>
                         <page string="Processing">
-                            <group>
-                                <field name="processing_note"/>
-                                <field name="processing_error" invisible="not processing_error"/>
+                            <group string="Outcome">
+                                <field name="processing_note" readonly="1"/>
+                            </group>
+                            <group string="Failure Details" invisible="not processing_error and state != 'rejected'">
+                                <field name="processing_error" readonly="1" invisible="not processing_error"/>
                                 <field name="rejection_category" invisible="state != 'rejected'"/>
                                 <field name="rejection_reason" invisible="state != 'rejected'"/>
                             </group>

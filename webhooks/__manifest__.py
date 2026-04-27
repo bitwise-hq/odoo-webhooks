@@ -6,6 +6,7 @@
     'description': 'Generic webhook framework with model-driven endpoint configuration, durable inbox storage, and queue-backed processing.',
     'depends': ['queue_job'],
     'data': [
+        'security/webhook_groups.xml',
         'security/ir.model.access.csv',
         'data/queue_job_function_data.xml',
         'views/webhook_handler_views.xml',

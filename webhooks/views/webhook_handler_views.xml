@@ -38,7 +38,7 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
+                    <group string="Handler">
                         <group>
                             <field name="name"/>
                             <field name="code"/>
@@ -51,11 +51,14 @@
                             <field name="outbound_enabled"/>
                         </group>
                     </group>
+                    <group string="Configuration Guidance" invisible="not configuration_warning">
+                        <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
+                    </group>
                     <group string="Python Callback" invisible="execution_mode != 'python'">
                         <field name="python_model_name"/>
                         <field name="python_method_name"/>
                     </group>
-                    <group>
+                    <group string="Internal Notes">
                         <field name="note"/>
                     </group>
                 </sheet>

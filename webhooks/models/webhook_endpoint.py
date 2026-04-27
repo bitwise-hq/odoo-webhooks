@@ -14,7 +14,7 @@ from ..exceptions import (
     WebhookSignatureValidationError,
     WebhookValidationError,
 )
-from .webhook_endpoint_source import BUILTIN_METADATA_FIELD_NAMES
+from .webhook_endpoint_semantic_binding import WEBHOOK_SEMANTIC_NAMES
 
 
 class WebhookEndpoint(models.Model):
@@ -40,6 +40,13 @@ class WebhookEndpoint(models.Model):
         ('unix_ms', 'Unix Milliseconds'),
         ('iso8601', 'ISO 8601'),
     ]
+    _ACCEPTANCE_KEY_POLICY_SELECTION = [
+        ('legacy_fallback', 'Legacy Fallback Chain'),
+        ('idempotency_key', 'Explicit Idempotency Key'),
+        ('delivery_id', 'Delivery Identity'),
+        ('event_id', 'Business Event Identity'),
+        ('body_sha256', 'Raw Body SHA256'),
+    ]
 
     _code_uniq = models.Constraint(
         'unique(code)',
@@ -47,8 +54,16 @@ class WebhookEndpoint(models.Model):
     )
 
     name = fields.Char(required=True)
-    code = fields.Char(required=True, copy=False, index=True)
-    active = fields.Boolean(default=True)
+    code = fields.Char(
+        required=True,
+        copy=False,
+        index=True,
+        help='Unique identifier used in the public inbound webhook URL. Changing this value changes the route path consumed by upstream providers.',
+    )
+    active = fields.Boolean(
+        default=True,
+        help='Archived endpoints are not matched by the public inbound webhook route.',
+    )
     is_paused = fields.Boolean(
         string='Paused',
         default=False,
@@ -60,27 +75,48 @@ class WebhookEndpoint(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
-    route_path = fields.Char(compute='_compute_route_path', string='Route')
+    route_path = fields.Char(
+        compute='_compute_route_path',
+        string='Public Route',
+        help='Computed public path derived from the endpoint code.',
+    )
     handler_id = fields.Many2one(
         'webhook.handler',
         string='Default Handler',
         domain="[('inbound_enabled', '=', True)]",
-        help='Fallback handler used when no handler selector resolves another handler.',
+        help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only.',
     )
     source_ids = fields.One2many(
         'webhook.endpoint.source',
         'endpoint_id',
-        string='Resolved Value Sources',
+        string='Value Resolution Rules',
+        help='Ordered rules used to resolve built-in semantics and custom values from headers, payload, literals, hashes, or computed methods.',
         copy=True,
+    )
+    semantic_binding_ids = fields.One2many(
+        'webhook.endpoint.semantic.binding',
+        'endpoint_id',
+        string='Semantic Bindings',
+        copy=True,
+        help='Maps built-in webhook semantics such as signature, delivery identity, and handler selector to resolved keys from the Value Resolution rules.',
+    )
+    acceptance_key_policy = fields.Selection(
+        selection=_ACCEPTANCE_KEY_POLICY_SELECTION,
+        required=True,
+        default='legacy_fallback',
+        string='Acceptance Key Policy',
+        help='Select which semantic determines accepted-delivery deduplication. Legacy fallback keeps the previous idempotency_key -> delivery_id -> event_id -> body hash behavior.',
     )
     signature_verification_mode = fields.Selection(
         selection=_SIGNATURE_MODE_SELECTION,
         required=True,
         default='none',
+        help='Enable shared-secret HMAC verification for incoming requests.',
     )
     signature_secret = fields.Char(
         copy=False,
         groups='base.group_system',
+        help='Primary shared secret used to compute the expected webhook signature.',
     )
     signature_secondary_secret = fields.Char(
         string='Secondary Signature Secret',
@@ -102,6 +138,7 @@ class WebhookEndpoint(models.Model):
         help='Optional prefix stripped from extracted signature values before comparison, such as v1=.',
     )
     signature_message_joiner = fields.Char(
+        string='Join Signature Parts With',
         default='',
         help='Text inserted between signature message parts. If no parts are configured, the raw request body is used.',
     )
@@ -109,9 +146,16 @@ class WebhookEndpoint(models.Model):
         selection=_TIMESTAMP_FORMAT_SELECTION,
         required=True,
         default='unix',
+        help='How the extracted signature_timestamp value should be parsed when freshness checks are enabled.',
     )
-    signature_max_age_seconds = fields.Integer(default=300)
-    signature_max_future_skew_seconds = fields.Integer(default=300)
+    signature_max_age_seconds = fields.Integer(
+        default=300,
+        help='Maximum allowed signature age in seconds. Set to 0 to disable the age check.',
+    )
+    signature_max_future_skew_seconds = fields.Integer(
+        default=300,
+        help='Maximum allowed future clock skew in seconds. Set to 0 to disable the future-skew check.',
+    )
     signature_part_ids = fields.One2many(
         'webhook.endpoint.signature.part',
         'endpoint_id',
@@ -121,6 +165,20 @@ class WebhookEndpoint(models.Model):
     inbound_event_ids = fields.One2many('webhook.inbound.event', 'endpoint_id', string='Inbound Events')
     inbound_event_count = fields.Integer(compute='_compute_related_counts')
     rejected_event_count = fields.Integer(compute='_compute_related_counts')
+    operational_state = fields.Selection(
+        selection=[
+            ('live', 'Live'),
+            ('paused', 'Paused'),
+            ('archived', 'Archived'),
+        ],
+        compute='_compute_admin_guidance',
+        string='Operational State',
+    )
+    configuration_warning = fields.Text(
+        compute='_compute_admin_guidance',
+        string='Configuration Guidance',
+        help='Human-readable guidance about the current endpoint configuration.',
+    )
 
     @api.depends('code')
     def _compute_route_path(self):
@@ -139,15 +197,133 @@ class WebhookEndpoint(models.Model):
                 ('state', '=', 'rejected'),
             ])
 
-    @api.constrains('signature_verification_mode', 'signature_secret', 'source_ids')
+    @api.depends(
+        'active',
+        'is_paused',
+        'handler_id',
+        'handler_id.execution_mode',
+        'signature_verification_mode',
+        'signature_secret',
+        'signature_max_age_seconds',
+        'signature_max_future_skew_seconds',
+        'acceptance_key_policy',
+        'source_ids.active',
+        'source_ids.field_name',
+        'semantic_binding_ids.semantic_name',
+        'semantic_binding_ids.value_key',
+        'signature_part_ids.active',
+    )
+    def _compute_admin_guidance(self):
+        for endpoint in self:
+            if not endpoint.active:
+                endpoint.operational_state = 'archived'
+            elif endpoint.is_paused:
+                endpoint.operational_state = 'paused'
+            else:
+                endpoint.operational_state = 'live'
+
+            messages = []
+            if not endpoint.active:
+                messages.append(_('Archived endpoints are not matched by the public inbound webhook route.'))
+            elif endpoint.is_paused:
+                messages.append(_('Paused endpoints keep their configuration but reject new deliveries.'))
+
+            if not endpoint.handler_id:
+                messages.append(_('No default handler is configured. Requests without a resolved handler selector will be stored only.'))
+            elif endpoint.handler_id.execution_mode == 'low_code':
+                messages.append(_('The selected default handler uses model-driven execution, which is still a placeholder in this version.'))
+
+            binding_map = endpoint._get_semantic_binding_map()
+            if endpoint.acceptance_key_policy == 'legacy_fallback':
+                messages.append(_('Accepted-delivery deduplication is still using the legacy fallback chain. Bind semantics explicitly and choose a dedicated acceptance key policy when the provider contract is known.'))
+            elif endpoint.acceptance_key_policy != 'body_sha256':
+                acceptance_key = binding_map.get(endpoint.acceptance_key_policy)
+                if not acceptance_key:
+                    messages.append(
+                        _('Acceptance key policy %s needs a semantic binding before deduplication becomes explicit.')
+                        % dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy]
+                    )
+                elif not endpoint._has_active_source_for_key(acceptance_key):
+                    messages.append(
+                        _('Acceptance key policy %s is bound to %s, but no active value resolution rule currently produces that key.')
+                        % (dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy], acceptance_key)
+                    )
+
+            if endpoint.signature_verification_mode == 'hmac':
+                signature_key = binding_map.get('signature')
+                timestamp_key = binding_map.get('signature_timestamp')
+                if not endpoint.signature_secret:
+                    messages.append(_('HMAC verification needs a primary signature secret.'))
+                if not signature_key:
+                    messages.append(_('HMAC verification needs a semantic binding for Signature.'))
+                elif not endpoint._has_active_source_for_key(signature_key):
+                    messages.append(
+                        _('HMAC verification is bound to %s for Signature, but no active value resolution rule currently produces that key.')
+                        % signature_key
+                    )
+                if (
+                    (endpoint.signature_max_age_seconds > 0 or endpoint.signature_max_future_skew_seconds > 0)
+                    and not timestamp_key
+                ):
+                    messages.append(_('Freshness checks are enabled, so add a semantic binding for Signature Timestamp or set both freshness windows to 0.'))
+                elif timestamp_key and not endpoint._has_active_source_for_key(timestamp_key):
+                    messages.append(
+                        _('Signature Timestamp is bound to %s, but no active value resolution rule currently produces that key.')
+                        % timestamp_key
+                    )
+                if not endpoint.signature_part_ids.filtered('active'):
+                    messages.append(_('No signature message parts are configured. The raw request body will be used as the signed message.'))
+
+            endpoint.configuration_warning = '\n'.join(messages) or False
+
+    @api.constrains(
+        'signature_verification_mode',
+        'signature_secret',
+        'signature_max_age_seconds',
+        'signature_max_future_skew_seconds',
+        'source_ids',
+        'semantic_binding_ids',
+        'acceptance_key_policy',
+    )
     def _check_signature_configuration(self):
         for endpoint in self:
+            binding_map = endpoint._get_semantic_binding_map()
+            if endpoint.signature_verification_mode != 'hmac':
+                if endpoint.acceptance_key_policy == 'body_sha256':
+                    continue
+            if endpoint.acceptance_key_policy not in ('legacy_fallback', 'body_sha256'):
+                acceptance_key = binding_map.get(endpoint.acceptance_key_policy)
+                if not acceptance_key:
+                    raise WebhookProcessingConfigurationError(
+                        _('Acceptance key policy %s requires a semantic binding.')
+                        % dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy]
+                    )
+                if not endpoint._has_active_source_for_key(acceptance_key):
+                    raise WebhookProcessingConfigurationError(
+                        _('Acceptance key policy %s is bound to %s, but no active value resolution rule produces that key.')
+                        % (dict(self._ACCEPTANCE_KEY_POLICY_SELECTION)[endpoint.acceptance_key_policy], acceptance_key)
+                    )
             if endpoint.signature_verification_mode != 'hmac':
                 continue
             if not endpoint.signature_secret:
                 raise WebhookProcessingConfigurationError(_('HMAC verification requires a primary signature secret.'))
-            if not endpoint.source_ids.filtered(lambda line: line.field_name == 'signature' and line.active):
-                raise WebhookProcessingConfigurationError(_('HMAC verification requires at least one active signature source line.'))
+            signature_key = binding_map.get('signature')
+            if not signature_key:
+                raise WebhookProcessingConfigurationError(_('HMAC verification requires a semantic binding for Signature.'))
+            if not endpoint._has_active_source_for_key(signature_key):
+                raise WebhookProcessingConfigurationError(
+                    _('HMAC verification is bound to %s for Signature, but no active value resolution rule produces that key.')
+                    % signature_key
+                )
+            if endpoint.signature_max_age_seconds > 0 or endpoint.signature_max_future_skew_seconds > 0:
+                timestamp_key = binding_map.get('signature_timestamp')
+                if not timestamp_key:
+                    raise WebhookProcessingConfigurationError(_('Freshness checks require a semantic binding for Signature Timestamp.'))
+                if not endpoint._has_active_source_for_key(timestamp_key):
+                    raise WebhookProcessingConfigurationError(
+                        _('Freshness checks are bound to %s for Signature Timestamp, but no active value resolution rule produces that key.')
+                        % timestamp_key
+                    )
 
     def action_view_inbound_events(self):
         self.ensure_one()
@@ -241,7 +417,25 @@ class WebhookEndpoint(models.Model):
             )
         return method(signature_part, body, headers, payload)
 
-    def _extract_field_candidates(self, field_name, body, headers, payload):
+    def _get_semantic_binding_map(self):
+        self.ensure_one()
+        return {
+            binding.semantic_name: (binding.value_key or '').strip()
+            for binding in self.semantic_binding_ids
+            if (binding.value_key or '').strip()
+        }
+
+    def _get_bound_value_key(self, semantic_name):
+        self.ensure_one()
+        return self._get_semantic_binding_map().get(semantic_name)
+
+    def _has_active_source_for_key(self, value_key):
+        self.ensure_one()
+        if not value_key:
+            return False
+        return bool(self.source_ids.filtered(lambda line: line.active and line.field_name == value_key))
+
+    def _extract_field_candidates(self, field_name, body, headers, payload, *, allow_multiple=False):
         self.ensure_one()
         candidates = []
         field_lines = self.source_ids.filtered(
@@ -257,8 +451,13 @@ class WebhookEndpoint(models.Model):
             candidate_invalid = False
             joiner = next((line.joiner for line in lines if line.joiner), '')
             for line in lines:
-                allow_multiple = field_name == 'signature' and line.source_kind == 'header_param'
-                raw_value = line._resolve_value(self, body, headers, payload, return_all=allow_multiple)
+                raw_value = line._resolve_value(
+                    self,
+                    body,
+                    headers,
+                    payload,
+                    return_all=allow_multiple and line.source_kind == 'header_param',
+                )
                 if isinstance(raw_value, list):
                     transformed = [
                         item for item in line._apply_transforms(raw_value)
@@ -299,14 +498,66 @@ class WebhookEndpoint(models.Model):
         }
         return sorted(field_names)
 
-    def _extract_inbound_metadata(self, body, headers, payload):
+    def _extract_resolved_values(self, body, headers, payload):
         self.ensure_one()
-        metadata = {}
+        resolved_values = {}
         for field_name in self._get_configured_field_names():
-            metadata[field_name] = self._extract_field_value(field_name, body, headers, payload)
-        for field_name in BUILTIN_METADATA_FIELD_NAMES:
-            metadata.setdefault(field_name, False)
-        return metadata
+            resolved_values[field_name] = self._extract_field_value(field_name, body, headers, payload)
+        return resolved_values
+
+    def _extract_semantic_candidates(self, semantic_name, body, headers, payload):
+        self.ensure_one()
+        value_key = self._get_bound_value_key(semantic_name)
+        if not value_key:
+            return []
+        return self._extract_field_candidates(
+            value_key,
+            body,
+            headers,
+            payload,
+            allow_multiple=semantic_name == 'signature',
+        )
+
+    def _extract_semantic_value(self, semantic_name, body, headers, payload, *, resolved_values=None):
+        self.ensure_one()
+        value_key = self._get_bound_value_key(semantic_name)
+        if not value_key:
+            return False
+        if semantic_name != 'signature' and resolved_values is not None:
+            return resolved_values.get(value_key, False)
+        candidates = self._extract_semantic_candidates(semantic_name, body, headers, payload)
+        return candidates[0] if candidates else False
+
+    def _extract_inbound_metadata(self, body, headers, payload, *, resolved_values=None):
+        self.ensure_one()
+        if resolved_values is None:
+            resolved_values = self._extract_resolved_values(body, headers, payload)
+        return {
+            semantic_name: self._extract_semantic_value(
+                semantic_name,
+                body,
+                headers,
+                payload,
+                resolved_values=resolved_values,
+            )
+            for semantic_name in WEBHOOK_SEMANTIC_NAMES
+        }
+
+    def _resolve_acceptance_key(self, body_sha256, metadata):
+        self.ensure_one()
+        policy = self.acceptance_key_policy or 'legacy_fallback'
+        if policy == 'legacy_fallback':
+            for semantic_name in ('idempotency_key', 'delivery_id', 'event_id'):
+                candidate = metadata.get(semantic_name)
+                if candidate:
+                    return candidate, semantic_name
+            return body_sha256, 'body_sha256'
+        if policy == 'body_sha256':
+            return body_sha256, 'body_sha256'
+        candidate = metadata.get(policy)
+        if candidate:
+            return candidate, policy
+        return body_sha256, 'body_sha256'
 
     def _get_signature_secrets(self):
         self.ensure_one()
@@ -369,7 +620,7 @@ class WebhookEndpoint(models.Model):
         self.ensure_one()
         if self.signature_verification_mode != 'hmac':
             return
-        incoming_values = self._extract_field_candidates('signature', body, headers, payload)
+        incoming_values = self._extract_semantic_candidates('signature', body, headers, payload)
         if not incoming_values:
             raise WebhookSignatureValidationError(_('The webhook signature could not be resolved.'))
         message = self._build_signature_message(body, headers, payload)

@@ -45,8 +45,21 @@ class WebhookInboundEvent(models.Model):
     event_id = fields.Char(index=True)
     delivery_id = fields.Char(index=True)
     notification_id = fields.Char(index=True)
-    idempotency_key = fields.Char(index=True)
-    accepted_idempotency_key = fields.Char(index=True)
+    idempotency_key = fields.Char(
+        index=True,
+        help='Resolved explicit idempotency key semantic, when configured by the endpoint.',
+    )
+    accepted_idempotency_key = fields.Char(index=True, help='Internal accepted-delivery identity key used for deduplication.')
+    accepted_identity_source = fields.Selection(
+        selection=[
+            ('idempotency_key', 'Explicit Idempotency Key'),
+            ('delivery_id', 'Delivery Identity'),
+            ('event_id', 'Business Event Identity'),
+            ('body_sha256', 'Raw Body SHA256'),
+        ],
+        index=True,
+        help='Which semantic actually supplied the accepted-delivery identity for this record.',
+    )
     signature = fields.Char()
     signature_timestamp_raw = fields.Char(string='Signature Timestamp')
     occurred_at_raw = fields.Char(string='Occurred At')
@@ -54,7 +67,11 @@ class WebhookInboundEvent(models.Model):
     version = fields.Char()
     resource_reference = fields.Char(index=True)
     handler_selector = fields.Char()
-    resolved_values_json = fields.Text(required=True, default='{}')
+    resolved_values_json = fields.Text(
+        required=True,
+        default='{}',
+        help='Serialized snapshot of all resolved built-in and custom values extracted during intake.',
+    )
     body_sha256 = fields.Char(required=True, index=True)
     request_body = fields.Text(required=True)
     request_headers_json = fields.Text(required=True)
@@ -63,6 +80,28 @@ class WebhookInboundEvent(models.Model):
     processing_error = fields.Text()
     rejection_category = fields.Char(index=True)
     rejection_reason = fields.Text()
+    operator_action_hint = fields.Text(
+        compute='_compute_operator_action_hint',
+        string='Operator Guidance',
+    )
+
+    @api.depends('state', 'handler_id', 'processing_note', 'processing_error', 'rejection_reason')
+    def _compute_operator_action_hint(self):
+        for event in self:
+            if event.state == 'received':
+                event.operator_action_hint = _('Queue processing to hand this delivery to the background worker.')
+            elif event.state == 'processing':
+                event.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
+            elif event.state == 'error':
+                event.operator_action_hint = _('Review the processing error, correct the handler or endpoint configuration, then replay if it is safe to do so.')
+            elif event.state == 'dead_letter':
+                event.operator_action_hint = _('The handler explicitly moved this delivery to dead letter. Confirm replay is safe before resetting it.')
+            elif event.state == 'rejected':
+                event.operator_action_hint = _('This request was rejected during intake validation. Replay is intentionally unavailable until the endpoint configuration is fixed.')
+            elif event.state == 'done' and not event.handler_id:
+                event.operator_action_hint = _('This delivery was stored successfully, but no handler was resolved so no business action ran.')
+            else:
+                event.operator_action_hint = False
 
     @api.model
     def _parse_payload(self, body_text, *, raise_on_invalid=False):
@@ -101,10 +140,10 @@ class WebhookInboundEvent(models.Model):
         return self.get_resolved_values().get(field_key, default)
 
     @api.model
-    def _prepare_create_values_from_request(self, endpoint, handler, body, headers, payload, metadata):
+    def _prepare_create_values_from_request(self, endpoint, handler, body, headers, payload, resolved_values, metadata):
         body_text = body.decode('utf-8', errors='replace')
         body_sha256 = hashlib.sha256(body).hexdigest()
-        idempotency_key = metadata.get('idempotency_key') or metadata.get('delivery_id') or metadata.get('event_id') or body_sha256
+        acceptance_key, acceptance_source = endpoint._resolve_acceptance_key(body_sha256, metadata)
         return {
             'name': metadata.get('event_type') or metadata.get('topic') or endpoint.display_name or _('Inbound Webhook Event'),
             'endpoint_id': endpoint.id,
@@ -115,8 +154,9 @@ class WebhookInboundEvent(models.Model):
             'event_id': metadata.get('event_id'),
             'delivery_id': metadata.get('delivery_id'),
             'notification_id': metadata.get('notification_id'),
-            'idempotency_key': idempotency_key,
-            'accepted_idempotency_key': idempotency_key,
+            'idempotency_key': metadata.get('idempotency_key'),
+            'accepted_idempotency_key': acceptance_key,
+            'accepted_identity_source': acceptance_source,
             'signature': metadata.get('signature'),
             'signature_timestamp_raw': metadata.get('signature_timestamp'),
             'occurred_at_raw': metadata.get('occurred_at'),
@@ -124,7 +164,7 @@ class WebhookInboundEvent(models.Model):
             'version': metadata.get('version'),
             'resource_reference': metadata.get('resource_reference'),
             'handler_selector': metadata.get('handler_selector'),
-            'resolved_values_json': self._serialize_resolved_values(metadata),
+            'resolved_values_json': self._serialize_resolved_values(resolved_values),
             'body_sha256': body_sha256,
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),
@@ -136,7 +176,9 @@ class WebhookInboundEvent(models.Model):
     def _log_rejected_request(self, endpoint, body, headers, *, payload=None, rejection_category='validation', rejection_reason=None):
         body_text = body.decode('utf-8', errors='replace')
         payload = payload if payload is not None else self._parse_payload(body_text)
-        metadata = endpoint._extract_inbound_metadata(body, headers, payload or {}) if endpoint and isinstance(payload, dict) else {}
+        payload_context = payload if isinstance(payload, dict) else {}
+        resolved_values = endpoint._extract_resolved_values(body, headers, payload_context) if endpoint else {}
+        metadata = endpoint._extract_inbound_metadata(body, headers, payload_context, resolved_values=resolved_values) if endpoint else {}
         values = {
             'name': _('Rejected Webhook Request'),
             'endpoint_id': endpoint.id if endpoint else False,
@@ -149,6 +191,7 @@ class WebhookInboundEvent(models.Model):
             'notification_id': metadata.get('notification_id'),
             'idempotency_key': metadata.get('idempotency_key'),
             'accepted_idempotency_key': False,
+            'accepted_identity_source': False,
             'signature': metadata.get('signature'),
             'signature_timestamp_raw': metadata.get('signature_timestamp'),
             'occurred_at_raw': metadata.get('occurred_at'),
@@ -156,7 +199,7 @@ class WebhookInboundEvent(models.Model):
             'version': metadata.get('version'),
             'resource_reference': metadata.get('resource_reference'),
             'handler_selector': metadata.get('handler_selector'),
-            'resolved_values_json': self._serialize_resolved_values(metadata),
+            'resolved_values_json': self._serialize_resolved_values(resolved_values),
             'body_sha256': hashlib.sha256(body).hexdigest(),
             'request_body': body_text,
             'request_headers_json': self._serialize_headers(headers),
@@ -175,14 +218,15 @@ class WebhookInboundEvent(models.Model):
             payload = self._parse_payload(body.decode('utf-8', errors='replace'), raise_on_invalid=True)
             if not isinstance(payload, dict):
                 raise WebhookPayloadValidationError(_('The webhook payload must be a JSON object.'))
-            metadata = endpoint._extract_inbound_metadata(body, headers, payload)
+            resolved_values = endpoint._extract_resolved_values(body, headers, payload)
+            metadata = endpoint._extract_inbound_metadata(body, headers, payload, resolved_values=resolved_values)
             endpoint._validate_inbound_request(body, headers, payload, metadata)
 
             body_sha256 = hashlib.sha256(body).hexdigest()
-            idempotency_key = metadata.get('idempotency_key') or metadata.get('delivery_id') or metadata.get('event_id') or body_sha256
+            accepted_identity_key, __ = endpoint._resolve_acceptance_key(body_sha256, metadata)
             existing = self.search([
                 ('endpoint_id', '=', endpoint.id),
-                ('accepted_idempotency_key', '=', idempotency_key),
+                ('accepted_idempotency_key', '=', accepted_identity_key),
             ], limit=1)
             if existing:
                 if existing.state in ('received', 'error'):
@@ -190,14 +234,14 @@ class WebhookInboundEvent(models.Model):
                 return existing
 
             handler = endpoint._resolve_handler(metadata)
-            values = self._prepare_create_values_from_request(endpoint, handler, body, headers, payload, metadata)
+            values = self._prepare_create_values_from_request(endpoint, handler, body, headers, payload, resolved_values, metadata)
             try:
                 with self.env.cr.savepoint():
                     event = self.create(values)
             except IntegrityError:
                 event = self.search([
                     ('endpoint_id', '=', endpoint.id),
-                    ('accepted_idempotency_key', '=', idempotency_key),
+                    ('accepted_idempotency_key', '=', accepted_identity_key),
                 ], limit=1)
 
             if event and event.state in ('received', 'error'):

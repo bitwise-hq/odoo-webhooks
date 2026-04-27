@@ -4,23 +4,6 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-BUILTIN_METADATA_FIELD_NAMES = (
-    'topic',
-    'event_type',
-    'event_id',
-    'delivery_id',
-    'notification_id',
-    'idempotency_key',
-    'signature',
-    'signature_timestamp',
-    'occurred_at',
-    'tenant_key',
-    'version',
-    'resource_reference',
-    'handler_selector',
-)
-
-
 class WebhookEndpointSource(models.Model):
     _name = 'webhook.endpoint.source'
     _description = 'Webhook Endpoint Source'
@@ -51,34 +34,36 @@ class WebhookEndpointSource(models.Model):
     field_name = fields.Char(
         required=True,
         index=True,
-        string='Field Key',
+        string='Resolved Key',
         help=(
-            'Free-form key for the resolved value. Built-in keys used by the framework are: '
-            'topic, event_type, event_id, delivery_id, notification_id, idempotency_key, '
-            'signature, signature_timestamp, occurred_at, tenant_key, version, '
-            'resource_reference, and handler_selector. Any other key is also allowed and '
-            'will be stored with the inbound event.'
+            'Free-form key for the resolved value. Use Semantic Bindings on the endpoint '
+            'to connect built-in webhook semantics such as signature, event type, or '
+            'delivery identity to one of these resolved keys. Any other key is allowed '
+            'and will be stored with the inbound event.'
         ),
     )
     candidate_sequence = fields.Integer(
+        string='Fallback Tier',
         default=10,
         required=True,
         help='Lines with the same field and candidate sequence are combined into one candidate value before fallback continues to the next candidate sequence.',
     )
-    sequence = fields.Integer(default=10, required=True)
+    sequence = fields.Integer(default=10, required=True, string='Line Order')
     joiner = fields.Char(
+        string='Join With',
         default='',
         help='Text inserted between non-empty line values when multiple lines are combined for the same candidate sequence.',
     )
-    source_kind = fields.Selection(selection=_SOURCE_KIND_SELECTION, required=True, default='header')
+    source_kind = fields.Selection(selection=_SOURCE_KIND_SELECTION, required=True, default='header', string='Source')
     header_name = fields.Char(help='Case-insensitive HTTP header name.')
-    header_param_name = fields.Char(help='Parameter name inside a structured header such as Stripe-Signature or Paddle-Signature.')
+    header_param_name = fields.Char(string='Header Parameter', help='Parameter name inside a structured header such as Stripe-Signature or Paddle-Signature.')
     payload_path = fields.Char(help='Dotted path such as data.object.id or items.0.sku.')
     literal_value = fields.Char()
-    computed_method = fields.Char(help='Endpoint method name used for computed sources.')
-    normalize_mode = fields.Selection(selection=_NORMALIZE_SELECTION, required=True, default='none')
-    hash_algorithm = fields.Selection(selection=_HASH_SELECTION, required=True, default='none')
+    computed_method = fields.Char(string='Compute Method', help='Endpoint method name used for computed sources.')
+    normalize_mode = fields.Selection(selection=_NORMALIZE_SELECTION, required=True, default='none', string='Normalize')
+    hash_algorithm = fields.Selection(selection=_HASH_SELECTION, required=True, default='none', string='Hash')
     required = fields.Boolean(
+        string='Required in Tier',
         default=False,
         help='If enabled, a missing value invalidates this candidate sequence and fallback continues to the next candidate sequence.',
     )

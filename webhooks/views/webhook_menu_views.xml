@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_webhooks_root" name="Webhooks" sequence="90" groups="base.group_system"/>
-    <menuitem id="menu_webhooks_configuration" name="Configuration" parent="menu_webhooks_root" sequence="10" groups="base.group_system"/>
-    <menuitem id="menu_webhooks_operations" name="Operations" parent="menu_webhooks_root" sequence="20" groups="base.group_system"/>
+    <menuitem id="menu_webhooks_root" name="Webhooks" sequence="90" groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_configuration" name="Configuration" parent="menu_webhooks_root" sequence="10" groups="webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_operations" name="Operations" parent="menu_webhooks_root" sequence="20" groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"/>
 
-    <menuitem id="menu_webhooks_handlers" name="Handlers" parent="menu_webhooks_configuration" action="action_webhook_handler" sequence="10" groups="base.group_system"/>
-    <menuitem id="menu_webhooks_endpoints" name="Endpoints" parent="menu_webhooks_configuration" action="action_webhook_endpoint" sequence="20" groups="base.group_system"/>
-    <menuitem id="menu_webhooks_inbound_events" name="Inbound Events" parent="menu_webhooks_operations" action="action_webhook_inbound_event" sequence="10" groups="base.group_system"/>
+    <menuitem id="menu_webhooks_handlers" name="Handlers" parent="menu_webhooks_configuration" action="action_webhook_handler" sequence="10" groups="webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_endpoints" name="Endpoints" parent="menu_webhooks_configuration" action="action_webhook_endpoint" sequence="20" groups="webhooks.group_webhooks_admin"/>
+    <menuitem id="menu_webhooks_inbound_events" name="Inbound Events" parent="menu_webhooks_operations" action="action_webhook_inbound_event" sequence="10" groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"/>
 
 </odoo>

@@ -18,14 +18,17 @@ class WebhookEndpointSignaturePart(models.Model):
 
     endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
     active = fields.Boolean(default=True)
-    sequence = fields.Integer(default=10, required=True)
-    source_kind = fields.Selection(selection=_SOURCE_KIND_SELECTION, required=True, default='raw_body')
+    sequence = fields.Integer(default=10, required=True, string='Part Order')
+    source_kind = fields.Selection(selection=_SOURCE_KIND_SELECTION, required=True, default='raw_body', string='Part Source')
     header_name = fields.Char()
-    header_param_name = fields.Char()
+    header_param_name = fields.Char(string='Header Parameter')
     payload_path = fields.Char()
     literal_value = fields.Char()
-    computed_method = fields.Char()
-    required = fields.Boolean(default=False)
+    computed_method = fields.Char(string='Compute Method')
+    required = fields.Boolean(
+        default=False,
+        help='If enabled, the entire signature message is invalid when this part cannot be resolved.',
+    )
 
     def _resolve_value(self, endpoint, body, headers, payload):
         self.ensure_one()

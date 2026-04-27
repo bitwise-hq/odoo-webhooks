@@ -11,6 +11,7 @@
                 <field name="company_id"/>
                 <field name="handler_id"/>
                 <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
                 <filter name="paused" string="Paused" domain="[('is_paused', '=', True)]"/>
             </search>
         </field>
@@ -23,10 +24,10 @@
             <list>
                 <field name="name"/>
                 <field name="code"/>
+                <field name="operational_state"/>
                 <field name="company_id"/>
                 <field name="handler_id"/>
                 <field name="route_path"/>
-                <field name="is_paused"/>
                 <field name="inbound_event_count" string="Accepted"/>
                 <field name="rejected_event_count" string="Rejected"/>
             </list>
@@ -47,36 +48,54 @@
                             <field name="rejected_event_count" widget="statinfo" string="Rejected"/>
                         </button>
                     </div>
-                    <group>
+                    <group string="Endpoint">
                         <group>
                             <field name="name"/>
                             <field name="code"/>
+                            <field name="route_path" readonly="1"/>
                             <field name="company_id"/>
-                            <field name="handler_id"/>
+                        </group>
+                        <group>
+                            <field name="operational_state" readonly="1"/>
                             <field name="active"/>
                             <field name="is_paused"/>
                         </group>
+                    </group>
+                    <group string="Handler Resolution">
                         <group>
-                            <field name="route_path" readonly="1"/>
+                            <field name="handler_id"/>
+                            <field name="acceptance_key_policy"/>
                         </group>
                     </group>
+                    <group string="Configuration Guidance" invisible="not configuration_warning">
+                        <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
+                    </group>
                     <notebook>
-                        <page string="Resolved Value Sources">
+                        <page string="Semantic Bindings">
+                            <field name="semantic_binding_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="semantic_name"/>
+                                    <field name="value_key"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Value Resolution">
                             <field name="source_ids" nolabel="1">
                                 <list editable="bottom">
                                     <field name="field_name"/>
                                     <field name="candidate_sequence"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="joiner" optional="hide"/>
+                                    <field name="joiner"/>
                                     <field name="source_kind"/>
                                     <field name="header_name" invisible="source_kind not in ['header', 'header_param']"/>
                                     <field name="header_param_name" invisible="source_kind != 'header_param'"/>
                                     <field name="payload_path" invisible="source_kind != 'payload_path'"/>
                                     <field name="literal_value" invisible="source_kind != 'literal'"/>
                                     <field name="computed_method" invisible="source_kind != 'computed'"/>
-                                    <field name="normalize_mode" optional="hide"/>
-                                    <field name="hash_algorithm" optional="hide"/>
-                                    <field name="required" optional="hide"/>
+                                    <field name="normalize_mode"/>
+                                    <field name="hash_algorithm"/>
+                                    <field name="required"/>
                                     <field name="active"/>
                                 </list>
                             </field>
@@ -106,13 +125,13 @@
                                         <field name="payload_path" invisible="source_kind != 'payload_path'"/>
                                         <field name="literal_value" invisible="source_kind != 'literal'"/>
                                         <field name="computed_method" invisible="source_kind != 'computed'"/>
-                                        <field name="required" optional="hide"/>
+                                        <field name="required"/>
                                         <field name="active"/>
                                     </list>
                                 </field>
                             </group>
                         </page>
-                        <page string="Accepted Events">
+                        <page string="Accepted Deliveries">
                             <field name="inbound_event_ids" domain="[('state', '!=', 'rejected')]" readonly="1">
                                 <list>
                                     <field name="received_at"/>
@@ -120,6 +139,8 @@
                                     <field name="event_id"/>
                                     <field name="delivery_id"/>
                                     <field name="idempotency_key"/>
+                                    <field name="accepted_identity_source"/>
+                                    <field name="handler_id"/>
                                     <field name="state"/>
                                 </list>
                             </field>
