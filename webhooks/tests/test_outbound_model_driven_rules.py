@@ -192,6 +192,25 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
         endpoint.action_set_draft()
         self.assertEqual(endpoint.state, 'draft')
 
+    def test_outbound_endpoint_state_actions_reject_invalid_states(self):
+        active_endpoint = self._create_outbound_endpoint(state='active')
+        draft_endpoint = self._create_outbound_endpoint(state='draft')
+        archived_endpoint = self._create_outbound_endpoint(state='archived')
+
+        with self.assertRaisesRegex(ValidationError, 'Only draft outbound endpoints'):
+            active_endpoint.action_activate()
+        with self.assertRaisesRegex(ValidationError, 'Only active or archived outbound endpoints'):
+            draft_endpoint.action_set_draft()
+        with self.assertRaisesRegex(ValidationError, 'Only draft or active outbound endpoints'):
+            archived_endpoint.action_archive()
+
+    def test_queue_delivery_rejects_non_queueable_states(self):
+        endpoint = self._create_outbound_endpoint()
+        delivery = self._create_outbound_delivery(endpoint, state='queued')
+
+        with self.assertRaisesRegex(ValidationError, 'Only draft or failed deliveries can be queued'):
+            delivery.action_queue_delivery()
+
     def test_reset_to_draft_rejects_non_resettable_states(self):
         endpoint = self._create_outbound_endpoint()
         delivery = self._create_outbound_delivery(endpoint, state='done')

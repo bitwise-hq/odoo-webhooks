@@ -408,7 +408,8 @@ class WebhookOutboundDelivery(models.Model):
             if delivery.endpoint_id.state == 'archived':
                 raise ValidationError(_('Archived outbound endpoint %s cannot queue new deliveries.') % delivery.endpoint_id.display_name)
             if delivery.state not in ('draft', 'error'):
-                continue
+                raise ValidationError(_('Only draft or failed deliveries can be queued.'))
+        for delivery in self:
             runtime_user_id = delivery._get_runtime_execution_user_id()
             delivery.write({
                 'execution_user_id': runtime_user_id,

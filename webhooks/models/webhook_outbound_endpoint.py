@@ -1,6 +1,7 @@
 from urllib.parse import urlsplit
 
 from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo.exceptions import ValidationError
 
 from ..exceptions import WebhookProcessingConfigurationError
 from .const import HTTP_METHOD_SELECTION
@@ -222,13 +223,19 @@ class WebhookOutboundEndpoint(models.Model):
         return action
 
     def action_activate(self):
-        self.filtered(lambda endpoint: endpoint.state == 'draft').write({'state': 'active'})
+        if self.filtered(lambda endpoint: endpoint.state != 'draft'):
+            raise ValidationError(_('Only draft outbound endpoints can be activated.'))
+        self.write({'state': 'active'})
         return True
 
     def action_set_draft(self):
-        self.filtered(lambda endpoint: endpoint.state in ('active', 'archived')).write({'state': 'draft'})
+        if self.filtered(lambda endpoint: endpoint.state not in ('active', 'archived')):
+            raise ValidationError(_('Only active or archived outbound endpoints can be moved to draft.'))
+        self.write({'state': 'draft'})
         return True
 
     def action_archive(self):
-        self.filtered(lambda endpoint: endpoint.state != 'archived').write({'state': 'archived'})
+        if self.filtered(lambda endpoint: endpoint.state not in ('draft', 'active')):
+            raise ValidationError(_('Only draft or active outbound endpoints can be archived.'))
+        self.write({'state': 'archived'})
         return True

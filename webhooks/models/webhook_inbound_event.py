@@ -441,9 +441,9 @@ class WebhookInboundEvent(models.Model):
             raise
 
     def _queue_processing(self):
+        if self.filtered(lambda event: event.state not in ('received', 'error')):
+            raise ValidationError(_('Only received or failed webhook events can be queued for processing.'))
         for event in self:
-            if event.state not in ('received', 'error'):
-                continue
             runtime_user_id = event._get_runtime_execution_user_id()
             write_vals = {'processing_error': False}
             if event.execution_user_id.id != runtime_user_id:

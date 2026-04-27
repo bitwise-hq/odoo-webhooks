@@ -156,6 +156,25 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
         endpoint.action_set_draft()
         self.assertEqual(endpoint.state, 'draft')
 
+    def test_inbound_endpoint_state_actions_reject_invalid_states(self):
+        active_endpoint = self._create_inbound_endpoint(state='active')
+        draft_endpoint = self._create_inbound_endpoint(state='draft')
+        archived_endpoint = self._create_inbound_endpoint(state='archived')
+
+        with self.assertRaisesRegex(ValidationError, 'Only draft inbound endpoints'):
+            active_endpoint.action_activate()
+        with self.assertRaisesRegex(ValidationError, 'Only active or archived inbound endpoints'):
+            draft_endpoint.action_set_draft()
+        with self.assertRaisesRegex(ValidationError, 'Only draft or active inbound endpoints'):
+            archived_endpoint.action_archive()
+
+    def test_queue_processing_rejects_non_queueable_states(self):
+        endpoint = self._create_inbound_endpoint()
+        event = self._create_inbound_event(endpoint, state='done')
+
+        with self.assertRaisesRegex(ValidationError, 'Only received or failed webhook events'):
+            event.action_queue_processing()
+
     def test_reset_to_received_rejects_non_retriable_states(self):
         endpoint = self._create_inbound_endpoint()
         event = self._create_inbound_event(endpoint, state='done')
