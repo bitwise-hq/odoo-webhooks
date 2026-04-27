@@ -1,0 +1,19 @@
+{
+    'name': 'Webhooks',
+    'version': '19.0.1.0.0',
+    'category': 'Tools',
+    'summary': 'Generic inbound and outbound webhook framework for Odoo.',
+    'description': 'Generic webhook framework with model-driven endpoint configuration, durable inbox storage, and queue-backed processing.',
+    'depends': ['queue_job'],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/queue_job_function_data.xml',
+        'views/webhook_handler_views.xml',
+        'views/webhook_endpoint_views.xml',
+        'views/webhook_inbound_event_views.xml',
+        'views/webhook_menu_views.xml',
+    ],
+    'author': 'Bitwise Technologies LLC',
+    'license': 'LGPL-3',
+    'installable': True,
+}
