@@ -239,6 +239,14 @@ class WebhookOutboundDelivery(models.Model):
             return current.ids
         return current
 
+    def _decode_literal_value(self, value):
+        if value in (False, None, '') or not isinstance(value, str):
+            return value
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return value
+
     def _get_context_values(self):
         self.ensure_one()
         values = {}
@@ -254,7 +262,7 @@ class WebhookOutboundDelivery(models.Model):
     def _resolve_source_value(self, source_kind, source_expression=False, literal_value=False, *, context_values=None, request_data=None):
         self.ensure_one()
         if source_kind == 'literal':
-            return literal_value
+            return self._decode_literal_value(literal_value)
 
         source_map = {
             'delivery_field': self,

@@ -512,7 +512,7 @@ class WebhookInboundEvent(models.Model):
                         'delivery_id': delivery.id,
                         'key_name': key_name,
                         'source_kind': 'literal',
-                        'literal_value': '' if value is False or value is None else str(value),
+                        'literal_value': json.dumps(value) if not isinstance(value, str) else value,
                     })
                 delivery.action_queue_delivery()
                 record_reference = '%s:%s' % (delivery._name, delivery.id)
@@ -538,10 +538,18 @@ class WebhookInboundEvent(models.Model):
             })
             raise
 
+    def _decode_literal_value(self, value):
+        if value in (False, None, '') or not isinstance(value, str):
+            return value
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return value
+
     def _resolve_inbound_source_value(self, source_kind, source_expression=False, literal_value=False):
         self.ensure_one()
         if source_kind == 'literal':
-            return literal_value
+            return self._decode_literal_value(literal_value)
         if source_kind == 'resolved_value':
             return self.get_resolved_value(source_expression)
         if source_kind in ('semantic_field', 'event_field'):
