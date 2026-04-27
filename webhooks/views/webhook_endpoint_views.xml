@@ -43,7 +43,10 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
+                    <button name="action_activate" type="object" string="Activate" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_set_draft" type="object" string="Move To Draft" invisible="state not in ['active', 'archived']"/>
+                    <button name="action_archive" type="object" string="Archive" invisible="state == 'archived'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active" options="{'clickable': 0}"/>
                 </header>
                 <sheet>
                     <field name="execution_user_id" invisible="1"/>

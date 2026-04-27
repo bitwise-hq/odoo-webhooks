@@ -140,3 +140,18 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
 
         with self.assertRaisesRegex(ValidationError, 'draft'):
             endpoint._validate_inbound_request(b'{}', {}, {}, {})
+
+    def test_inbound_endpoint_state_actions(self):
+        endpoint = self._create_inbound_endpoint(state='draft')
+
+        endpoint.action_activate()
+        self.assertEqual(endpoint.state, 'active')
+
+        endpoint.action_set_draft()
+        self.assertEqual(endpoint.state, 'draft')
+
+        endpoint.action_archive()
+        self.assertEqual(endpoint.state, 'archived')
+
+        endpoint.action_set_draft()
+        self.assertEqual(endpoint.state, 'draft')

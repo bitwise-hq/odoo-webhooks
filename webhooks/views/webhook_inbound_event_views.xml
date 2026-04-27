@@ -57,9 +57,9 @@
         <field name="arch" type="xml">
             <form create="false" delete="false" edit="false">
                 <header>
-                    <button name="action_queue_processing" type="object" string="Queue Processing" invisible="state not in ['received', 'error']"/>
-                    <button name="action_reset_to_received" type="object" string="Replay" invisible="state not in ['error', 'dead_letter']"/>
-                    <field name="state" widget="statusbar" statusbar_visible="received,processing,done,error,dead_letter,rejected"/>
+                    <button name="action_queue_processing" type="object" string="Queue Processing" class="oe_highlight" invisible="state not in ['received', 'error']"/>
+                    <button name="action_reset_to_received" type="object" string="Reset To Received" invisible="state not in ['error', 'dead_letter']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="received,processing,done" options="{'clickable': 0}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

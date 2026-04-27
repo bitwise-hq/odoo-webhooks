@@ -176,3 +176,18 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
 
         with self.assertRaisesRegex(ValidationError, 'Draft outbound endpoint'):
             delivery._queue_processing()
+
+    def test_outbound_endpoint_state_actions(self):
+        endpoint = self._create_outbound_endpoint(state='draft')
+
+        endpoint.action_activate()
+        self.assertEqual(endpoint.state, 'active')
+
+        endpoint.action_set_draft()
+        self.assertEqual(endpoint.state, 'draft')
+
+        endpoint.action_archive()
+        self.assertEqual(endpoint.state, 'archived')
+
+        endpoint.action_set_draft()
+        self.assertEqual(endpoint.state, 'draft')

@@ -49,11 +49,11 @@
         <field name="arch" type="xml">
             <form delete="false">
                 <header>
-                    <button name="action_queue_delivery" type="object" string="Queue Delivery" invisible="state not in ['draft', 'error']"/>
+                    <button name="action_queue_delivery" type="object" string="Queue Delivery" class="oe_highlight" invisible="state not in ['draft', 'error']"/>
                     <button name="action_reset_to_draft" type="object" string="Reset To Draft" invisible="state not in ['error', 'dead_letter', 'canceled']"/>
                     <button name="action_create_replay_delivery" type="object" string="Create Replay" invisible="state in ['draft', 'queued', 'processing']"/>
                     <button name="action_cancel_delivery" type="object" string="Cancel" invisible="state not in ['draft', 'error']"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,done,error,dead_letter,canceled"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,done" options="{'clickable': 0}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

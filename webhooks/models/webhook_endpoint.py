@@ -355,6 +355,18 @@ class WebhookEndpoint(models.Model):
         action['context'] = {'default_endpoint_id': self.id}
         return action
 
+    def action_activate(self):
+        self.filtered(lambda endpoint: endpoint.state == 'draft').write({'state': 'active'})
+        return True
+
+    def action_set_draft(self):
+        self.filtered(lambda endpoint: endpoint.state in ('active', 'archived')).write({'state': 'draft'})
+        return True
+
+    def action_archive(self):
+        self.filtered(lambda endpoint: endpoint.state != 'archived').write({'state': 'archived'})
+        return True
+
     @api.model
     def _find_active_endpoint_by_path(self, path):
         return self.search([('path', '=', path), ('state', '=', 'active')], limit=1)
