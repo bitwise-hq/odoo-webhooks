@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="action_webhook_inbound_queue_job" model="ir.actions.act_window">
+    <field name="name">Inbound Jobs</field>
+    <field name="res_model">queue.job</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="queue_job.view_queue_job_search" />
+    <field
+      name="domain"
+    >[('model_name', '=', 'webhook.inbound.event'), ('method_name', '=', 'process_event')]</field>
+  </record>
+
+  <record id="action_webhook_outbound_queue_job" model="ir.actions.act_window">
+    <field name="name">Outbound Jobs</field>
+    <field name="res_model">queue.job</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="queue_job.view_queue_job_search" />
+    <field
+      name="domain"
+    >[('model_name', '=', 'webhook.outbound.delivery'), ('method_name', '=', 'process_delivery')]</field>
+  </record>
+
+  <menuitem
+    id="menu_webhooks_root"
+    name="Webhooks"
+    sequence="90"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_inbound"
+    name="Inbound"
+    parent="menu_webhooks_root"
+    sequence="10"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_outbound"
+    name="Outbound"
+    parent="menu_webhooks_root"
+    sequence="20"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_administration"
+    name="Administration"
+    parent="menu_webhooks_root"
+    sequence="30"
+    groups="webhooks.group_webhooks_admin"
+  />
+
+  <menuitem
+    id="menu_webhooks_endpoints"
+    name="Endpoints"
+    parent="menu_webhooks_inbound"
+    action="action_webhook_endpoint"
+    sequence="10"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_inbound_events"
+    name="Events"
+    parent="menu_webhooks_inbound"
+    action="action_webhook_inbound_event"
+    sequence="20"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_inbound_jobs"
+    name="Jobs"
+    parent="menu_webhooks_inbound"
+    action="action_webhook_inbound_queue_job"
+    sequence="30"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+
+  <menuitem
+    id="menu_webhooks_outbound_endpoints"
+    name="Endpoints"
+    parent="menu_webhooks_outbound"
+    action="action_webhook_outbound_endpoint"
+    sequence="10"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_outbound_deliveries"
+    name="Deliveries"
+    parent="menu_webhooks_outbound"
+    action="action_webhook_outbound_delivery"
+    sequence="20"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+  <menuitem
+    id="menu_webhooks_outbound_jobs"
+    name="Jobs"
+    parent="menu_webhooks_outbound"
+    action="action_webhook_outbound_queue_job"
+    sequence="30"
+    groups="webhooks.group_webhooks_operator,webhooks.group_webhooks_admin"
+  />
+
+  <menuitem
+    id="menu_webhooks_handlers"
+    name="Handlers"
+    parent="menu_webhooks_administration"
+    action="action_webhook_handler"
+    sequence="10"
+    groups="webhooks.group_webhooks_admin"
+  />
+</odoo>

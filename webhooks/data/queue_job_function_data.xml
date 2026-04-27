@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="channel_webhooks" model="queue.job.channel">
+    <field name="name">webhooks</field>
+    <field name="parent_id" ref="queue_job.channel_root" />
+    <field name="removal_interval">90</field>
+  </record>
+
+  <record
+    id="job_function_webhook_inbound_event_process_event"
+    model="queue.job.function"
+  >
+    <field name="model_id" ref="model_webhook_inbound_event" />
+    <field name="method">process_event</field>
+    <field name="channel_id" ref="channel_webhooks" />
+    <field name="retry_pattern" eval="{1: 30, 3: 120, 5: 600}" />
+  </record>
+
+  <record
+    id="job_function_webhook_outbound_delivery_process_delivery"
+    model="queue.job.function"
+  >
+    <field name="model_id" ref="model_webhook_outbound_delivery" />
+    <field name="method">process_delivery</field>
+    <field name="channel_id" ref="channel_webhooks" />
+    <field name="retry_pattern" eval="{1: 30, 3: 120, 5: 600}" />
+  </record>
+</odoo>

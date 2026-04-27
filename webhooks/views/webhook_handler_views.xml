@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_handler_search" model="ir.ui.view">
+    <field name="name">webhook.handler.search</field>
+    <field name="model">webhook.handler</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name" />
+        <field name="code" />
+        <field name="execution_mode" />
+        <field name="direction" />
+        <field name="company_id" />
+        <field name="partner_id" />
+        <filter name="active" string="Active" domain="[('active', '=', True)]" />
+        <filter name="inactive" string="Archived" domain="[('active', '=', False)]" />
+      </search>
+    </field>
+  </record>
+
+  <record id="view_webhook_handler_list" model="ir.ui.view">
+    <field name="name">webhook.handler.list</field>
+    <field name="model">webhook.handler</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name" />
+        <field name="code" />
+        <field name="direction" />
+        <field name="execution_mode" />
+        <field name="company_id" />
+        <field name="partner_id" />
+        <field name="active" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_webhook_handler_form" model="ir.ui.view">
+    <field name="name">webhook.handler.form</field>
+    <field name="model">webhook.handler</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group string="Handler">
+            <group>
+              <field name="name" />
+              <field name="code" />
+              <field name="active" />
+            </group>
+            <group>
+              <field name="direction" />
+              <field name="execution_mode" />
+            </group>
+          </group>
+          <group string="Scope">
+            <group>
+              <field name="company_id" />
+              <field name="partner_id" placeholder="Company-scoped only" />
+            </group>
+          </group>
+          <group string="Python Callback" invisible="execution_mode != 'python'">
+            <field name="python_model_name" />
+            <field name="python_method_name" />
+          </group>
+          <notebook invisible="execution_mode != 'model_driven'">
+            <page string="Inbound Rules" invisible="direction != 'inbound'">
+              <field
+                name="inbound_rule_ids"
+                nolabel="1"
+                context="{'default_handler_id': id}"
+              >
+                <list editable="bottom">
+                  <field name="sequence" />
+                  <field name="active" />
+                  <field name="name" />
+                  <field name="action_type" />
+                  <field name="target_model_name" />
+                  <field name="outbound_endpoint_id" />
+                  <field name="retry_seconds" />
+                </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="name" />
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="action_type" />
+                      </group>
+                      <group>
+                        <field
+                          name="target_model_name"
+                          invisible="action_type not in ['create_record', 'update_record', 'upsert_record']"
+                        />
+                        <field
+                          name="outbound_endpoint_id"
+                          invisible="action_type != 'queue_outbound'"
+                        />
+                        <field
+                          name="retry_seconds"
+                          invisible="action_type != 'retry'"
+                        />
+                      </group>
+                    </group>
+                    <group string="Notes">
+                      <field name="note" nolabel="1" widget="text" />
+                    </group>
+                    <notebook>
+                      <page string="Conditions">
+                        <field name="condition_ids" nolabel="1">
+                          <list editable="bottom">
+                            <field name="sequence" />
+                            <field name="source_kind" />
+                            <field name="source_expression" />
+                            <field name="operator" />
+                            <field name="expected_value" />
+                          </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="source_kind" />
+                                  <field name="source_expression" />
+                                </group>
+                                <group>
+                                  <field name="operator" />
+                                  <field name="expected_value" />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
+                        </field>
+                      </page>
+                      <page
+                        string="Lookup Keys"
+                        invisible="action_type not in ['update_record', 'upsert_record']"
+                      >
+                        <field name="lookup_ids" nolabel="1">
+                          <list editable="bottom">
+                            <field name="sequence" />
+                            <field name="target_field_name" />
+                            <field name="source_kind" />
+                            <field name="source_expression" />
+                            <field name="literal_value" />
+                          </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_field_name" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
+                        </field>
+                      </page>
+                      <page
+                        string="Assignments"
+                        invisible="action_type not in ['create_record', 'update_record', 'upsert_record', 'queue_outbound']"
+                      >
+                        <field name="assignment_ids" nolabel="1">
+                          <list editable="bottom">
+                            <field name="sequence" />
+                            <field name="target_kind" />
+                            <field name="target_expression" />
+                            <field name="source_kind" />
+                            <field name="source_expression" />
+                            <field name="literal_value" />
+                          </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_kind" />
+                                  <field name="target_expression" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
+                        </field>
+                      </page>
+                      <page string="Executions">
+                        <field name="execution_ids" nolabel="1" readonly="1">
+                          <list>
+                            <field name="create_date" string="Executed" />
+                            <field name="event_id" />
+                            <field name="state" />
+                            <field name="record_reference" />
+                            <field name="note" />
+                          </list>
+                        </field>
+                      </page>
+                    </notebook>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Outbound Rules" invisible="direction != 'outbound'">
+              <field
+                name="outbound_rule_ids"
+                nolabel="1"
+                context="{'default_handler_id': id}"
+              >
+                <list editable="bottom">
+                  <field name="sequence" />
+                  <field name="active" />
+                  <field name="name" />
+                  <field name="result_status" />
+                  <field name="retry_seconds" />
+                </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="name" />
+                        <field name="sequence" />
+                        <field name="active" />
+                      </group>
+                      <group>
+                        <field name="result_status" />
+                        <field
+                          name="retry_seconds"
+                          invisible="result_status != 'retry'"
+                        />
+                      </group>
+                    </group>
+                    <group string="Notes">
+                      <field name="note" nolabel="1" widget="text" />
+                    </group>
+                    <notebook>
+                      <page string="Conditions">
+                        <field name="condition_ids" nolabel="1">
+                          <list editable="bottom">
+                            <field name="sequence" />
+                            <field name="source_kind" />
+                            <field name="source_expression" />
+                            <field name="operator" />
+                            <field name="expected_value" />
+                          </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="source_kind" />
+                                  <field name="source_expression" />
+                                </group>
+                                <group>
+                                  <field name="operator" />
+                                  <field name="expected_value" />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
+                        </field>
+                      </page>
+                      <page string="Assignments">
+                        <field name="assignment_ids" nolabel="1">
+                          <list editable="bottom">
+                            <field name="sequence" />
+                            <field name="target_scope" />
+                            <field name="target_expression" />
+                            <field name="source_kind" />
+                            <field name="source_expression" />
+                            <field name="literal_value" />
+                          </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_scope" />
+                                  <field name="target_expression" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
+                        </field>
+                      </page>
+                    </notebook>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+          </notebook>
+          <group string="Internal Notes">
+            <field name="note" />
+          </group>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="action_webhook_handler" model="ir.actions.act_window">
+    <field name="name">Webhook Handlers</field>
+    <field name="res_model">webhook.handler</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="view_webhook_handler_search" />
+  </record>
+</odoo>

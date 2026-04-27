@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_outbound_delivery_search" model="ir.ui.view">
+    <field name="name">webhook.outbound.delivery.search</field>
+    <field name="model">webhook.outbound.delivery</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name" />
+        <field name="endpoint_id" />
+        <field name="company_id" />
+        <field name="partner_id" />
+        <field name="handler_id" />
+        <field name="state" />
+        <field name="response_status_code" />
+        <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
+        <filter name="queued" string="Queued" domain="[('state', '=', 'queued')]" />
+        <filter name="done" string="Done" domain="[('state', '=', 'done')]" />
+        <filter name="error" string="Error" domain="[('state', '=', 'error')]" />
+        <filter
+          name="dead_letter"
+          string="Dead Letter"
+          domain="[('state', '=', 'dead_letter')]"
+        />
+      </search>
+    </field>
+  </record>
+
+  <record id="view_webhook_outbound_delivery_list" model="ir.ui.view">
+    <field name="name">webhook.outbound.delivery.list</field>
+    <field name="model">webhook.outbound.delivery</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="create_date" string="Created" />
+        <field name="endpoint_id" />
+        <field name="company_id" />
+        <field name="partner_id" />
+        <field name="attempt_count" />
+        <field name="replay_count" />
+        <field name="state" />
+        <field name="queue_job_count" string="Jobs" />
+        <field name="latest_queue_job_state" string="Latest Job State" />
+        <field name="response_status_code" />
+        <field name="queued_at" />
+        <field name="processed_at" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_webhook_outbound_delivery_form" model="ir.ui.view">
+    <field name="name">webhook.outbound.delivery.form</field>
+    <field name="model">webhook.outbound.delivery</field>
+    <field name="arch" type="xml">
+      <form delete="false">
+        <header>
+          <button
+            name="action_queue_delivery"
+            type="object"
+            string="Queue Delivery"
+            class="oe_highlight"
+            invisible="state not in ['draft', 'error']"
+          />
+          <button
+            name="action_reset_to_draft"
+            type="object"
+            string="Reset To Draft"
+            invisible="state not in ['error', 'dead_letter', 'canceled']"
+          />
+          <button
+            name="action_create_replay_delivery"
+            type="object"
+            string="Create Replay"
+            invisible="state in ['draft', 'queued', 'processing']"
+          />
+          <button
+            name="action_cancel_delivery"
+            type="object"
+            string="Cancel"
+            invisible="state not in ['draft', 'error']"
+          />
+          <field
+            name="state"
+            widget="statusbar"
+            statusbar_visible="draft,queued,processing,done"
+            options="{'clickable': 0}"
+          />
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button
+              class="oe_stat_button"
+              type="object"
+              name="action_view_queue_jobs"
+              icon="fa-tasks"
+            >
+              <field name="queue_job_count" widget="statinfo" string="Jobs" />
+            </button>
+          </div>
+          <field name="execution_user_id" invisible="1" />
+          <group string="Context">
+            <group>
+              <field name="name" />
+              <field name="endpoint_id" />
+              <field name="company_id" />
+              <field name="partner_id" placeholder="Inherited from endpoint when set" />
+              <field name="replayed_from_delivery_id" />
+              <field name="handler_id" />
+              <field name="matched_outbound_rule_id" readonly="1" />
+            </group>
+            <group>
+              <field name="http_method" />
+              <field name="target_url" widget="url" />
+              <field name="timeout_seconds" />
+              <field name="replay_count" readonly="1" />
+              <field name="latest_queue_job_id" readonly="1" />
+              <field name="latest_queue_job_state" readonly="1" />
+              <field name="queued_at" />
+              <field name="processed_at" />
+            </group>
+          </group>
+          <notebook>
+            <page string="Request">
+              <group string="Runtime Request Snapshots">
+                <group>
+                  <field name="request_headers_json" widget="text" readonly="1" />
+                </group>
+                <group>
+                  <field name="payload_json" widget="text" readonly="1" />
+                </group>
+              </group>
+            </page>
+            <page string="Context Lines">
+              <field
+                name="context_line_ids"
+                nolabel="1"
+                context="{'default_delivery_id': id}"
+              >
+                <list editable="bottom">
+                  <field name="sequence" />
+                  <field name="active" />
+                  <field name="key_name" />
+                  <field name="source_kind" />
+                  <field name="source_expression" />
+                  <field name="literal_value" />
+                </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="key_name" />
+                      </group>
+                      <group>
+                        <field name="source_kind" />
+                        <field
+                          name="source_expression"
+                          invisible="source_kind == 'literal'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                          widget="text"
+                        />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Response">
+              <group>
+                <field name="response_status_code" readonly="1" />
+                <field name="response_headers_json" widget="text" readonly="1" />
+                <field name="response_body" widget="text" readonly="1" />
+              </group>
+            </page>
+            <page string="Attempts">
+              <field name="attempt_ids" readonly="1">
+                <list>
+                  <field name="attempt_number" />
+                  <field name="started_at" />
+                  <field name="finished_at" />
+                  <field name="state" />
+                  <field name="http_method" />
+                  <field name="target_url" />
+                  <field name="response_status_code" />
+                  <field name="processing_error" />
+                </list>
+              </field>
+            </page>
+            <page string="Replays">
+              <field name="replay_delivery_ids" readonly="1">
+                <list>
+                  <field name="create_date" string="Created" />
+                  <field name="name" />
+                  <field name="state" />
+                  <field name="response_status_code" />
+                  <field name="processed_at" />
+                </list>
+              </field>
+            </page>
+            <page string="Processing">
+              <group>
+                <field name="matched_outbound_rule_id" readonly="1" />
+                <field name="processing_note" readonly="1" />
+                <field name="processing_error" readonly="1" />
+                <field name="queue_job_identity_key" readonly="1" />
+                <field name="latest_queue_job_id" readonly="1" />
+                <field name="latest_queue_job_state" readonly="1" />
+              </group>
+            </page>
+            <page string="Jobs">
+              <field name="queue_job_ids" nolabel="1" readonly="1">
+                <list>
+                  <field name="date_created" />
+                  <field name="name" />
+                  <field name="uuid" />
+                  <field name="state" />
+                  <field name="retry" />
+                  <field name="max_retries" />
+                  <field name="date_done" />
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="action_webhook_outbound_delivery" model="ir.actions.act_window">
+    <field name="name">Outbound Deliveries</field>
+    <field name="res_model">webhook.outbound.delivery</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="view_webhook_outbound_delivery_search" />
+  </record>
+</odoo>
