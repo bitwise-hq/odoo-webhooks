@@ -6,6 +6,7 @@ class WebhookEndpointSignaturePart(models.Model):
     _name = 'webhook.endpoint.signature.part'
     _description = 'Webhook Endpoint Signature Part'
     _order = 'sequence, id'
+    _check_company_auto = True
 
     _SOURCE_KIND_SELECTION = [
         ('raw_body', 'Raw Body'),
@@ -16,7 +17,21 @@ class WebhookEndpointSignaturePart(models.Model):
         ('computed', 'Computed'),
     ]
 
-    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
+    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
+    company_id = fields.Many2one(
+        'res.company',
+        related='endpoint_id.company_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
+    partner_id = fields.Many2one(
+        'res.partner',
+        related='endpoint_id.partner_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=10, required=True, string='Part Order')
     source_kind = fields.Selection(selection=_SOURCE_KIND_SELECTION, required=True, default='raw_body', string='Part Source')

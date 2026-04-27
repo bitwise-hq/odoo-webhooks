@@ -8,6 +8,7 @@ class WebhookEndpointSource(models.Model):
     _name = 'webhook.endpoint.source'
     _description = 'Webhook Endpoint Source'
     _order = 'field_name, candidate_sequence, sequence, id'
+    _check_company_auto = True
     _SOURCE_KIND_SELECTION = [
         ('header', 'Header'),
         ('header_param', 'Structured Header Parameter'),
@@ -29,7 +30,21 @@ class WebhookEndpointSource(models.Model):
         ('sha512', 'SHA512'),
     ]
 
-    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
+    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
+    company_id = fields.Many2one(
+        'res.company',
+        related='endpoint_id.company_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
+    partner_id = fields.Many2one(
+        'res.partner',
+        related='endpoint_id.partner_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
     active = fields.Boolean(default=True)
     field_name = fields.Char(
         required=True,

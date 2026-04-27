@@ -9,6 +9,7 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="company_id"/>
+                <field name="partner_id"/>
                 <field name="handler_id"/>
                 <filter name="active" string="Active" domain="[('active', '=', True)]"/>
                 <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
@@ -26,6 +27,7 @@
                 <field name="code"/>
                 <field name="operational_state"/>
                 <field name="company_id"/>
+                <field name="partner_id"/>
                 <field name="handler_id"/>
                 <field name="route_path"/>
                 <field name="inbound_event_count" string="Accepted"/>
@@ -53,14 +55,21 @@
                             <field name="name"/>
                             <field name="code"/>
                             <field name="route_path" readonly="1"/>
-                            <field name="company_id"/>
-                            <field name="execution_user_id"/>
                         </group>
                         <group>
                             <field name="operational_state" readonly="1"/>
                             <field name="active"/>
                             <field name="is_paused"/>
                             <field name="payload_contract"/>
+                        </group>
+                    </group>
+                    <group string="Scope">
+                        <group>
+                            <field name="company_id"/>
+                            <field name="partner_id" placeholder="Company-scoped only"/>
+                        </group>
+                        <group>
+                            <field name="execution_user_id"/>
                         </group>
                     </group>
                     <group string="Handler And Identity">
@@ -141,6 +150,7 @@
                                     <field name="event_type"/>
                                     <field name="event_id"/>
                                     <field name="delivery_id"/>
+                                    <field name="partner_id"/>
                                     <field name="idempotency_key"/>
                                     <field name="delivery_identity_source"/>
                                     <field name="delivery_kind"/>
@@ -156,6 +166,7 @@
                                     <field name="event_type"/>
                                     <field name="event_id"/>
                                     <field name="delivery_id"/>
+                                    <field name="partner_id"/>
                                     <field name="rejection_category"/>
                                     <field name="state"/>
                                 </list>

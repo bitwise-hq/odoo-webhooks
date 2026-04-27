@@ -8,6 +8,7 @@
     'data': [
         'security/webhook_groups.xml',
         'security/ir.model.access.csv',
+        'security/webhook_security.xml',
         'data/queue_job_function_data.xml',
         'views/webhook_handler_views.xml',
         'views/webhook_endpoint_views.xml',

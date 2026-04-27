@@ -15,6 +15,8 @@
                 <field name="delivery_identity_source"/>
                 <field name="delivery_kind"/>
                 <field name="endpoint_id"/>
+                <field name="company_id"/>
+                <field name="partner_id"/>
                 <field name="handler_id"/>
                 <separator/>
                 <filter name="received" string="Received" domain="[('state', '=', 'received')]"/>
@@ -33,6 +35,8 @@
             <list>
                 <field name="received_at"/>
                 <field name="endpoint_id"/>
+                <field name="company_id"/>
+                <field name="partner_id"/>
                 <field name="handler_id"/>
                 <field name="event_type"/>
                 <field name="event_id"/>
@@ -63,9 +67,10 @@
                         <group>
                             <field name="name"/>
                             <field name="endpoint_id"/>
+                            <field name="company_id"/>
+                            <field name="partner_id" placeholder="Inherited from endpoint when set"/>
                             <field name="execution_user_id"/>
                             <field name="handler_id"/>
-                            <field name="company_id"/>
                             <field name="received_at"/>
                             <field name="processed_at"/>
                         </group>

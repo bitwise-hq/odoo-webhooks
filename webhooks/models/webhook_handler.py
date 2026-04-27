@@ -6,6 +6,7 @@ class WebhookHandler(models.Model):
     _name = 'webhook.handler'
     _description = 'Webhook Handler'
     _order = 'name, id'
+    _check_company_auto = True
 
     _code_uniq = models.Constraint(
         'unique(code)',

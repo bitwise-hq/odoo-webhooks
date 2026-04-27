@@ -21,6 +21,7 @@ class WebhookEndpoint(models.Model):
     _name = 'webhook.endpoint'
     _description = 'Webhook Endpoint'
     _order = 'name, id'
+    _check_company_auto = True
 
     _SIGNATURE_MODE_SELECTION = [
         ('none', 'None'),
@@ -82,10 +83,19 @@ class WebhookEndpoint(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Partner',
+        index=True,
+        check_company=True,
+        domain="[('is_company', '=', True)]",
+        help='Optional endpoint-level tenant/account partner. When set, accepted and rejected webhook records inherit this partner from the endpoint scope.',
+    )
     execution_user_id = fields.Many2one(
         'res.users',
         required=True,
         default=lambda self: self.env.user,
+        check_company=True,
         domain="[('share', '=', False), ('active', '=', True)]",
         string='Execution User',
         help='Accepted requests and queued processing run as this internal user instead of the superuser. Use a dedicated technical user with Webhook Administrator access.',
@@ -98,6 +108,7 @@ class WebhookEndpoint(models.Model):
     handler_id = fields.Many2one(
         'webhook.handler',
         string='Default Handler',
+        check_company=True,
         domain="[('inbound_enabled', '=', True)]",
         help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only.',
     )
@@ -229,6 +240,7 @@ class WebhookEndpoint(models.Model):
     @api.depends(
         'active',
         'is_paused',
+        'partner_id',
         'execution_user_id',
         'handler_id',
         'handler_id.execution_mode',
@@ -260,6 +272,16 @@ class WebhookEndpoint(models.Model):
             elif endpoint.is_paused:
                 messages.append(_('Paused endpoints keep their configuration but reject new deliveries.'))
 
+            binding_map = endpoint._get_semantic_binding_map()
+
+            if endpoint.partner_id:
+                messages.append(
+                    _('This endpoint is scoped to partner %s. Accepted and rejected records inherit that scope from the endpoint.')
+                    % endpoint._get_scoped_partner().display_name
+                )
+            else:
+                messages.append(_('This endpoint is company-scoped only. Accepted and rejected records do not store a partner from endpoint scope.'))
+
             if endpoint.payload_contract == 'json_object':
                 messages.append(_('This endpoint currently accepts only top-level JSON objects.'))
             else:
@@ -270,7 +292,6 @@ class WebhookEndpoint(models.Model):
             elif endpoint.handler_id.execution_mode == 'low_code':
                 messages.append(_('The selected default handler uses model-driven execution, which is still a placeholder in this version.'))
 
-            binding_map = endpoint._get_semantic_binding_map()
             if endpoint.delivery_identity_policy != 'body_sha256':
                 delivery_key = binding_map.get(endpoint.delivery_identity_policy)
                 if not delivery_key:
@@ -499,6 +520,14 @@ class WebhookEndpoint(models.Model):
             for binding in self.semantic_binding_ids
             if (binding.value_key or '').strip()
         }
+
+    def _normalize_partner(self, partner):
+        self.ensure_one()
+        return partner.commercial_partner_id if partner else self.env['res.partner']
+
+    def _get_scoped_partner(self):
+        self.ensure_one()
+        return self._normalize_partner(self.partner_id)
 
     def _get_bound_value_key(self, semantic_name):
         self.ensure_one()

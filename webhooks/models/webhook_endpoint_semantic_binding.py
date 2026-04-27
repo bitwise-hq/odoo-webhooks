@@ -24,13 +24,28 @@ class WebhookEndpointSemanticBinding(models.Model):
     _name = 'webhook.endpoint.semantic.binding'
     _description = 'Webhook Endpoint Semantic Binding'
     _order = 'semantic_name, id'
+    _check_company_auto = True
 
     _endpoint_semantic_uniq = models.Constraint(
         'unique(endpoint_id, semantic_name)',
         'Each semantic can be bound only once per endpoint.',
     )
 
-    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
+    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
+    company_id = fields.Many2one(
+        'res.company',
+        related='endpoint_id.company_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
+    partner_id = fields.Many2one(
+        'res.partner',
+        related='endpoint_id.partner_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
     semantic_name = fields.Selection(selection=WEBHOOK_SEMANTIC_SELECTION, required=True, index=True)
     value_key = fields.Char(
         required=True,

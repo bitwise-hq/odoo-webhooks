@@ -15,6 +15,7 @@ class WebhookInboundEvent(models.Model):
     _name = 'webhook.inbound.event'
     _description = 'Inbound Webhook Event'
     _order = 'received_at desc, id desc'
+    _check_company_auto = True
 
     _endpoint_dedupe_uniq = models.Constraint(
         'unique(endpoint_id, delivery_identity_key)',
@@ -22,17 +23,24 @@ class WebhookInboundEvent(models.Model):
     )
 
     name = fields.Char(required=True, default=lambda self: _('Inbound Webhook Event'))
-    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True)
+    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
     execution_user_id = fields.Many2one(
         'res.users',
         required=True,
         ondelete='restrict',
         index=True,
+        check_company=True,
         string='Execution User',
         help='Accepted request creation and queued processing run as this user.',
     )
-    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True)
+    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True)
     company_id = fields.Many2one('res.company', required=True, index=True)
+    partner_id = fields.Many2one(
+        'res.partner',
+        index=True,
+        check_company=True,
+        help='Resolved tenant/account partner for this webhook event, when the endpoint scope is partner-aware.',
+    )
     received_at = fields.Datetime(required=True, default=fields.Datetime.now, index=True)
     processed_at = fields.Datetime(index=True)
     state = fields.Selection(
@@ -86,7 +94,13 @@ class WebhookInboundEvent(models.Model):
         index=True,
         help='Whether this record is the first stored delivery for its replay identity or a later replay/redelivery.',
     )
-    replayed_from_event_id = fields.Many2one('webhook.inbound.event', string='Replay Of', ondelete='set null', index=True)
+    replayed_from_event_id = fields.Many2one(
+        'webhook.inbound.event',
+        string='Replay Of',
+        ondelete='set null',
+        index=True,
+        check_company=True,
+    )
     signature = fields.Char()
     signature_timestamp_raw = fields.Char(string='Signature Timestamp')
     occurred_at_raw = fields.Char(string='Occurred At')
@@ -204,12 +218,14 @@ class WebhookInboundEvent(models.Model):
     ):
         body_text = body.decode('utf-8', errors='replace')
         body_sha256 = hashlib.sha256(body).hexdigest()
+        partner = endpoint._get_scoped_partner()
         return {
             'name': metadata.get('event_type') or metadata.get('topic') or endpoint.display_name or _('Inbound Webhook Event'),
             'endpoint_id': endpoint.id,
             'execution_user_id': endpoint.execution_user_id.id,
             'handler_id': handler.id if handler else False,
             'company_id': endpoint.company_id.id,
+            'partner_id': partner.id if partner else False,
             'topic': metadata.get('topic'),
             'event_type': metadata.get('event_type'),
             'event_id': metadata.get('event_id'),
@@ -281,6 +297,7 @@ class WebhookInboundEvent(models.Model):
             'execution_user_id': endpoint.execution_user_id.id if endpoint else self.env.user.id,
             'handler_id': False,
             'company_id': endpoint.company_id.id if endpoint else self.env.company.id,
+            'partner_id': endpoint._get_scoped_partner().id if endpoint else False,
             'topic': metadata.get('topic'),
             'event_type': metadata.get('event_type'),
             'event_id': metadata.get('event_id'),
