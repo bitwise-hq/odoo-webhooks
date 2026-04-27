@@ -1,54 +1,82 @@
 Webhooks
 ========
 
-This addon provides a generic inbound and outbound webhook framework for Odoo.
+This addon provides a relational inbound and outbound webhook framework for
+Odoo. It is designed for three audiences:
+
+* operators configuring and monitoring webhook traffic in Odoo
+* developers building business-module integrations on top of the addon
+* maintainers evolving the addon internals, security model, and test surface
+
+Documentation map
+-----------------
+
+Start with the guide that matches your job:
+
+* `Documentation index <docs/index.rst>`_
+* `Operator getting started <docs/operator_getting_started.rst>`_
+* `Developer getting started <docs/developer_getting_started.rst>`_
+* `Maintainer architecture guide <docs/maintainer_architecture.rst>`_
 
 Supported design
 ----------------
 
-* inbound endpoints with public HTTP intake
-* relational source lines, semantic bindings, and signature-part configuration
-* relational inbound handler conditions, lookups, and assignments
-* durable inbound event storage with idempotency and execution logs
-* outbound endpoints with relational header and payload rules
-* outbound deliveries with relational context lines and queued processing
-* relational outbound handler conditions and assignments
-* runtime request and response snapshots for auditability
+The supported configuration path is relational throughout the addon:
 
-Operator workflow
------------------
+* inbound endpoints use source lines, semantic bindings, and signature parts
+* inbound handlers use rule, condition, lookup, and assignment rows
+* outbound endpoints use header rules and payload rules
+* outbound deliveries use context lines and attempt history
+* outbound handlers use rule, condition, and assignment rows
 
-* configure an inbound or outbound endpoint with company scope and,
-	optionally, a partner scope
-* define relational child rows for value resolution, signatures,
-	header rules, payload rules, or delivery context
-* attach a model-driven handler when inbound or outbound rule
-	evaluation should mutate data or route processing
-* review inbound events, outbound deliveries, attempts, and execution
-	logs through the stored audit snapshots
+JSON fields shown on inbound events and outbound deliveries are runtime audit
+evidence only. They are not the supported authoring surface.
 
-JSON fields shown on inbound events and outbound deliveries are runtime evidence only.
-The supported authoring path is relational configuration through the child rule and
-config models.
+Core concepts
+-------------
 
-Security model
+* ``webhook.endpoint`` receives inbound HTTP traffic on an immutable public path
+* ``webhook.outbound.endpoint`` defines where outbound deliveries are sent
+* ``webhook.handler`` chooses between model-driven rules and Python callbacks
+* source lines resolve raw request data into reusable keys
+* semantic bindings map those keys to built-in webhook concepts such as
+  delivery identity, event identity, signature, topic, and handler selection
+* delivery identity and replay identity are separate decisions
+* optional ``partner_id`` scope cascades from handlers and endpoints to their
+  relational child rows
+
+Audience guide
 --------------
 
-* company rules apply to all webhook records
-* optional partner scoping on handlers and endpoints cascades to
-	relational child rows
-* webhook operators have read-only access within their allowed partners
-* webhook admins can manage webhook configuration across the full
-	allowed company scope
+Operators
+  Use the operator guides to configure endpoints, review inbound events,
+  monitor outbound deliveries, and understand replay, reset, and queue actions.
 
-Demo data
----------
+Developers
+  Use the developer guides to build integrations in custom Odoo modules,
+  implement Python callback handlers, create deliveries programmatically, and
+  test integrations with the shared webhook test helpers.
 
-The demo data installs:
+Maintainers
+  Use the maintainer guides to understand the request and delivery pipelines,
+  queue-job integration, partner-aware security rules, demo data strategy, and
+  validation workflow for changes to the addon itself.
 
-* a company-scoped inbound orders endpoint with relational source and semantic binding rules
-* a partner-scoped signed inbound endpoint with relational signature assembly
-* a flexible JSON-value store-only endpoint
-* a partner-scoped outbound loopback endpoint with relational header
-	rules, payload rules, outbound handler rules, and seeded delivery
-	context lines
+Demo scenarios
+--------------
+
+The demo data provides four reference scenarios that are reused throughout the
+documentation:
+
+* a company-scoped inbound orders endpoint
+* a partner-scoped signed inbound endpoint
+* a store-only endpoint that accepts any JSON value
+* a partner-scoped outbound loopback endpoint with handler-driven mutations
+
+See `Documentation index <docs/index.rst>`_ for the full guide set.
+
+.. note::
+
+   The documentation describes only the final relational implementation.
+   Removed JSON authoring paths are intentionally not part of the supported
+   workflow.
