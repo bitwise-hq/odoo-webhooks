@@ -478,7 +478,5 @@ class TestWebhookEndpointSignature(WebhookEndpointTestCase):
             [],
         )
         self.assertFalse(
-            empty_endpoint._extract_semantic_value(
-                "signature", body, headers, payload
-            )
+            empty_endpoint._extract_semantic_value("signature", body, headers, payload)
         )

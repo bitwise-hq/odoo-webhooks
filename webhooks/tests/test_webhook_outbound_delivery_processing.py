@@ -293,7 +293,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
             autospec=True,
             return_value={"status": "cancel", "note": "Canceled by handler"},
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 cancel_delivery.process_delivery()
         self.assertEqual(cancel_delivery.state, "canceled")
         self.assertEqual(cancel_delivery.attempt_ids[:1].state, "canceled")
@@ -309,7 +311,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
             autospec=True,
             return_value={"status": "dead_letter", "note": "Blocked by handler"},
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 dead_letter_delivery.process_delivery()
         self.assertEqual(dead_letter_delivery.state, "dead_letter")
         self.assertEqual(dead_letter_delivery.attempt_ids[:1].state, "dead_letter")
@@ -330,7 +334,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
                 "seconds": 12,
             },
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 with self.assertRaisesRegex(RetryableJobError, "Retry by handler"):
                     retry_delivery.process_delivery()
         self.assertEqual(retry_delivery.state, "error")
@@ -348,7 +354,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
             autospec=True,
             return_value=False,
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 false_delivery.process_delivery()
         self.assertEqual(false_delivery.state, "canceled")
         self.assertEqual(false_delivery.attempt_ids[:1].state, "canceled")
@@ -364,7 +372,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
             autospec=True,
             return_value={"status": "dead_letter", "note": "Dead by handler"},
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 dead_handler_delivery.process_delivery()
         self.assertEqual(dead_handler_delivery.state, "dead_letter")
         self.assertEqual(dead_handler_delivery.attempt_ids[:1].state, "dead_letter")
@@ -377,7 +387,9 @@ class TestWebhookOutboundDeliveryProcessing(WebhookOutboundDeliveryTestCase):
         with patch.object(
             type(false_handler), "execute_outbound", autospec=True, return_value=False
         ):
-            with patch.object(outbound_delivery_model.requests, "request") as request_mock:
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
                 false_delivery.process_delivery()
         self.assertEqual(false_delivery.state, "canceled")
         self.assertEqual(false_delivery.attempt_ids[:1].state, "canceled")
