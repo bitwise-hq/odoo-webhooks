@@ -43,9 +43,13 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <field name="execution_user_id" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_view_outbound_deliveries" icon="fa-cloud-upload">
                             <field name="outbound_delivery_count" widget="statinfo" string="Deliveries"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_failed_outbound_deliveries" icon="fa-exclamation-triangle">
+                            <field name="failed_delivery_count" widget="statinfo" string="Failures"/>
                         </button>
                     </div>
                     <group string="Endpoint">
@@ -68,9 +72,6 @@
                             <field name="company_id"/>
                             <field name="partner_id" placeholder="Company-scoped only"/>
                         </group>
-                        <group>
-                            <field name="execution_user_id"/>
-                        </group>
                     </group>
                     <group string="Template Guidance">
                         <field name="template_guidance" nolabel="1" widget="text" readonly="1"/>
@@ -82,31 +83,29 @@
                         <field name="note"/>
                     </group>
                     <notebook>
-                        <page string="Request Assembly">
-                            <group string="Header Rules">
-                                <field name="header_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
-                                    <list editable="bottom">
-                                        <field name="sequence"/>
-                                        <field name="active"/>
-                                        <field name="header_name"/>
-                                        <field name="source_kind"/>
-                                        <field name="source_expression"/>
-                                        <field name="literal_value"/>
-                                    </list>
-                                </field>
-                            </group>
-                            <group string="Payload Rules">
-                                <field name="payload_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
-                                    <list editable="bottom">
-                                        <field name="sequence"/>
-                                        <field name="active"/>
-                                        <field name="target_path"/>
-                                        <field name="source_kind"/>
-                                        <field name="source_expression"/>
-                                        <field name="literal_value"/>
-                                    </list>
-                                </field>
-                            </group>
+                        <page string="Header Rules">
+                            <field name="header_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="active"/>
+                                    <field name="header_name"/>
+                                    <field name="source_kind"/>
+                                    <field name="source_expression"/>
+                                    <field name="literal_value"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Payload Rules">
+                            <field name="payload_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="active"/>
+                                    <field name="target_path"/>
+                                    <field name="source_kind"/>
+                                    <field name="source_expression"/>
+                                    <field name="literal_value"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Deliveries">
                             <field name="outbound_delivery_ids" readonly="1">
@@ -121,6 +120,7 @@
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

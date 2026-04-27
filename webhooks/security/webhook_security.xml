@@ -290,5 +290,31 @@
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
         </record>
 
+        <record id="queue_job_webhook_operator_rule" model="ir.rule">
+            <field name="name">Webhook Queue Job operator scope</field>
+            <field name="model_id" ref="queue_job.model_queue_job"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                '|', ('company_id', '=', False), ('company_id', 'in', company_ids),
+                '|',
+                '&amp;', ('model_name', '=', 'webhook.inbound.event'), ('method_name', '=', 'process_event'),
+                '&amp;', ('model_name', '=', 'webhook.outbound.delivery'), ('method_name', '=', 'process_delivery')
+            ]</field>
+        </record>
+
+        <record id="queue_job_webhook_admin_rule" model="ir.rule">
+            <field name="name">Webhook Queue Job admin scope</field>
+            <field name="model_id" ref="queue_job.model_queue_job"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                '|', ('company_id', '=', False), ('company_id', 'in', company_ids),
+                '|',
+                '&amp;', ('model_name', '=', 'webhook.inbound.event'), ('method_name', '=', 'process_event'),
+                '&amp;', ('model_name', '=', 'webhook.outbound.delivery'), ('method_name', '=', 'process_delivery')
+            ]</field>
+        </record>
+
     </data>
 </odoo>

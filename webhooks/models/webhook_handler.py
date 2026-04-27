@@ -4,6 +4,7 @@ from odoo.exceptions import ValidationError
 
 class WebhookHandler(models.Model):
     _name = 'webhook.handler'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Webhook Handler'
     _order = 'name, id'
     _check_company_auto = True
@@ -24,15 +25,15 @@ class WebhookHandler(models.Model):
 
     name = fields.Char(required=True)
     code = fields.Char(required=True, copy=False, index=True)
-    active = fields.Boolean(default=True, help='Archived handlers stay available for audit history but are no longer selectable for new work.')
+    active = fields.Boolean(default=True, tracking=True, help='Archived handlers stay available for audit history but are no longer selectable for new work.')
     company_id = fields.Many2one(
         'res.company',
         required=True,
         default=lambda self: self.env.company,
         index=True,
     )
-    inbound_enabled = fields.Boolean(default=True, help='Allow this handler to be selected for inbound webhook processing.')
-    outbound_enabled = fields.Boolean(default=False, help='Reserve this handler for future outbound webhook processing.')
+    inbound_enabled = fields.Boolean(default=True, tracking=True, help='Allow this handler to be selected for inbound webhook processing.')
+    outbound_enabled = fields.Boolean(default=False, tracking=True, help='Reserve this handler for future outbound webhook processing.')
     execution_mode = fields.Selection(
         selection=[
             ('model_driven', 'Model Driven'),
@@ -40,6 +41,7 @@ class WebhookHandler(models.Model):
         ],
         required=True,
         default='model_driven',
+        tracking=True,
         help='Python callbacks execute custom model methods. Model-driven handlers use inbound and outbound rule rows instead of authored JSON configuration.',
     )
     python_model_name = fields.Char(

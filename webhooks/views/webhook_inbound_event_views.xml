@@ -45,6 +45,8 @@
                 <field name="delivery_identity_source"/>
                 <field name="delivery_kind"/>
                 <field name="state"/>
+                <field name="queue_job_count" string="Jobs"/>
+                <field name="latest_queue_job_state" string="Latest Job State"/>
             </list>
         </field>
     </record>
@@ -60,6 +62,12 @@
                     <field name="state" widget="statusbar" statusbar_visible="received,processing,done,error,dead_letter,rejected"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_queue_jobs" icon="fa-tasks">
+                            <field name="queue_job_count" widget="statinfo" string="Jobs"/>
+                        </button>
+                    </div>
+                    <field name="execution_user_id" invisible="1"/>
                     <group string="Operator Guidance" invisible="not operator_action_hint">
                         <field name="operator_action_hint" nolabel="1" widget="text" readonly="1"/>
                     </group>
@@ -69,11 +77,15 @@
                             <field name="endpoint_id"/>
                             <field name="company_id"/>
                             <field name="partner_id" placeholder="Inherited from endpoint when set"/>
-                            <field name="execution_user_id"/>
                             <field name="handler_id"/>
                             <field name="matched_inbound_rule_id" readonly="1"/>
                             <field name="received_at"/>
                             <field name="processed_at"/>
+                        </group>
+                        <group>
+                            <field name="latest_queue_job_id" readonly="1"/>
+                            <field name="latest_queue_job_state" readonly="1"/>
+                            <field name="queue_job_count" readonly="1"/>
                         </group>
                     </group>
                     <group string="Resolved Metadata">
@@ -123,12 +135,27 @@
                                 <field name="matched_inbound_rule_id" readonly="1"/>
                                 <field name="processing_note" readonly="1"/>
                                 <field name="queue_job_identity_key" readonly="1"/>
+                                <field name="latest_queue_job_id" readonly="1"/>
+                                <field name="latest_queue_job_state" readonly="1"/>
                             </group>
                             <group string="Failure Details" invisible="not processing_error and state != 'rejected'">
                                 <field name="processing_error" readonly="1" invisible="not processing_error"/>
                                 <field name="rejection_category" invisible="state != 'rejected'"/>
                                 <field name="rejection_reason" invisible="state != 'rejected'"/>
                             </group>
+                        </page>
+                        <page string="Jobs">
+                            <field name="queue_job_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="date_created"/>
+                                    <field name="name"/>
+                                    <field name="uuid"/>
+                                    <field name="state"/>
+                                    <field name="retry"/>
+                                    <field name="max_retries"/>
+                                    <field name="date_done"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Rule Executions">
                             <field name="rule_execution_ids" nolabel="1" readonly="1">
@@ -144,12 +171,13 @@
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
 
     <record id="action_webhook_inbound_event" model="ir.actions.act_window">
-        <field name="name">Inbound Webhook Events</field>
+        <field name="name">Inbound Events</field>
         <field name="res_model">webhook.inbound.event</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_webhook_inbound_event_search"/>

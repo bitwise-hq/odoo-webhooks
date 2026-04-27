@@ -19,6 +19,7 @@ from .webhook_endpoint_semantic_binding import WEBHOOK_SEMANTIC_NAMES
 
 class WebhookEndpoint(models.Model):
     _name = 'webhook.endpoint'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Webhook Endpoint'
     _order = 'name, id'
     _check_company_auto = True
@@ -70,11 +71,13 @@ class WebhookEndpoint(models.Model):
     )
     active = fields.Boolean(
         default=True,
+        tracking=True,
         help='Archived endpoints are not matched by the public inbound webhook route.',
     )
     is_paused = fields.Boolean(
         string='Paused',
         default=False,
+        tracking=True,
         help='Paused endpoints keep their configuration but reject new webhook deliveries.',
     )
     company_id = fields.Many2one(
@@ -89,6 +92,7 @@ class WebhookEndpoint(models.Model):
         index=True,
         check_company=True,
         domain="[('is_company', '=', True)]",
+        tracking=True,
         help='Optional endpoint-level tenant/account partner. When set, accepted and rejected webhook records inherit this partner from the endpoint scope.',
     )
     execution_user_id = fields.Many2one(
@@ -110,6 +114,7 @@ class WebhookEndpoint(models.Model):
         string='Default Handler',
         check_company=True,
         domain="[('inbound_enabled', '=', True)]",
+        tracking=True,
         help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only.',
     )
     source_ids = fields.One2many(
@@ -131,6 +136,7 @@ class WebhookEndpoint(models.Model):
         required=True,
         default='delivery_id',
         string='Delivery Identity Policy',
+        tracking=True,
         help='Select which semantic identifies an exact delivery for duplicate detection.',
     )
     replay_identity_policy = fields.Selection(
@@ -138,6 +144,7 @@ class WebhookEndpoint(models.Model):
         required=True,
         default='none',
         string='Replay Identity Policy',
+        tracking=True,
         help='Optionally select which semantic links distinct deliveries of the same business event.',
     )
     payload_contract = fields.Selection(
@@ -145,12 +152,14 @@ class WebhookEndpoint(models.Model):
         required=True,
         default='json_object',
         string='Payload Contract',
+        tracking=True,
         help='JSON Object accepts only top-level JSON objects. Any JSON Value also allows arrays, scalars, booleans, and null.',
     )
     signature_verification_mode = fields.Selection(
         selection=_SIGNATURE_MODE_SELECTION,
         required=True,
         default='none',
+        tracking=True,
         help='Enable shared-secret HMAC verification for incoming requests.',
     )
     signature_secret = fields.Char(

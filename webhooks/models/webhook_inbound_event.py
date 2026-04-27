@@ -4,7 +4,7 @@ import traceback
 
 from psycopg2 import IntegrityError
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
 
@@ -13,6 +13,7 @@ from ..exceptions import WebhookPayloadValidationError
 
 class WebhookInboundEvent(models.Model):
     _name = 'webhook.inbound.event'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Inbound Webhook Event'
     _order = 'received_at desc, id desc'
     _check_company_auto = True
@@ -33,7 +34,7 @@ class WebhookInboundEvent(models.Model):
         string='Execution User',
         help='Accepted request creation and queued processing run as this user.',
     )
-    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True)
+    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True, tracking=True)
     company_id = fields.Many2one('res.company', required=True, index=True)
     partner_id = fields.Many2one(
         'res.partner',
@@ -55,6 +56,7 @@ class WebhookInboundEvent(models.Model):
         required=True,
         default='received',
         index=True,
+        tracking=True,
     )
     topic = fields.Char(index=True)
     event_type = fields.Char(index=True)
@@ -100,6 +102,7 @@ class WebhookInboundEvent(models.Model):
         ondelete='set null',
         index=True,
         check_company=True,
+        tracking=True,
     )
     signature = fields.Char()
     signature_timestamp_raw = fields.Char(string='Signature Timestamp')
@@ -119,7 +122,7 @@ class WebhookInboundEvent(models.Model):
     payload_json = fields.Text(required=True)
     processing_note = fields.Text()
     processing_error = fields.Text()
-    matched_inbound_rule_id = fields.Many2one('webhook.handler.inbound.rule', string='Matched Rule', ondelete='set null', index=True)
+    matched_inbound_rule_id = fields.Many2one('webhook.handler.inbound.rule', string='Matched Rule', ondelete='set null', index=True, tracking=True)
     rule_execution_ids = fields.One2many('webhook.inbound.rule.execution', 'event_id', string='Rule Executions')
     rejection_category = fields.Char(index=True)
     rejection_reason = fields.Text()
@@ -132,6 +135,10 @@ class WebhookInboundEvent(models.Model):
         string='Queue Job Identity Key',
         help='Identity key used when enqueuing background processing for this event.',
     )
+    queue_job_ids = fields.Many2many('queue.job', compute='_compute_queue_job_observability', string='Queue Jobs')
+    queue_job_count = fields.Integer(compute='_compute_queue_job_observability', string='Queue Jobs')
+    latest_queue_job_id = fields.Many2one('queue.job', compute='_compute_queue_job_observability', string='Latest Queue Job')
+    latest_queue_job_state = fields.Char(compute='_compute_queue_job_observability', string='Latest Queue Job State')
 
     @api.depends('state', 'handler_id', 'delivery_kind', 'replayed_from_event_id', 'processing_note', 'processing_error', 'rejection_reason')
     def _compute_operator_action_hint(self):
@@ -159,9 +166,53 @@ class WebhookInboundEvent(models.Model):
         for event in self:
             event.queue_job_identity_key = event._get_queue_job_identity_key() if event.id else False
 
+    @api.depends('queue_job_identity_key')
+    def _compute_queue_job_observability(self):
+        job_model = self.env['queue.job']
+        jobs_by_key = {}
+        identity_keys = [key for key in self.mapped('queue_job_identity_key') if key]
+        if identity_keys:
+            jobs = job_model.search([
+                ('identity_key', 'in', identity_keys),
+                ('model_name', '=', 'webhook.inbound.event'),
+                ('method_name', '=', 'process_event'),
+            ], order='date_created desc, id desc')
+            for job in jobs:
+                jobs_by_key.setdefault(job.identity_key, job_model.browse())
+                jobs_by_key[job.identity_key] |= job
+        for event in self:
+            jobs = jobs_by_key.get(event.queue_job_identity_key, job_model.browse())
+            event.queue_job_ids = jobs
+            event.queue_job_count = len(jobs)
+            event.latest_queue_job_id = jobs[:1]
+            event.latest_queue_job_state = jobs[:1].state if jobs else False
+
+    @api.model
+    def _get_runtime_execution_user_id(self):
+        if self.env.uid == SUPERUSER_ID or self.env.context.get('webhook_automated_execution'):
+            return SUPERUSER_ID
+        return self.env.user.id
+
     def _get_queue_job_identity_key(self):
         self.ensure_one()
         return f'webhook_inbound_event_process:{self.id}' if self.id else False
+
+    def _get_queue_job_action_domain(self):
+        self.ensure_one()
+        if not self.queue_job_identity_key:
+            return [('id', '=', 0)]
+        return [
+            ('identity_key', '=', self.queue_job_identity_key),
+            ('model_name', '=', 'webhook.inbound.event'),
+            ('method_name', '=', 'process_event'),
+        ]
+
+    def action_view_queue_jobs(self):
+        self.ensure_one()
+        action = self.env.ref('queue_job.action_queue_job').read()[0]
+        action['name'] = _('Inbound Queue Jobs')
+        action['domain'] = self._get_queue_job_action_domain()
+        return action
 
     @api.model
     def _parse_payload(self, body_text, *, raise_on_invalid=False):
@@ -223,7 +274,7 @@ class WebhookInboundEvent(models.Model):
         return {
             'name': metadata.get('event_type') or metadata.get('topic') or endpoint.display_name or _('Inbound Webhook Event'),
             'endpoint_id': endpoint.id,
-            'execution_user_id': endpoint.execution_user_id.id,
+            'execution_user_id': self._get_runtime_execution_user_id(),
             'handler_id': handler.id if handler else False,
             'company_id': endpoint.company_id.id,
             'partner_id': partner.id if partner else False,
@@ -295,7 +346,7 @@ class WebhookInboundEvent(models.Model):
         values = {
             'name': _('Rejected Webhook Request'),
             'endpoint_id': endpoint.id if endpoint else False,
-            'execution_user_id': endpoint.execution_user_id.id if endpoint else self.env.user.id,
+            'execution_user_id': self._get_runtime_execution_user_id(),
             'handler_id': False,
             'company_id': endpoint.company_id.id if endpoint else self.env.company.id,
             'partner_id': endpoint._get_scoped_partner().id if endpoint else False,
@@ -408,7 +459,12 @@ class WebhookInboundEvent(models.Model):
         for event in self:
             if event.state not in ('received', 'error'):
                 continue
-            event.with_user(event.execution_user_id).with_delay(identity_key=event._get_queue_job_identity_key()).process_event()
+            runtime_user_id = event._get_runtime_execution_user_id()
+            write_vals = {'processing_error': False}
+            if event.execution_user_id.id != runtime_user_id:
+                write_vals['execution_user_id'] = runtime_user_id
+            event.write(write_vals)
+            event.with_user(runtime_user_id).with_delay(identity_key=event._get_queue_job_identity_key()).process_event()
 
     def action_queue_processing(self):
         self._queue_processing()

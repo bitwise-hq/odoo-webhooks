@@ -4,7 +4,7 @@
     'category': 'Tools',
     'summary': 'Generic inbound and outbound webhook framework for Odoo.',
     'description': 'Generic webhook framework with model-driven endpoint configuration, durable inbox storage, and queue-backed processing.',
-    'depends': ['queue_job'],
+    'depends': ['mail', 'queue_job'],
     'data': [
         'security/webhook_groups.xml',
         'security/ir.model.access.csv',

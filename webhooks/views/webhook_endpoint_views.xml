@@ -42,6 +42,7 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <field name="execution_user_id" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_view_inbound_events" icon="fa-cloud-download">
                             <field name="inbound_event_count" widget="statinfo" string="Accepted"/>
@@ -67,9 +68,6 @@
                         <group>
                             <field name="company_id"/>
                             <field name="partner_id" placeholder="Company-scoped only"/>
-                        </group>
-                        <group>
-                            <field name="execution_user_id"/>
                         </group>
                     </group>
                     <group string="Handler And Identity">
@@ -126,24 +124,25 @@
                                 <field name="signature_max_age_seconds"/>
                                 <field name="signature_max_future_skew_seconds"/>
                             </group>
-                            <group string="Message Assembly" invisible="signature_verification_mode != 'hmac'">
+                            <separator string="Message Assembly" invisible="signature_verification_mode != 'hmac'"/>
+                            <group invisible="signature_verification_mode != 'hmac'">
                                 <field name="signature_message_joiner"/>
-                                <field name="signature_part_ids" nolabel="1">
-                                    <list editable="bottom">
-                                        <field name="sequence" widget="handle"/>
-                                        <field name="source_kind"/>
-                                        <field name="header_name" invisible="source_kind not in ['header', 'header_param']"/>
-                                        <field name="header_param_name" invisible="source_kind != 'header_param'"/>
-                                        <field name="payload_path" invisible="source_kind != 'payload_path'"/>
-                                        <field name="literal_value" invisible="source_kind != 'literal'"/>
-                                        <field name="computed_method" invisible="source_kind != 'computed'"/>
-                                        <field name="required"/>
-                                        <field name="active"/>
-                                    </list>
-                                </field>
                             </group>
+                            <field name="signature_part_ids" nolabel="1" invisible="signature_verification_mode != 'hmac'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="source_kind"/>
+                                    <field name="header_name" invisible="source_kind not in ['header', 'header_param']"/>
+                                    <field name="header_param_name" invisible="source_kind != 'header_param'"/>
+                                    <field name="payload_path" invisible="source_kind != 'payload_path'"/>
+                                    <field name="literal_value" invisible="source_kind != 'literal'"/>
+                                    <field name="computed_method" invisible="source_kind != 'computed'"/>
+                                    <field name="required"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
                         </page>
-                        <page string="Accepted Deliveries">
+                        <page string="Accepted Events">
                             <field name="inbound_event_ids" domain="[('state', '!=', 'rejected')]" readonly="1">
                                 <list>
                                     <field name="received_at"/>
@@ -174,12 +173,13 @@
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
 
     <record id="action_webhook_endpoint" model="ir.actions.act_window">
-        <field name="name">Webhook Endpoints</field>
+        <field name="name">Inbound Endpoints</field>
         <field name="res_model">webhook.endpoint</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_webhook_endpoint_search"/>

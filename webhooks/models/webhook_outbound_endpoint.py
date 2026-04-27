@@ -5,6 +5,7 @@ from ..exceptions import WebhookProcessingConfigurationError
 
 class WebhookOutboundEndpoint(models.Model):
     _name = 'webhook.outbound.endpoint'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Outbound Webhook Endpoint'
     _order = 'name, id'
     _check_company_auto = True
@@ -24,11 +25,13 @@ class WebhookOutboundEndpoint(models.Model):
     code = fields.Char(required=True, copy=False, index=True)
     active = fields.Boolean(
         default=True,
+        tracking=True,
         help='Archived outbound endpoints stay available for audit history but can no longer queue new deliveries.',
     )
     is_paused = fields.Boolean(
         string='Paused',
         default=False,
+        tracking=True,
         help='Paused outbound endpoints keep their configuration but will not queue or send deliveries.',
     )
     company_id = fields.Many2one(
@@ -43,6 +46,7 @@ class WebhookOutboundEndpoint(models.Model):
         index=True,
         check_company=True,
         domain="[('is_company', '=', True)]",
+        tracking=True,
         help='Optional endpoint-level tenant/account partner. Outbound deliveries inherit this scope from the endpoint.',
     )
     execution_user_id = fields.Many2one(
@@ -59,6 +63,7 @@ class WebhookOutboundEndpoint(models.Model):
         string='Default Handler',
         check_company=True,
         domain="[('outbound_enabled', '=', True)]",
+        tracking=True,
         help='Optional handler that can adjust or veto outbound deliveries before the HTTP request is sent.',
     )
     http_method = fields.Selection(
@@ -66,14 +71,17 @@ class WebhookOutboundEndpoint(models.Model):
         required=True,
         default='post',
         string='HTTP Method',
+        tracking=True,
     )
     target_url = fields.Char(
         required=True,
         string='Target URL',
+        tracking=True,
         help='Absolute URL that will receive the outbound webhook delivery.',
     )
     timeout_seconds = fields.Integer(
         default=30,
+        tracking=True,
         help='Request timeout in seconds for outbound deliveries.',
     )
     note = fields.Text()
@@ -204,5 +212,15 @@ class WebhookOutboundEndpoint(models.Model):
         self.ensure_one()
         action = self.env.ref('webhooks.action_webhook_outbound_delivery').read()[0]
         action['domain'] = [('endpoint_id', '=', self.id)]
+        action['context'] = {'default_endpoint_id': self.id}
+        return action
+
+    def action_view_failed_outbound_deliveries(self):
+        self.ensure_one()
+        action = self.env.ref('webhooks.action_webhook_outbound_delivery').read()[0]
+        action['domain'] = [
+            ('endpoint_id', '=', self.id),
+            ('state', 'in', ('error', 'dead_letter')),
+        ]
         action['context'] = {'default_endpoint_id': self.id}
         return action

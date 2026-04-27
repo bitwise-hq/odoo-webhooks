@@ -3,7 +3,7 @@ import traceback
 
 import requests
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
 from odoo.tools import json_default
@@ -13,6 +13,7 @@ from ..exceptions import WebhookProcessingConfigurationError
 
 class WebhookOutboundDelivery(models.Model):
     _name = 'webhook.outbound.delivery'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Outbound Webhook Delivery'
     _order = 'create_date desc, id desc'
     _check_company_auto = True
@@ -34,7 +35,7 @@ class WebhookOutboundDelivery(models.Model):
         string='Execution User',
         help='Queued outbound delivery processing runs as this user.',
     )
-    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True)
+    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True, tracking=True)
     company_id = fields.Many2one('res.company', required=True, index=True)
     partner_id = fields.Many2one(
         'res.partner',
@@ -55,26 +56,28 @@ class WebhookOutboundDelivery(models.Model):
         required=True,
         default='draft',
         index=True,
+        tracking=True,
     )
     queued_at = fields.Datetime(index=True)
     processed_at = fields.Datetime(index=True)
-    http_method = fields.Selection(selection=_HTTP_METHOD_SELECTION, required=True, default='post', string='HTTP Method')
-    target_url = fields.Char(required=True, string='Target URL')
+    http_method = fields.Selection(selection=_HTTP_METHOD_SELECTION, required=True, default='post', string='HTTP Method', tracking=True)
+    target_url = fields.Char(required=True, string='Target URL', tracking=True)
     timeout_seconds = fields.Integer(required=True, default=30)
     request_headers_json = fields.Text(required=True, default='{}', string='Request Headers')
     payload_json = fields.Text(required=True, default='{}', string='Payload JSON')
-    response_status_code = fields.Integer(index=True, string='Response Status')
+    response_status_code = fields.Integer(index=True, string='Response Status', tracking=True)
     response_headers_json = fields.Text(string='Response Headers')
     response_body = fields.Text(string='Response Body')
     processing_note = fields.Text()
     processing_error = fields.Text()
-    matched_outbound_rule_id = fields.Many2one('webhook.handler.outbound.rule', string='Matched Rule', ondelete='set null', index=True)
+    matched_outbound_rule_id = fields.Many2one('webhook.handler.outbound.rule', string='Matched Rule', ondelete='set null', index=True, tracking=True)
     replayed_from_delivery_id = fields.Many2one(
         'webhook.outbound.delivery',
         string='Replay Of',
         ondelete='set null',
         index=True,
         check_company=True,
+        tracking=True,
     )
     replay_delivery_ids = fields.One2many('webhook.outbound.delivery', 'replayed_from_delivery_id', string='Replay Deliveries')
     replay_count = fields.Integer(compute='_compute_replay_count')
@@ -88,6 +91,10 @@ class WebhookOutboundDelivery(models.Model):
         string='Queue Job Identity Key',
         help='Identity key used when enqueuing background delivery processing for this outbound delivery.',
     )
+    queue_job_ids = fields.Many2many('queue.job', compute='_compute_queue_job_observability', string='Queue Jobs')
+    queue_job_count = fields.Integer(compute='_compute_queue_job_observability', string='Queue Jobs')
+    latest_queue_job_id = fields.Many2one('queue.job', compute='_compute_queue_job_observability', string='Latest Queue Job')
+    latest_queue_job_state = fields.Char(compute='_compute_queue_job_observability', string='Latest Queue Job State')
 
     @api.depends('state', 'handler_id', 'replayed_from_delivery_id', 'processing_note', 'processing_error', 'response_status_code')
     def _compute_operator_action_hint(self):
@@ -144,9 +151,53 @@ class WebhookOutboundDelivery(models.Model):
         for delivery in self:
             delivery.queue_job_identity_key = delivery._get_queue_job_identity_key() if delivery.id else False
 
+    @api.depends('queue_job_identity_key')
+    def _compute_queue_job_observability(self):
+        job_model = self.env['queue.job']
+        jobs_by_key = {}
+        identity_keys = [key for key in self.mapped('queue_job_identity_key') if key]
+        if identity_keys:
+            jobs = job_model.search([
+                ('identity_key', 'in', identity_keys),
+                ('model_name', '=', 'webhook.outbound.delivery'),
+                ('method_name', '=', 'process_delivery'),
+            ], order='date_created desc, id desc')
+            for job in jobs:
+                jobs_by_key.setdefault(job.identity_key, job_model.browse())
+                jobs_by_key[job.identity_key] |= job
+        for delivery in self:
+            jobs = jobs_by_key.get(delivery.queue_job_identity_key, job_model.browse())
+            delivery.queue_job_ids = jobs
+            delivery.queue_job_count = len(jobs)
+            delivery.latest_queue_job_id = jobs[:1]
+            delivery.latest_queue_job_state = jobs[:1].state if jobs else False
+
+    @api.model
+    def _get_runtime_execution_user_id(self):
+        if self.env.uid == SUPERUSER_ID or self.env.context.get('webhook_automated_execution'):
+            return SUPERUSER_ID
+        return self.env.user.id
+
     def _get_queue_job_identity_key(self):
         self.ensure_one()
         return f'webhook_outbound_delivery_process:{self.id}' if self.id else False
+
+    def _get_queue_job_action_domain(self):
+        self.ensure_one()
+        if not self.queue_job_identity_key:
+            return [('id', '=', 0)]
+        return [
+            ('identity_key', '=', self.queue_job_identity_key),
+            ('model_name', '=', 'webhook.outbound.delivery'),
+            ('method_name', '=', 'process_delivery'),
+        ]
+
+    def action_view_queue_jobs(self):
+        self.ensure_one()
+        action = self.env.ref('queue_job.action_queue_job').read()[0]
+        action['name'] = _('Outbound Queue Jobs')
+        action['domain'] = self._get_queue_job_action_domain()
+        return action
 
     def _get_next_replay_number(self):
         self.ensure_one()
@@ -175,7 +226,7 @@ class WebhookOutboundDelivery(models.Model):
     @api.model
     def _prepare_endpoint_snapshot_vals(self, endpoint, vals):
         prepared_vals = dict(vals)
-        prepared_vals.setdefault('execution_user_id', endpoint.execution_user_id.id)
+        prepared_vals.setdefault('execution_user_id', self._get_runtime_execution_user_id())
         prepared_vals.setdefault('handler_id', endpoint.handler_id.id if endpoint.handler_id else False)
         prepared_vals.setdefault('company_id', endpoint.company_id.id)
         prepared_vals.setdefault('partner_id', endpoint._get_scoped_partner().id if endpoint._get_scoped_partner() else False)
@@ -379,12 +430,14 @@ class WebhookOutboundDelivery(models.Model):
                 raise ValidationError(_('Archived outbound endpoint %s cannot queue new deliveries.') % delivery.endpoint_id.display_name)
             if delivery.state not in ('draft', 'error'):
                 continue
+            runtime_user_id = delivery._get_runtime_execution_user_id()
             delivery.write({
+                'execution_user_id': runtime_user_id,
                 'state': 'queued',
                 'queued_at': fields.Datetime.now(),
                 'processing_error': False,
             })
-            delivery.with_user(delivery.execution_user_id).with_delay(identity_key=delivery._get_queue_job_identity_key()).process_delivery()
+            delivery.with_user(runtime_user_id).with_delay(identity_key=delivery._get_queue_job_identity_key()).process_delivery()
 
     def action_queue_delivery(self):
         self._queue_processing()
