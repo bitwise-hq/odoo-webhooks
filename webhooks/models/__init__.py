@@ -1,3 +1,4 @@
+from . import res_users
 from . import webhook_handler
 from . import webhook_endpoint_source
 from . import webhook_endpoint_semantic_binding

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="base.user_admin" model="res.users">
+            <field name="groups_id" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+        </record>
+
+        <record id="webhook_demo_partner_alpha" model="res.partner">
+            <field name="name">Webhook Smoke Tenant Alpha</field>
+            <field name="is_company">True</field>
+        </record>
+
+        <record id="webhook_demo_handler_basic" model="webhook.handler">
+            <field name="name">Demo Basic Handler</field>
+            <field name="code">demo_basic_handler</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="execution_mode">low_code</field>
+            <field name="note">Smoke-test handler for regular JSON object deliveries.</field>
+        </record>
+
+        <record id="webhook_demo_handler_signed" model="webhook.handler">
+            <field name="name">Demo Signed Handler</field>
+            <field name="code">demo_signed_handler</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="execution_mode">low_code</field>
+            <field name="note">Smoke-test handler for partner-scoped signed deliveries.</field>
+        </record>
+
+        <!-- Basic company-scoped JSON object endpoint: X-Delivery-Id header + event_id in payload. -->
+        <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+            <field name="name">Demo Orders Endpoint</field>
+            <field name="code">demo-orders</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="execution_user_id" ref="base.user_admin"/>
+            <field name="handler_id" ref="webhook_demo_handler_basic"/>
+            <field name="payload_contract">json_object</field>
+            <field name="delivery_identity_policy">delivery_id</field>
+            <field name="replay_identity_policy">event_id</field>
+        </record>
+
+        <record id="webhook_demo_orders_source_delivery_id" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="field_name">delivery_id</field>
+            <field name="source_kind">header</field>
+            <field name="header_name">X-Delivery-Id</field>
+        </record>
+
+        <record id="webhook_demo_orders_source_event_id" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="field_name">event_id</field>
+            <field name="source_kind">payload_path</field>
+            <field name="payload_path">event_id</field>
+        </record>
+
+        <record id="webhook_demo_orders_source_event_type" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="field_name">event_type</field>
+            <field name="source_kind">payload_path</field>
+            <field name="payload_path">type</field>
+        </record>
+
+        <record id="webhook_demo_orders_source_topic" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="field_name">topic</field>
+            <field name="source_kind">header</field>
+            <field name="header_name">X-Topic</field>
+        </record>
+
+        <record id="webhook_demo_orders_binding_delivery_id" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="semantic_name">delivery_id</field>
+            <field name="value_key">delivery_id</field>
+        </record>
+
+        <record id="webhook_demo_orders_binding_event_id" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="semantic_name">event_id</field>
+            <field name="value_key">event_id</field>
+        </record>
+
+        <record id="webhook_demo_orders_binding_event_type" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="semantic_name">event_type</field>
+            <field name="value_key">event_type</field>
+        </record>
+
+        <record id="webhook_demo_orders_binding_topic" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
+            <field name="semantic_name">topic</field>
+            <field name="value_key">topic</field>
+        </record>
+
+        <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
+        <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+            <field name="name">Demo Signed Partner Endpoint</field>
+            <field name="code">demo-signed-partner</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="partner_id" ref="webhook_demo_partner_alpha"/>
+            <field name="execution_user_id" ref="base.user_admin"/>
+            <field name="handler_id" ref="webhook_demo_handler_signed"/>
+            <field name="payload_contract">json_object</field>
+            <field name="delivery_identity_policy">idempotency_key</field>
+            <field name="replay_identity_policy">event_id</field>
+            <field name="signature_verification_mode">hmac</field>
+            <field name="signature_secret">demo-shared-secret</field>
+            <field name="signature_max_age_seconds">0</field>
+            <field name="signature_max_future_skew_seconds">0</field>
+        </record>
+
+        <record id="webhook_demo_signed_source_signature" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="field_name">signature</field>
+            <field name="source_kind">header</field>
+            <field name="header_name">X-Signature</field>
+        </record>
+
+        <record id="webhook_demo_signed_source_idempotency" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="field_name">idempotency_key</field>
+            <field name="source_kind">header</field>
+            <field name="header_name">X-Idempotency-Key</field>
+        </record>
+
+        <record id="webhook_demo_signed_source_event_id" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="field_name">event_id</field>
+            <field name="source_kind">payload_path</field>
+            <field name="payload_path">event.id</field>
+        </record>
+
+        <record id="webhook_demo_signed_source_event_type" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="field_name">event_type</field>
+            <field name="source_kind">header</field>
+            <field name="header_name">X-Event-Type</field>
+        </record>
+
+        <record id="webhook_demo_signed_source_topic" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="field_name">topic</field>
+            <field name="source_kind">literal</field>
+            <field name="literal_value">partner.sync</field>
+        </record>
+
+        <record id="webhook_demo_signed_binding_signature" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="semantic_name">signature</field>
+            <field name="value_key">signature</field>
+        </record>
+
+        <record id="webhook_demo_signed_binding_idempotency" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="semantic_name">idempotency_key</field>
+            <field name="value_key">idempotency_key</field>
+        </record>
+
+        <record id="webhook_demo_signed_binding_event_id" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="semantic_name">event_id</field>
+            <field name="value_key">event_id</field>
+        </record>
+
+        <record id="webhook_demo_signed_binding_event_type" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="semantic_name">event_type</field>
+            <field name="value_key">event_type</field>
+        </record>
+
+        <record id="webhook_demo_signed_binding_topic" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
+            <field name="semantic_name">topic</field>
+            <field name="value_key">topic</field>
+        </record>
+
+        <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
+        <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
+            <field name="name">Demo Any JSON Store-Only Endpoint</field>
+            <field name="code">demo-any-json</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="execution_user_id" ref="base.user_admin"/>
+            <field name="payload_contract">json_value</field>
+            <field name="delivery_identity_policy">body_sha256</field>
+            <field name="replay_identity_policy">none</field>
+        </record>
+
+        <record id="webhook_demo_any_json_source_topic" model="webhook.endpoint.source">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_any_json"/>
+            <field name="field_name">topic</field>
+            <field name="source_kind">literal</field>
+            <field name="literal_value">generic.any-json</field>
+        </record>
+
+        <record id="webhook_demo_any_json_binding_topic" model="webhook.endpoint.semantic.binding">
+            <field name="endpoint_id" ref="webhook_demo_endpoint_any_json"/>
+            <field name="semantic_name">topic</field>
+            <field name="value_key">topic</field>
+        </record>
+
+    </data>
+</odoo>

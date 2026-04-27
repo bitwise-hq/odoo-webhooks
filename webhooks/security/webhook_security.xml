@@ -8,10 +8,38 @@
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
         </record>
 
+        <record id="webhook_endpoint_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint operator partner scope</field>
+            <field name="model_id" ref="model_webhook_endpoint"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_endpoint_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint admin partner override</field>
+            <field name="model_id" ref="model_webhook_endpoint"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
         <record id="webhook_endpoint_company_rule" model="ir.rule">
             <field name="name">Webhook Endpoint multi-company</field>
             <field name="model_id" ref="model_webhook_endpoint"/>
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+        </record>
+
+        <record id="webhook_endpoint_source_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Source operator partner scope</field>
+            <field name="model_id" ref="model_webhook_endpoint_source"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_endpoint_source_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Source admin partner override</field>
+            <field name="model_id" ref="model_webhook_endpoint_source"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
         </record>
 
         <record id="webhook_endpoint_source_company_rule" model="ir.rule">
@@ -20,16 +48,58 @@
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
         </record>
 
+        <record id="webhook_endpoint_semantic_binding_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Semantic Binding operator partner scope</field>
+            <field name="model_id" ref="model_webhook_endpoint_semantic_binding"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_endpoint_semantic_binding_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Semantic Binding admin partner override</field>
+            <field name="model_id" ref="model_webhook_endpoint_semantic_binding"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
         <record id="webhook_endpoint_semantic_binding_company_rule" model="ir.rule">
             <field name="name">Webhook Endpoint Semantic Binding multi-company</field>
             <field name="model_id" ref="model_webhook_endpoint_semantic_binding"/>
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
         </record>
 
+        <record id="webhook_endpoint_signature_part_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Signature Part operator partner scope</field>
+            <field name="model_id" ref="model_webhook_endpoint_signature_part"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_endpoint_signature_part_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Endpoint Signature Part admin partner override</field>
+            <field name="model_id" ref="model_webhook_endpoint_signature_part"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
         <record id="webhook_endpoint_signature_part_company_rule" model="ir.rule">
             <field name="name">Webhook Endpoint Signature Part multi-company</field>
             <field name="model_id" ref="model_webhook_endpoint_signature_part"/>
             <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+        </record>
+
+        <record id="webhook_inbound_event_operator_partner_rule" model="ir.rule">
+            <field name="name">Webhook Inbound Event operator partner scope</field>
+            <field name="model_id" ref="model_webhook_inbound_event"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]"/>
+            <field name="domain_force">['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+        </record>
+
+        <record id="webhook_inbound_event_admin_partner_rule" model="ir.rule">
+            <field name="name">Webhook Inbound Event admin partner override</field>
+            <field name="model_id" ref="model_webhook_inbound_event"/>
+            <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
         </record>
 
         <record id="webhook_inbound_event_company_rule" model="ir.rule">
