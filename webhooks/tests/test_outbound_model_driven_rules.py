@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from odoo import fields
 
 from .common import WebhookRuleTestCase
@@ -135,3 +137,14 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
             fields.Datetime.to_string(delivery.create_date),
         )
         self.assertIn(fields.Datetime.to_string(delivery.create_date), delivery._serialize_payload(request_data['payload']))
+
+    def test_process_delivery_marks_error_when_attempt_logging_fails(self):
+        endpoint = self._create_outbound_endpoint()
+        delivery = self._create_outbound_delivery(endpoint)
+
+        with patch.object(type(delivery), '_create_attempt', autospec=True, side_effect=RuntimeError('attempt logging failed')):
+            with self.assertRaisesRegex(RuntimeError, 'attempt logging failed'):
+                delivery.process_delivery()
+
+        self.assertEqual(delivery.state, 'error')
+        self.assertIn('attempt logging failed', delivery.processing_error)

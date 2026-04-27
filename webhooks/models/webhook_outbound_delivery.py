@@ -1,12 +1,12 @@
 import json
 import traceback
-from datetime import date, datetime
 
 import requests
 
 from odoo import _, api, fields, models
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
+from odoo.tools import json_default
 
 from ..exceptions import WebhookProcessingConfigurationError
 
@@ -284,7 +284,7 @@ class WebhookOutboundDelivery(models.Model):
             raise WebhookProcessingConfigurationError(_('Could not resolve source expression %s.') % source_expression) from err
 
     def _set_payload_path(self, payload, target_path, value):
-        value = self._to_json_compatible(value)
+        value = json.loads(json.dumps(value, default=json_default))
         if not target_path:
             return value
         if payload in (False, None):
@@ -299,20 +299,6 @@ class WebhookOutboundDelivery(models.Model):
                 raise WebhookProcessingConfigurationError(_('Payload assignment path %s collides with a non-object value.') % target_path)
         current[path_parts[-1]] = value
         return payload
-
-    def _to_json_compatible(self, value):
-        if isinstance(value, datetime):
-            return fields.Datetime.to_string(value)
-        if isinstance(value, date):
-            return fields.Date.to_string(value)
-        if isinstance(value, dict):
-            return {
-                str(key): self._to_json_compatible(item)
-                for key, item in value.items()
-            }
-        if isinstance(value, (list, tuple)):
-            return [self._to_json_compatible(item) for item in value]
-        return value
 
     def _build_request_data(self):
         self.ensure_one()
@@ -346,7 +332,7 @@ class WebhookOutboundDelivery(models.Model):
         return json.dumps({str(key): str(value) for key, value in headers.items()}, indent=2, sort_keys=True)
 
     def _serialize_payload(self, payload):
-        return json.dumps(payload, indent=2, sort_keys=True)
+        return json.dumps(payload, default=json_default, indent=2, sort_keys=True)
 
     def _get_next_attempt_number(self):
         self.ensure_one()
@@ -465,7 +451,7 @@ class WebhookOutboundDelivery(models.Model):
 
         updated_request_data = dict(request_data)
         updated_request_data['headers'] = dict(request_data['headers'])
-        updated_request_data['payload'] = json.loads(json.dumps(request_data['payload']))
+        updated_request_data['payload'] = json.loads(json.dumps(request_data['payload'], default=json_default))
         for assignment in matched_rule.assignment_ids.sorted(key=lambda record: (record.sequence, record.id)):
             value = self._resolve_source_value(
                 assignment.source_kind,
@@ -530,7 +516,7 @@ class WebhookOutboundDelivery(models.Model):
         if 'headers' in result and result.get('headers') is not None:
             updated_request_data['headers'] = {str(key): str(value) for key, value in result['headers'].items()}
         if 'payload' in result:
-            updated_request_data['payload'] = result['payload']
+            updated_request_data['payload'] = json.loads(json.dumps(result['payload'], default=json_default))
         return result, updated_request_data
 
     def process_delivery(self):
@@ -541,6 +527,7 @@ class WebhookOutboundDelivery(models.Model):
             request_data = False
             handler_note = False
             matched_rule_id = False
+            attempt = False
             try:
                 request_data = delivery._build_request_data()
                 if delivery.handler_id:
@@ -591,31 +578,46 @@ class WebhookOutboundDelivery(models.Model):
                             'processing_error': False,
                         })
                         continue
+
+                delivery.write({
+                    'request_headers_json': delivery._serialize_headers(request_data['headers']),
+                    'payload_json': delivery._serialize_payload(request_data['payload']),
+                    'matched_outbound_rule_id': matched_rule_id or False,
+                })
+
+                attempt = delivery._create_attempt(request_data)
             except RetryableJobError:
                 raise
             except Exception:
                 processing_error = traceback.format_exc()
-                if request_data:
-                    delivery._create_attempt(
-                        request_data,
-                        state='error',
-                        note=handler_note or False,
-                        error=processing_error,
-                    )
                 delivery.write({
                     'state': 'error',
                     'processing_note': handler_note or False,
                     'processing_error': processing_error,
                 })
+                if request_data:
+                    try:
+                        if attempt:
+                            attempt.write({
+                                'state': 'error',
+                                'finished_at': fields.Datetime.now(),
+                                'processing_note': handler_note or False,
+                                'processing_error': processing_error,
+                            })
+                        else:
+                            delivery._create_attempt(
+                                request_data,
+                                state='error',
+                                note=handler_note or False,
+                                error=processing_error,
+                            )
+                    except Exception:
+                        delivery.write({
+                            'processing_error': '%s\n\nFailed to record outbound attempt:\n%s'
+                            % (processing_error, traceback.format_exc()),
+                        })
                 raise
 
-            delivery.write({
-                'request_headers_json': delivery._serialize_headers(request_data['headers']),
-                'payload_json': delivery._serialize_payload(request_data['payload']),
-                'matched_outbound_rule_id': matched_rule_id or False,
-            })
-
-            attempt = delivery._create_attempt(request_data)
             try:
                 delivery.write({'state': 'processing', 'processing_error': False})
                 response = requests.request(
