@@ -1,437 +1,559 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <data noupdate="1">
+  <data noupdate="1">
+    <record id="base.user_admin" model="res.users">
+      <field name="group_ids" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+    </record>
 
-        <record id="base.user_admin" model="res.users">
-            <field name="group_ids" eval="[(4, ref('webhooks.group_webhooks_admin'))]"/>
-        </record>
+    <record id="webhook_demo_partner_alpha" model="res.partner">
+      <field name="name">Webhook Smoke Tenant Alpha</field>
+      <field name="is_company">True</field>
+    </record>
 
-        <record id="webhook_demo_partner_alpha" model="res.partner">
-            <field name="name">Webhook Smoke Tenant Alpha</field>
-            <field name="is_company">True</field>
-        </record>
+    <record id="webhook_demo_handler_basic" model="webhook.handler">
+      <field name="name">Demo Basic Handler</field>
+      <field name="code">demo_basic_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_mode">model_driven</field>
+      <field name="note">Smoke-test handler for regular JSON object deliveries.</field>
+    </record>
 
-        <record id="webhook_demo_handler_basic" model="webhook.handler">
-            <field name="name">Demo Basic Handler</field>
-            <field name="code">demo_basic_handler</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="execution_mode">model_driven</field>
-            <field name="note">Smoke-test handler for regular JSON object deliveries.</field>
-        </record>
+    <record id="webhook_demo_handler_signed" model="webhook.handler">
+      <field name="name">Demo Signed Handler</field>
+      <field name="code">demo_signed_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_mode">model_driven</field>
+      <field
+        name="note"
+      >Smoke-test handler for partner-scoped signed deliveries.</field>
+    </record>
 
-        <record id="webhook_demo_handler_signed" model="webhook.handler">
-            <field name="name">Demo Signed Handler</field>
-            <field name="code">demo_signed_handler</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="execution_mode">model_driven</field>
-            <field name="note">Smoke-test handler for partner-scoped signed deliveries.</field>
-        </record>
+    <record
+      id="webhook_demo_handler_basic_rule_done"
+      model="webhook.handler.inbound.rule"
+    >
+      <field name="handler_id" ref="webhook_demo_handler_basic" />
+      <field name="name">Complete Created Orders</field>
+      <field name="action_type">done</field>
+      <field
+        name="note"
+      >Marks demo order-created events as processed through the model-based inbound rule path.</field>
+    </record>
 
-        <record id="webhook_demo_handler_basic_rule_done" model="webhook.handler.inbound.rule">
-            <field name="handler_id" ref="webhook_demo_handler_basic"/>
-            <field name="name">Complete Created Orders</field>
-            <field name="action_type">done</field>
-            <field name="note">Marks demo order-created events as processed through the model-based inbound rule path.</field>
-        </record>
+    <record
+      id="webhook_demo_handler_basic_rule_done_condition"
+      model="webhook.handler.inbound.rule.condition"
+    >
+      <field name="rule_id" ref="webhook_demo_handler_basic_rule_done" />
+      <field name="source_kind">semantic_field</field>
+      <field name="source_expression">event_type</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">order.created</field>
+    </record>
 
-        <record id="webhook_demo_handler_basic_rule_done_condition" model="webhook.handler.inbound.rule.condition">
-            <field name="rule_id" ref="webhook_demo_handler_basic_rule_done"/>
-            <field name="source_kind">semantic_field</field>
-            <field name="source_expression">event_type</field>
-            <field name="operator">equals</field>
-            <field name="expected_value">order.created</field>
-        </record>
+    <record
+      id="webhook_demo_handler_signed_rule_done"
+      model="webhook.handler.inbound.rule"
+    >
+      <field name="handler_id" ref="webhook_demo_handler_signed" />
+      <field name="name">Complete Partner Sync</field>
+      <field name="action_type">done</field>
+      <field
+        name="note"
+      >Marks signed partner sync events as processed through the model-based inbound rule path.</field>
+    </record>
 
-        <record id="webhook_demo_handler_signed_rule_done" model="webhook.handler.inbound.rule">
-            <field name="handler_id" ref="webhook_demo_handler_signed"/>
-            <field name="name">Complete Partner Sync</field>
-            <field name="action_type">done</field>
-            <field name="note">Marks signed partner sync events as processed through the model-based inbound rule path.</field>
-        </record>
+    <record
+      id="webhook_demo_handler_signed_rule_done_condition"
+      model="webhook.handler.inbound.rule.condition"
+    >
+      <field name="rule_id" ref="webhook_demo_handler_signed_rule_done" />
+      <field name="source_kind">semantic_field</field>
+      <field name="source_expression">topic</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">partner.sync</field>
+    </record>
 
-        <record id="webhook_demo_handler_signed_rule_done_condition" model="webhook.handler.inbound.rule.condition">
-            <field name="rule_id" ref="webhook_demo_handler_signed_rule_done"/>
-            <field name="source_kind">semantic_field</field>
-            <field name="source_expression">topic</field>
-            <field name="operator">equals</field>
-            <field name="expected_value">partner.sync</field>
-        </record>
+    <!-- Basic company-scoped JSON object endpoint: X-Delivery-Id header + event_id in payload. -->
+    <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+      <field name="name">Demo Orders Endpoint</field>
+      <field name="path">demo-orders</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_user_id" ref="base.user_admin" />
+      <field name="handler_id" ref="webhook_demo_handler_basic" />
+      <field name="payload_contract">json_object</field>
+      <field name="delivery_identity_policy">body_sha256</field>
+      <field name="replay_identity_policy">none</field>
+    </record>
 
-        <!-- Basic company-scoped JSON object endpoint: X-Delivery-Id header + event_id in payload. -->
-        <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
-            <field name="name">Demo Orders Endpoint</field>
-            <field name="path">demo-orders</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="execution_user_id" ref="base.user_admin"/>
-            <field name="handler_id" ref="webhook_demo_handler_basic"/>
-            <field name="payload_contract">json_object</field>
-            <field name="delivery_identity_policy">body_sha256</field>
-            <field name="replay_identity_policy">none</field>
-        </record>
+    <record id="webhook_demo_orders_source_delivery_id" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">delivery_id</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Delivery-Id</field>
+    </record>
 
-        <record id="webhook_demo_orders_source_delivery_id" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="field_name">delivery_id</field>
-            <field name="source_kind">header</field>
-            <field name="header_name">X-Delivery-Id</field>
-        </record>
+    <record id="webhook_demo_orders_source_event_id" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">event_id</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">event_id</field>
+    </record>
 
-        <record id="webhook_demo_orders_source_event_id" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="field_name">event_id</field>
-            <field name="source_kind">payload_path</field>
-            <field name="payload_path">event_id</field>
-        </record>
+    <record id="webhook_demo_orders_source_event_type" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">event_type</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">type</field>
+    </record>
 
-        <record id="webhook_demo_orders_source_event_type" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="field_name">event_type</field>
-            <field name="source_kind">payload_path</field>
-            <field name="payload_path">type</field>
-        </record>
+    <record id="webhook_demo_orders_source_topic" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="field_name">topic</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Topic</field>
+    </record>
 
-        <record id="webhook_demo_orders_source_topic" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="field_name">topic</field>
-            <field name="source_kind">header</field>
-            <field name="header_name">X-Topic</field>
-        </record>
+    <record
+      id="webhook_demo_orders_binding_delivery_id"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">delivery_id</field>
+      <field name="value_key">delivery_id</field>
+    </record>
 
-        <record id="webhook_demo_orders_binding_delivery_id" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="semantic_name">delivery_id</field>
-            <field name="value_key">delivery_id</field>
-        </record>
+    <record
+      id="webhook_demo_orders_binding_event_id"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">event_id</field>
+      <field name="value_key">event_id</field>
+    </record>
 
-        <record id="webhook_demo_orders_binding_event_id" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="semantic_name">event_id</field>
-            <field name="value_key">event_id</field>
-        </record>
+    <record
+      id="webhook_demo_orders_binding_event_type"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">event_type</field>
+      <field name="value_key">event_type</field>
+    </record>
 
-        <record id="webhook_demo_orders_binding_event_type" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="semantic_name">event_type</field>
-            <field name="value_key">event_type</field>
-        </record>
+    <record
+      id="webhook_demo_orders_binding_topic"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_orders" />
+      <field name="semantic_name">topic</field>
+      <field name="value_key">topic</field>
+    </record>
 
-        <record id="webhook_demo_orders_binding_topic" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_orders"/>
-            <field name="semantic_name">topic</field>
-            <field name="value_key">topic</field>
-        </record>
+    <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+      <field name="delivery_identity_policy">delivery_id</field>
+      <field name="replay_identity_policy">event_id</field>
+    </record>
 
-        <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
-            <field name="delivery_identity_policy">delivery_id</field>
-            <field name="replay_identity_policy">event_id</field>
-        </record>
+    <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
+    <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+      <field name="name">Demo Signed Partner Endpoint</field>
+      <field name="path">demo-signed-partner</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="partner_id" ref="webhook_demo_partner_alpha" />
+      <field name="execution_user_id" ref="base.user_admin" />
+      <field name="handler_id" ref="webhook_demo_handler_signed" />
+      <field name="payload_contract">json_object</field>
+      <field name="delivery_identity_policy">body_sha256</field>
+      <field name="replay_identity_policy">none</field>
+      <field name="signature_verification_mode">none</field>
+      <field name="signature_max_age_seconds">0</field>
+      <field name="signature_max_future_skew_seconds">0</field>
+    </record>
 
-        <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
-        <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
-            <field name="name">Demo Signed Partner Endpoint</field>
-            <field name="path">demo-signed-partner</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="partner_id" ref="webhook_demo_partner_alpha"/>
-            <field name="execution_user_id" ref="base.user_admin"/>
-            <field name="handler_id" ref="webhook_demo_handler_signed"/>
-            <field name="payload_contract">json_object</field>
-            <field name="delivery_identity_policy">body_sha256</field>
-            <field name="replay_identity_policy">none</field>
-            <field name="signature_verification_mode">none</field>
-            <field name="signature_max_age_seconds">0</field>
-            <field name="signature_max_future_skew_seconds">0</field>
-        </record>
+    <record id="webhook_demo_signed_source_signature" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">signature</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Signature</field>
+    </record>
 
-        <record id="webhook_demo_signed_source_signature" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="field_name">signature</field>
-            <field name="source_kind">header</field>
-            <field name="header_name">X-Signature</field>
-        </record>
+    <record id="webhook_demo_signed_source_idempotency" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">idempotency_key</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Idempotency-Key</field>
+    </record>
 
-        <record id="webhook_demo_signed_source_idempotency" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="field_name">idempotency_key</field>
-            <field name="source_kind">header</field>
-            <field name="header_name">X-Idempotency-Key</field>
-        </record>
+    <record id="webhook_demo_signed_source_event_id" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">event_id</field>
+      <field name="source_kind">payload_path</field>
+      <field name="payload_path">event.id</field>
+    </record>
 
-        <record id="webhook_demo_signed_source_event_id" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="field_name">event_id</field>
-            <field name="source_kind">payload_path</field>
-            <field name="payload_path">event.id</field>
-        </record>
+    <record id="webhook_demo_signed_source_event_type" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">event_type</field>
+      <field name="source_kind">header</field>
+      <field name="header_name">X-Event-Type</field>
+    </record>
 
-        <record id="webhook_demo_signed_source_event_type" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="field_name">event_type</field>
-            <field name="source_kind">header</field>
-            <field name="header_name">X-Event-Type</field>
-        </record>
+    <record id="webhook_demo_signed_source_topic" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="field_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">partner.sync</field>
+    </record>
 
-        <record id="webhook_demo_signed_source_topic" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="field_name">topic</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">partner.sync</field>
-        </record>
+    <record
+      id="webhook_demo_signed_binding_signature"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">signature</field>
+      <field name="value_key">signature</field>
+    </record>
 
-        <record id="webhook_demo_signed_binding_signature" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="semantic_name">signature</field>
-            <field name="value_key">signature</field>
-        </record>
+    <record
+      id="webhook_demo_signed_binding_idempotency"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">idempotency_key</field>
+      <field name="value_key">idempotency_key</field>
+    </record>
 
-        <record id="webhook_demo_signed_binding_idempotency" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="semantic_name">idempotency_key</field>
-            <field name="value_key">idempotency_key</field>
-        </record>
+    <record
+      id="webhook_demo_signed_binding_event_id"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">event_id</field>
+      <field name="value_key">event_id</field>
+    </record>
 
-        <record id="webhook_demo_signed_binding_event_id" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="semantic_name">event_id</field>
-            <field name="value_key">event_id</field>
-        </record>
+    <record
+      id="webhook_demo_signed_binding_event_type"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">event_type</field>
+      <field name="value_key">event_type</field>
+    </record>
 
-        <record id="webhook_demo_signed_binding_event_type" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="semantic_name">event_type</field>
-            <field name="value_key">event_type</field>
-        </record>
+    <record
+      id="webhook_demo_signed_binding_topic"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner" />
+      <field name="semantic_name">topic</field>
+      <field name="value_key">topic</field>
+    </record>
 
-        <record id="webhook_demo_signed_binding_topic" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
-            <field name="semantic_name">topic</field>
-            <field name="value_key">topic</field>
-        </record>
+    <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+      <field name="delivery_identity_policy">idempotency_key</field>
+      <field name="replay_identity_policy">event_id</field>
+      <field name="signature_verification_mode">hmac</field>
+      <field name="signature_secret">demo-shared-secret</field>
+    </record>
 
-        <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
-            <field name="delivery_identity_policy">idempotency_key</field>
-            <field name="replay_identity_policy">event_id</field>
-            <field name="signature_verification_mode">hmac</field>
-            <field name="signature_secret">demo-shared-secret</field>
-        </record>
+    <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
+    <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
+      <field name="name">Demo Any JSON Store-Only Endpoint</field>
+      <field name="path">demo-any-json</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="execution_user_id" ref="base.user_admin" />
+      <field name="payload_contract">json_value</field>
+      <field name="delivery_identity_policy">body_sha256</field>
+      <field name="replay_identity_policy">none</field>
+    </record>
 
-        <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
-        <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
-            <field name="name">Demo Any JSON Store-Only Endpoint</field>
-            <field name="path">demo-any-json</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="execution_user_id" ref="base.user_admin"/>
-            <field name="payload_contract">json_value</field>
-            <field name="delivery_identity_policy">body_sha256</field>
-            <field name="replay_identity_policy">none</field>
-        </record>
+    <record id="webhook_demo_any_json_source_topic" model="webhook.endpoint.source">
+      <field name="endpoint_id" ref="webhook_demo_endpoint_any_json" />
+      <field name="field_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">generic.any-json</field>
+    </record>
 
-        <record id="webhook_demo_any_json_source_topic" model="webhook.endpoint.source">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_any_json"/>
-            <field name="field_name">topic</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">generic.any-json</field>
-        </record>
+    <record
+      id="webhook_demo_any_json_binding_topic"
+      model="webhook.endpoint.semantic.binding"
+    >
+      <field name="endpoint_id" ref="webhook_demo_endpoint_any_json" />
+      <field name="semantic_name">topic</field>
+      <field name="value_key">topic</field>
+    </record>
 
-        <record id="webhook_demo_any_json_binding_topic" model="webhook.endpoint.semantic.binding">
-            <field name="endpoint_id" ref="webhook_demo_endpoint_any_json"/>
-            <field name="semantic_name">topic</field>
-            <field name="value_key">topic</field>
-        </record>
+    <!-- Outbound loopback endpoint: drafts can be queued to the demo inbound orders endpoint for smoke tests. -->
+    <record
+      id="webhook_demo_outbound_endpoint_loopback_orders"
+      model="webhook.outbound.endpoint"
+    >
+      <field name="name">Demo Outbound Loopback Orders Endpoint</field>
+      <field name="code">demo-outbound-loopback-orders</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="partner_id" ref="webhook_demo_partner_alpha" />
+      <field name="execution_user_id" ref="base.user_admin" />
+      <field name="http_method">post</field>
+      <field name="target_hostname">http://localhost:8069</field>
+      <field name="target_path">/webhooks/in/demo-orders</field>
+      <field
+        name="note"
+      >Demo loopback outbound endpoint for smoke tests. Update the target hostname and path if your local Odoo server is not running on http://localhost:8069.</field>
+    </record>
 
-        <!-- Outbound loopback endpoint: drafts can be queued to the demo inbound orders endpoint for smoke tests. -->
-        <record id="webhook_demo_outbound_endpoint_loopback_orders" model="webhook.outbound.endpoint">
-            <field name="name">Demo Outbound Loopback Orders Endpoint</field>
-            <field name="code">demo-outbound-loopback-orders</field>
-            <field name="company_id" ref="base.main_company"/>
-            <field name="partner_id" ref="webhook_demo_partner_alpha"/>
-            <field name="execution_user_id" ref="base.user_admin"/>
-            <field name="http_method">post</field>
-            <field name="target_hostname">http://localhost:8069</field>
-            <field name="target_path">/webhooks/in/demo-orders</field>
-            <field name="note">Demo loopback outbound endpoint for smoke tests. Update the target hostname and path if your local Odoo server is not running on http://localhost:8069.</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_header_rule_source"
+      model="webhook.outbound.endpoint.header.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">10</field>
+      <field name="header_name">X-Demo-Source</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">odoo-webhooks-demo</field>
+    </record>
 
-        <record id="webhook_demo_outbound_header_rule_source" model="webhook.outbound.endpoint.header.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">10</field>
-            <field name="header_name">X-Demo-Source</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">odoo-webhooks-demo</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_header_rule_delivery_id"
+      model="webhook.outbound.endpoint.header.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">20</field>
+      <field name="header_name">X-Delivery-Id</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">delivery_id</field>
+    </record>
 
-        <record id="webhook_demo_outbound_header_rule_delivery_id" model="webhook.outbound.endpoint.header.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">20</field>
-            <field name="header_name">X-Delivery-Id</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">delivery_id</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_header_rule_topic"
+      model="webhook.outbound.endpoint.header.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">30</field>
+      <field name="header_name">X-Topic</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">topic</field>
+    </record>
 
-        <record id="webhook_demo_outbound_header_rule_topic" model="webhook.outbound.endpoint.header.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">30</field>
-            <field name="header_name">X-Topic</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">topic</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_event_id"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">10</field>
+      <field name="target_path">event_id</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">event_id</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_event_id" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">10</field>
-            <field name="target_path">event_id</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">event_id</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_event_type"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">20</field>
+      <field name="target_path">type</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">event_type</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_event_type" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">20</field>
-            <field name="target_path">type</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">event_type</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_order_id"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">30</field>
+      <field name="target_path">data.id</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">order_id</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_order_id" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">30</field>
-            <field name="target_path">data.id</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">order_id</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_order_total"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">40</field>
+      <field name="target_path">data.total</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">order_total</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_order_total" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">40</field>
-            <field name="target_path">data.total</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">order_total</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_order_currency"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">50</field>
+      <field name="target_path">data.currency</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">currency</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_order_currency" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">50</field>
-            <field name="target_path">data.currency</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">currency</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_order_customer"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">60</field>
+      <field name="target_path">data.customer</field>
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">customer</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_order_customer" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">60</field>
-            <field name="target_path">data.customer</field>
-            <field name="source_kind">context_key</field>
-            <field name="source_expression">customer</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_delivery_name"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">70</field>
+      <field name="target_path">meta.delivery_name</field>
+      <field name="source_kind">delivery_field</field>
+      <field name="source_expression">name</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_delivery_name" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">70</field>
-            <field name="target_path">meta.delivery_name</field>
-            <field name="source_kind">delivery_field</field>
-            <field name="source_expression">name</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_endpoint_code"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">80</field>
+      <field name="target_path">meta.source_endpoint</field>
+      <field name="source_kind">endpoint_field</field>
+      <field name="source_expression">code</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_endpoint_code" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">80</field>
-            <field name="target_path">meta.source_endpoint</field>
-            <field name="source_kind">endpoint_field</field>
-            <field name="source_expression">code</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_company_name"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">90</field>
+      <field name="target_path">meta.company</field>
+      <field name="source_kind">company_field</field>
+      <field name="source_expression">name</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_company_name" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">90</field>
-            <field name="target_path">meta.company</field>
-            <field name="source_kind">company_field</field>
-            <field name="source_expression">name</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_partner_name"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">100</field>
+      <field name="target_path">meta.partner</field>
+      <field name="source_kind">partner_field</field>
+      <field name="source_expression">name</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_partner_name" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">100</field>
-            <field name="target_path">meta.partner</field>
-            <field name="source_kind">partner_field</field>
-            <field name="source_expression">name</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_payload_rule_created_at"
+      model="webhook.outbound.endpoint.payload.rule"
+    >
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field name="sequence">110</field>
+      <field name="target_path">meta.created_at</field>
+      <field name="source_kind">delivery_field</field>
+      <field name="source_expression">create_date</field>
+    </record>
 
-        <record id="webhook_demo_outbound_payload_rule_created_at" model="webhook.outbound.endpoint.payload.rule">
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="sequence">110</field>
-            <field name="target_path">meta.created_at</field>
-            <field name="source_kind">delivery_field</field>
-            <field name="source_expression">create_date</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_delivery_loopback_orders"
+      model="webhook.outbound.delivery"
+    >
+      <field name="name">Demo Loopback Order Delivery</field>
+      <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
+      <field
+        name="processing_note"
+      >Seeded demo delivery. Queue it after install to smoke-test relational outbound request assembly against the demo inbound orders endpoint.</field>
+    </record>
 
-        <record id="webhook_demo_outbound_delivery_loopback_orders" model="webhook.outbound.delivery">
-            <field name="name">Demo Loopback Order Delivery</field>
-            <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders"/>
-            <field name="processing_note">Seeded demo delivery. Queue it after install to smoke-test relational outbound request assembly against the demo inbound orders endpoint.</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_delivery_id"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">10</field>
+      <field name="key_name">delivery_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-delivery-0001</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_delivery_id" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">10</field>
-            <field name="key_name">delivery_id</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">demo-outbound-delivery-0001</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_topic"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">20</field>
+      <field name="key_name">topic</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo.orders.created</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_topic" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">20</field>
-            <field name="key_name">topic</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">demo.orders.created</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_event_id"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">30</field>
+      <field name="key_name">event_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">demo-outbound-event-0001</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_event_id" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">30</field>
-            <field name="key_name">event_id</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">demo-outbound-event-0001</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_event_type"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">40</field>
+      <field name="key_name">event_type</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">order.created</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_event_type" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">40</field>
-            <field name="key_name">event_type</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">order.created</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_order_id"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">50</field>
+      <field name="key_name">order_id</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">SO-DEMO-0001</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_order_id" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">50</field>
-            <field name="key_name">order_id</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">SO-DEMO-0001</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_order_total"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">60</field>
+      <field name="key_name">order_total</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">149.99</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_order_total" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">60</field>
-            <field name="key_name">order_total</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">149.99</field>
-        </record>
+    <record
+      id="webhook_demo_outbound_context_currency"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">70</field>
+      <field name="key_name">currency</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">USD</field>
+    </record>
 
-        <record id="webhook_demo_outbound_context_currency" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">70</field>
-            <field name="key_name">currency</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">USD</field>
-        </record>
-
-        <record id="webhook_demo_outbound_context_customer" model="webhook.outbound.delivery.context.line">
-            <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders"/>
-            <field name="sequence">80</field>
-            <field name="key_name">customer</field>
-            <field name="source_kind">literal</field>
-            <field name="literal_value">Webhook Smoke Tenant Alpha</field>
-        </record>
-
-    </data>
+    <record
+      id="webhook_demo_outbound_context_customer"
+      model="webhook.outbound.delivery.context.line"
+    >
+      <field name="delivery_id" ref="webhook_demo_outbound_delivery_loopback_orders" />
+      <field name="sequence">80</field>
+      <field name="key_name">customer</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">Webhook Smoke Tenant Alpha</field>
+    </record>
+  </data>
 </odoo>

@@ -3,70 +3,78 @@ from odoo.exceptions import ValidationError
 
 
 WEBHOOK_SEMANTIC_SELECTION = [
-    ('topic', 'Topic'),
-    ('event_type', 'Event Type'),
-    ('event_id', 'Business Event Identity'),
-    ('delivery_id', 'Delivery Identity'),
-    ('notification_id', 'Notification ID'),
-    ('idempotency_key', 'Explicit Idempotency Key'),
-    ('signature', 'Signature'),
-    ('signature_timestamp', 'Signature Timestamp'),
-    ('occurred_at', 'Occurred At'),
-    ('tenant_key', 'Tenant / Shop / Account'),
-    ('version', 'Version'),
-    ('resource_reference', 'Resource Reference'),
-    ('handler_selector', 'Handler Selector'),
+    ("topic", "Topic"),
+    ("event_type", "Event Type"),
+    ("event_id", "Business Event Identity"),
+    ("delivery_id", "Delivery Identity"),
+    ("notification_id", "Notification ID"),
+    ("idempotency_key", "Explicit Idempotency Key"),
+    ("signature", "Signature"),
+    ("signature_timestamp", "Signature Timestamp"),
+    ("occurred_at", "Occurred At"),
+    ("tenant_key", "Tenant / Shop / Account"),
+    ("version", "Version"),
+    ("resource_reference", "Resource Reference"),
+    ("handler_selector", "Handler Selector"),
 ]
 WEBHOOK_SEMANTIC_NAMES = tuple(name for name, _label in WEBHOOK_SEMANTIC_SELECTION)
 
 
 class WebhookEndpointSemanticBinding(models.Model):
-    _name = 'webhook.endpoint.semantic.binding'
-    _description = 'Webhook Endpoint Semantic Binding'
-    _order = 'semantic_name, id'
+    _name = "webhook.endpoint.semantic.binding"
+    _description = "Webhook Endpoint Semantic Binding"
+    _order = "semantic_name, id"
     _check_company_auto = True
 
     _endpoint_semantic_uniq = models.Constraint(
-        'unique(endpoint_id, semantic_name)',
-        'Each semantic can be bound only once per endpoint.',
+        "unique(endpoint_id, semantic_name)",
+        "Each semantic can be bound only once per endpoint.",
     )
 
-    endpoint_id = fields.Many2one('webhook.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
+    endpoint_id = fields.Many2one(
+        "webhook.endpoint",
+        required=True,
+        ondelete="cascade",
+        index=True,
+        check_company=True,
+    )
     company_id = fields.Many2one(
-        'res.company',
-        related='endpoint_id.company_id',
+        "res.company",
+        related="endpoint_id.company_id",
         store=True,
         readonly=True,
         index=True,
     )
     partner_id = fields.Many2one(
-        'res.partner',
-        related='endpoint_id.partner_id',
+        "res.partner",
+        related="endpoint_id.partner_id",
         store=True,
         readonly=True,
         index=True,
     )
-    semantic_name = fields.Selection(selection=WEBHOOK_SEMANTIC_SELECTION, required=True, index=True)
+    semantic_name = fields.Selection(
+        selection=WEBHOOK_SEMANTIC_SELECTION, required=True, index=True
+    )
     value_key = fields.Char(
         required=True,
         index=True,
-        string='Resolved Key',
-        help='Resolved key produced by the Value Resolution rules that should feed this built-in semantic.',
+        string="Resolved Key",
+        help="Resolved key produced by the Value Resolution rules that should feed this built-in semantic.",
     )
     note = fields.Char()
 
-    @api.constrains('value_key')
+    @api.constrains("value_key")
     def _check_value_key(self):
         for binding in self:
-            if not (binding.value_key or '').strip():
-                raise ValidationError(_('Semantic bindings require a resolved key.'))
+            if not (binding.value_key or "").strip():
+                raise ValidationError(_("Semantic bindings require a resolved key."))
 
     @api.model
     def _normalize_vals(self, vals):
         normalized_vals = dict(vals)
-        value_key = normalized_vals.get('value_key')
+        value_key = normalized_vals.get("value_key")
         if value_key is not None:
-            normalized_vals['value_key'] = value_key.strip()
+            normalized_vals["value_key"] = value_key.strip()
         return normalized_vals
 
     @api.model_create_multi
