@@ -112,10 +112,10 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
         self.assertEqual(event.rule_execution_ids.record_reference, f'res.partner:{existing_partner.id}')
 
     def test_inbound_endpoint_path_is_immutable(self):
-        endpoint = self._create_inbound_endpoint(code='immutable-path')
+        endpoint = self._create_inbound_endpoint(path='immutable-path')
 
         with self.assertRaisesRegex(ValidationError, 'cannot be changed'):
-            endpoint.write({'code': 'changed-path'})
+            endpoint.write({'path': 'changed-path'})
 
     def test_outbound_handler_cannot_execute_inbound_event(self):
         handler = self._create_handler(direction='outbound')
@@ -126,8 +126,8 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
             handler.execute_inbound(event)
 
     def test_find_active_endpoint_by_path_ignores_draft_records(self):
-        active_endpoint = self._create_inbound_endpoint(code='lookup-active')
-        self._create_inbound_endpoint(code='lookup-draft', state='draft')
+        active_endpoint = self._create_inbound_endpoint(path='lookup-active')
+        self._create_inbound_endpoint(path='lookup-draft', state='draft')
 
         found_endpoint = self.env['webhook.endpoint']._find_active_endpoint_by_path('lookup-active')
         missing_endpoint = self.env['webhook.endpoint']._find_active_endpoint_by_path('lookup-draft')

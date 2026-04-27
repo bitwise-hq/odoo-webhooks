@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="code"/>
+                <field name="path"/>
                 <field name="state"/>
                 <field name="company_id"/>
                 <field name="partner_id"/>
@@ -25,7 +25,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
-                <field name="code"/>
+                <field name="path"/>
                 <field name="state"/>
                 <field name="company_id"/>
                 <field name="partner_id"/>
@@ -58,7 +58,7 @@
                     <group string="Endpoint">
                         <group>
                             <field name="name"/>
-                            <field name="code" readonly="id"/>
+                            <field name="path" readonly="id"/>
                             <field name="route_path" readonly="1"/>
                         </group>
                         <group>

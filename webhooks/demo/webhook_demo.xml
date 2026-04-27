@@ -60,7 +60,7 @@
         <!-- Basic company-scoped JSON object endpoint: X-Delivery-Id header + event_id in payload. -->
         <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
             <field name="name">Demo Orders Endpoint</field>
-            <field name="code">demo-orders</field>
+            <field name="path">demo-orders</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="execution_user_id" ref="base.user_admin"/>
             <field name="handler_id" ref="webhook_demo_handler_basic"/>
@@ -129,7 +129,7 @@
         <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
         <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
             <field name="name">Demo Signed Partner Endpoint</field>
-            <field name="code">demo-signed-partner</field>
+            <field name="path">demo-signed-partner</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="partner_id" ref="webhook_demo_partner_alpha"/>
             <field name="execution_user_id" ref="base.user_admin"/>
@@ -217,7 +217,7 @@
         <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
         <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
             <field name="name">Demo Any JSON Store-Only Endpoint</field>
-            <field name="code">demo-any-json</field>
+            <field name="path">demo-any-json</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="execution_user_id" ref="base.user_admin"/>
             <field name="payload_contract">json_value</field>

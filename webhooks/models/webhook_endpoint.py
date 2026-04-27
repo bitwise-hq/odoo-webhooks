@@ -63,14 +63,13 @@ class WebhookEndpoint(models.Model):
         ('archived', 'Archived'),
     ]
 
-    _code_uniq = models.Constraint(
-        'unique(code)',
+    _path_uniq = models.Constraint(
+        'unique(path)',
         'The inbound webhook path must be unique.',
     )
 
     name = fields.Char(required=True)
-    code = fields.Char(
-        string='Path',
+    path = fields.Char(
         required=True,
         copy=False,
         index=True,
@@ -220,10 +219,10 @@ class WebhookEndpoint(models.Model):
     inbound_event_count = fields.Integer(compute='_compute_related_counts')
     rejected_event_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('code')
+    @api.depends('path')
     def _compute_route_path(self):
         for endpoint in self:
-            endpoint.route_path = f'/webhooks/in/{endpoint.code}' if endpoint.code else False
+            endpoint.route_path = f'/webhooks/in/{endpoint.path}' if endpoint.path else False
 
     def _compute_related_counts(self):
         event_model = self.env['webhook.inbound.event']
@@ -241,18 +240,18 @@ class WebhookEndpoint(models.Model):
     @api.model
     def _normalize_path_vals(self, vals):
         normalized_vals = dict(vals)
-        if 'code' in normalized_vals and normalized_vals.get('code') is not False:
-            normalized_vals['code'] = str(normalized_vals['code']).strip().strip('/')
+        if 'path' in normalized_vals and normalized_vals.get('path') is not False:
+            normalized_vals['path'] = str(normalized_vals['path']).strip().strip('/')
         return normalized_vals
 
-    @api.constrains('code')
+    @api.constrains('path')
     def _check_path_configuration(self):
         for endpoint in self:
-            if not endpoint.code:
+            if not endpoint.path:
                 continue
-            if '/' in endpoint.code:
+            if '/' in endpoint.path:
                 raise ValidationError(_('Inbound endpoint paths must be a single URL path segment without slashes.'))
-            if any(character.isspace() for character in endpoint.code):
+            if any(character.isspace() for character in endpoint.path):
                 raise ValidationError(_('Inbound endpoint paths cannot contain whitespace.'))
 
     @api.model_create_multi
@@ -262,9 +261,9 @@ class WebhookEndpoint(models.Model):
 
     def write(self, vals):
         normalized_vals = self._normalize_path_vals(vals)
-        if 'code' in normalized_vals:
+        if 'path' in normalized_vals:
             for endpoint in self:
-                if endpoint.id and endpoint.code and normalized_vals['code'] != endpoint.code:
+                if endpoint.id and endpoint.path and normalized_vals['path'] != endpoint.path:
                     raise ValidationError(_('Inbound endpoint paths cannot be changed after the endpoint is created.'))
         return super().write(normalized_vals)
 
@@ -358,7 +357,7 @@ class WebhookEndpoint(models.Model):
 
     @api.model
     def _find_active_endpoint_by_path(self, path):
-        return self.search([('code', '=', path), ('state', '=', 'active')], limit=1)
+        return self.search([('path', '=', path), ('state', '=', 'active')], limit=1)
 
     def _normalize_headers(self, headers):
         normalized = {}

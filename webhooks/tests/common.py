@@ -43,7 +43,7 @@ class WebhookRuleTestCase(TransactionCase):
         token = self._next_token('inbound_endpoint')
         create_vals = {
             'name': values.pop('name', token),
-            'code': values.pop('code', token),
+            'path': values.pop('path', token),
             'state': values.pop('state', 'active'),
             'company_id': self.company.id,
             'execution_user_id': values.pop('execution_user_id', self.execution_user.id),
