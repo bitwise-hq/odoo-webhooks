@@ -1,3 +1,5 @@
+import base64
+import hmac
 import hashlib
 from datetime import datetime, timedelta, timezone
 
@@ -838,3 +840,96 @@ class TestWebhookEndpointHelpers(WebhookRuleTestCase):
 
         with self.assertRaisesRegex(WebhookValidationError, "replay identity"):
             endpoint._resolve_replay_identity({})
+
+    def test_endpoint_misc_helper_and_signature_branches(self):
+        endpoint = self._create_inbound_endpoint()
+        same_path_endpoint = self._create_inbound_endpoint(path="same-path")
+        body = b'{"ok": true}'
+        payload = {"data": {"items": [{"id": 1}]}}
+        headers = {"Stripe-Signature": "v1=abc, v1=def"}
+
+        same_path_endpoint.write({"path": "same-path"})
+        self.assertEqual(same_path_endpoint.path, "same-path")
+
+        self.assertFalse(endpoint._extract_header_value({"X-Test": "1"}, False))
+        self.assertEqual(
+            endpoint._extract_header_parameter_values(headers, False, "v1"), []
+        )
+        self.assertEqual(
+            endpoint._extract_header_parameter_values(
+                headers, "Stripe-Signature", False
+            ),
+            [],
+        )
+        self.assertFalse(
+            endpoint._extract_payload_path_value(payload, "data.items.foo")
+        )
+        self.assertFalse(endpoint._extract_payload_path_value(payload, "data.items.9"))
+        self.assertFalse(endpoint._extract_payload_path_value("plain-text", "data"))
+        self.assertFalse(endpoint._get_bound_value_key("missing"))
+        self.assertFalse(endpoint._has_active_source_for_key("missing"))
+        self.assertFalse(
+            endpoint._extract_field_value("missing", body, headers, payload)
+        )
+        self.assertEqual(
+            endpoint._build_signature_message(body, {}, payload), body.decode()
+        )
+
+        endpoint.write({"signature_encoding": "base64"})
+        self.assertEqual(
+            endpoint._compute_expected_signature("topsecret", "message"),
+            base64.b64encode(
+                hmac.new(
+                    b"topsecret",
+                    b"message",
+                    getattr(hashlib, endpoint.signature_digest_algorithm),
+                ).digest()
+            ).decode("utf-8"),
+        )
+        self.assertFalse(endpoint._parse_signature_timestamp(False))
+        endpoint.write({"signature_timestamp_format": "iso8601"})
+        self.assertEqual(
+            endpoint._parse_signature_timestamp("2024-01-02T03:04:05"),
+            datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone.utc),
+        )
+        endpoint.write(
+            {
+                "signature_max_age_seconds": 0,
+                "signature_max_future_skew_seconds": 0,
+            }
+        )
+        endpoint._validate_signature_freshness(False)
+        endpoint._verify_signature(body, {}, payload, {})
+
+        multi_endpoint = self._create_inbound_endpoint()
+        empty_endpoint = self._create_inbound_endpoint()
+        self._create_source(
+            multi_endpoint,
+            field_name="signature_key",
+            source_kind="header_param",
+            header_name="Stripe-Signature",
+            header_param_name="v1",
+        )
+        self.assertEqual(
+            multi_endpoint._extract_field_candidates(
+                "signature_key",
+                body,
+                headers,
+                payload,
+                allow_multiple=True,
+            ),
+            ["abc", "def"],
+        )
+        self.assertEqual(empty_endpoint._get_configured_field_names(), [])
+        self.assertEqual(
+            empty_endpoint._extract_resolved_values(body, headers, payload), {}
+        )
+        self.assertEqual(
+            empty_endpoint._extract_semantic_candidates(
+                "signature", body, headers, payload
+            ),
+            [],
+        )
+        self.assertFalse(
+            empty_endpoint._extract_semantic_value("signature", body, headers, payload)
+        )

@@ -84,6 +84,9 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
         partner = self.env["res.partner"].create(
             {"name": "Webhook Partner", "is_company": True}
         )
+        extra_partner = self.env["res.partner"].create(
+            {"name": "Webhook Extra Partner", "is_company": True}
+        )
         endpoint = self._create_outbound_endpoint(partner_id=partner.id)
         delivery = self._create_outbound_delivery(endpoint)
         self._create_outbound_context_line(
@@ -126,6 +129,13 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
         self.assertEqual(action["name"], "Outbound Queue Jobs")
         self.assertEqual(action["domain"], delivery._get_queue_job_action_domain())
 
+        delivery._compute_queue_job_identity_key()
+        delivery._compute_queue_job_observability()
+        self.assertFalse(delivery.queue_job_ids)
+        self.assertEqual(delivery.queue_job_count, 0)
+        self.assertFalse(delivery.latest_queue_job_id)
+        self.assertFalse(delivery.latest_queue_job_state)
+
         self.assertEqual(
             delivery._get_context_values(),
             {"trace_id": "trace-001", "endpoint_code": endpoint.code},
@@ -136,6 +146,13 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
         self.assertEqual(
             delivery._resolve_expression_value({"payload": [1, 2]}, "payload"),
             [1, 2],
+        )
+        self.assertEqual(
+            delivery._resolve_expression_value(
+                self.env["res.partner"].browse([partner.id, extra_partner.id]),
+                "",
+            ),
+            [partner.id, extra_partner.id],
         )
         self.assertEqual(
             delivery._resolve_source_value("endpoint_field", "code"),
@@ -157,11 +174,28 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
             ),
             "abc",
         )
+        self.assertFalse(delivery._resolve_source_value("unsupported", "code"))
         self.assertFalse(delivery._resolve_source_value("request_field", False))
         with self.assertRaisesRegex(
             WebhookProcessingConfigurationError, "missing.attribute"
         ):
             delivery._resolve_source_value("endpoint_field", "missing.attribute")
+
+        invalid_headers_delivery = self.env["webhook.outbound.delivery"].new(
+            {"request_headers_json": "{broken", "payload_json": "{}"}
+        )
+        with self.assertRaisesRegex(
+            WebhookProcessingConfigurationError, "Request Headers must be valid JSON"
+        ):
+            invalid_headers_delivery._get_request_headers()
+
+        invalid_payload_delivery = self.env["webhook.outbound.delivery"].new(
+            {"request_headers_json": "{}", "payload_json": "{broken"}
+        )
+        with self.assertRaisesRegex(
+            WebhookProcessingConfigurationError, "Payload JSON must be valid JSON"
+        ):
+            invalid_payload_delivery._get_payload()
 
         self.assertEqual(
             delivery._set_payload_path({}, "meta.trace", "abc"),
@@ -229,6 +263,11 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
             queued_replay.action_create_replay_delivery()
 
     def test_queue_and_reset_delivery_state_helpers(self):
+        draft_endpoint = self._create_outbound_endpoint(state="draft")
+        draft_delivery = self._create_outbound_delivery(draft_endpoint)
+        with self.assertRaisesRegex(ValidationError, "Draft outbound endpoint"):
+            draft_delivery._queue_processing()
+
         archived_endpoint = self._create_outbound_endpoint(state="archived")
         archived_delivery = self._create_outbound_delivery(archived_endpoint)
         with self.assertRaisesRegex(ValidationError, "Archived outbound endpoint"):
@@ -243,7 +282,7 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
             with patch.object(
                 type(delivery), "with_delay", autospec=True, return_value=delayed
             ) as with_delay_mock:
-                delivery._queue_processing()
+                self.assertTrue(delivery.action_queue_delivery())
 
         self.assertEqual(delivery.state, "queued")
         self.assertFalse(delivery.processing_error)
@@ -280,6 +319,154 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
         delivery.write({"state": "error"})
         delivery.action_cancel_delivery()
         self.assertEqual(delivery.state, "canceled")
+
+        invalid_reset = self._create_outbound_delivery(endpoint, state="done")
+        with self.assertRaisesRegex(
+            ValidationError, "Only failed, dead-letter, or canceled deliveries"
+        ):
+            invalid_reset.action_reset_to_draft()
+
+        invalid_queue = self._create_outbound_delivery(endpoint, state="done")
+        with self.assertRaisesRegex(
+            ValidationError, "Only draft or failed deliveries can be queued"
+        ):
+            invalid_queue._queue_processing()
+
+        invalid_cancel = self._create_outbound_delivery(endpoint, state="queued")
+        with self.assertRaisesRegex(
+            ValidationError, "Only draft or failed deliveries can be canceled"
+        ):
+            invalid_cancel.action_cancel_delivery()
+
+        processing_replay = self._create_outbound_delivery(endpoint, state="processing")
+        with self.assertRaisesRegex(ValidationError, "cannot be replayed"):
+            processing_replay.action_create_replay_delivery()
+
+    def test_model_driven_handler_rule_evaluation_branches(self):
+        handler = self._create_handler(direction="outbound")
+        endpoint = self._create_outbound_endpoint(handler=handler)
+        delivery = self._create_outbound_delivery(endpoint)
+        self._create_outbound_context_line(
+            delivery,
+            key_name="trace_id",
+            literal_value='"trace-001"',
+        )
+        request_data = {
+            "target_url": delivery.target_url,
+            "http_method": "post",
+            "headers": {"X-Test": "1"},
+            "payload": {"meta": {"ok": True}},
+        }
+
+        no_match_rule = self._create_outbound_rule(handler, result_status="send")
+        self.env["webhook.handler.outbound.rule.condition"].create(
+            {
+                "rule_id": no_match_rule.id,
+                "source_kind": "request_field",
+                "source_expression": "target_url",
+                "operator": "contains",
+                "expected_value": "does-not-match",
+            }
+        )
+
+        self.assertEqual(
+            delivery._execute_model_driven_handler(handler, request_data=request_data),
+            {"status": "send"},
+        )
+
+        matched_send_rule = self._create_outbound_rule(
+            handler,
+            sequence=20,
+            result_status="send",
+        )
+        self.env["webhook.handler.outbound.rule.condition"].create(
+            {
+                "rule_id": matched_send_rule.id,
+                "source_kind": "request_field",
+                "source_expression": "target_url",
+                "operator": "equals",
+                "expected_value": delivery.target_url,
+            }
+        )
+
+        send_result = delivery._execute_model_driven_handler(
+            handler, request_data=request_data
+        )
+
+        self.assertEqual(send_result["status"], "send")
+        self.assertEqual(send_result["matched_rule_id"], matched_send_rule.id)
+        self.assertNotIn("target_url", send_result)
+        self.assertNotIn("http_method", send_result)
+        self.assertNotIn("headers", send_result)
+        self.assertNotIn("payload", send_result)
+
+        matched_send_rule.write({"active": False})
+        retry_rule = self._create_outbound_rule(
+            handler,
+            sequence=30,
+            result_status="retry",
+            retry_seconds=25,
+            note="Retry later",
+        )
+        self.env["webhook.handler.outbound.rule.condition"].create(
+            {
+                "rule_id": retry_rule.id,
+                "source_kind": "request_field",
+                "source_expression": "target_url",
+                "operator": "contains",
+                "expected_value": "example.com",
+            }
+        )
+        self.env["webhook.handler.outbound.assignment"].create(
+            {
+                "rule_id": retry_rule.id,
+                "target_scope": "request",
+                "target_expression": "target_url",
+                "source_kind": "literal",
+                "literal_value": "https://override.example.com/out",
+            }
+        )
+        self.env["webhook.handler.outbound.assignment"].create(
+            {
+                "rule_id": retry_rule.id,
+                "target_scope": "request",
+                "target_expression": "http_method",
+                "source_kind": "literal",
+                "literal_value": "patch",
+            }
+        )
+        self.env["webhook.handler.outbound.assignment"].create(
+            {
+                "rule_id": retry_rule.id,
+                "target_scope": "header",
+                "target_expression": "X-Trace",
+                "source_kind": "context_key",
+                "source_expression": "trace_id",
+            }
+        )
+        self.env["webhook.handler.outbound.assignment"].create(
+            {
+                "rule_id": retry_rule.id,
+                "target_scope": "payload",
+                "target_expression": "meta.count",
+                "source_kind": "literal",
+                "literal_value": "2",
+            }
+        )
+
+        retry_result = delivery._execute_model_driven_handler(
+            handler, request_data=request_data
+        )
+
+        self.assertEqual(retry_result["status"], "retry")
+        self.assertEqual(retry_result["matched_rule_id"], retry_rule.id)
+        self.assertEqual(retry_result["seconds"], 25)
+        self.assertEqual(retry_result["target_url"], "https://override.example.com/out")
+        self.assertEqual(retry_result["http_method"], "patch")
+        self.assertEqual(
+            retry_result["headers"], {"X-Test": "1", "X-Trace": "trace-001"}
+        )
+        self.assertEqual(retry_result["payload"], {"meta": {"ok": True, "count": 2}})
 
     def test_apply_handler_result_and_condition_helpers(self):
         endpoint = self._create_outbound_endpoint()
@@ -327,6 +514,24 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
             operator="not_set",
             expected_value=False,
         )
+        equals_condition = SimpleNamespace(
+            source_kind="request_field",
+            source_expression="target_url",
+            operator="equals",
+            expected_value=delivery.target_url,
+        )
+        not_equals_condition = SimpleNamespace(
+            source_kind="delivery_field",
+            source_expression="state",
+            operator="not_equals",
+            expected_value="done",
+        )
+        contains_condition = SimpleNamespace(
+            source_kind="request_field",
+            source_expression="target_url",
+            operator="contains",
+            expected_value="example.com",
+        )
         invalid_condition = SimpleNamespace(
             source_kind="delivery_field",
             source_expression="state",
@@ -339,6 +544,15 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
         )
         self.assertTrue(
             delivery._outbound_condition_matches(not_set_condition, {}, request_data)
+        )
+        self.assertTrue(
+            delivery._outbound_condition_matches(equals_condition, {}, request_data)
+        )
+        self.assertTrue(
+            delivery._outbound_condition_matches(not_equals_condition, {}, request_data)
+        )
+        self.assertTrue(
+            delivery._outbound_condition_matches(contains_condition, {}, request_data)
         )
         with self.assertRaisesRegex(
             WebhookProcessingConfigurationError, "Unsupported outbound condition"
@@ -416,6 +630,67 @@ class TestWebhookOutboundDeliveryHelpers(WebhookRuleTestCase):
                 cancel_delivery.process_delivery()
         self.assertEqual(cancel_delivery.state, "canceled")
         self.assertEqual(cancel_delivery.attempt_ids[:1].state, "canceled")
+        request_mock.assert_not_called()
+
+        dead_letter_handler = self._create_handler(direction="outbound")
+        dead_letter_delivery = self._create_outbound_delivery(
+            self._create_outbound_endpoint(handler=dead_letter_handler)
+        )
+        with patch.object(
+            type(dead_letter_handler),
+            "execute_outbound",
+            autospec=True,
+            return_value={"status": "dead_letter", "note": "Blocked by handler"},
+        ):
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
+                dead_letter_delivery.process_delivery()
+        self.assertEqual(dead_letter_delivery.state, "dead_letter")
+        self.assertEqual(dead_letter_delivery.attempt_ids[:1].state, "dead_letter")
+        self.assertEqual(dead_letter_delivery.processing_note, "Blocked by handler")
+        request_mock.assert_not_called()
+
+        retry_handler = self._create_handler(direction="outbound")
+        retry_delivery = self._create_outbound_delivery(
+            self._create_outbound_endpoint(handler=retry_handler)
+        )
+        with patch.object(
+            type(retry_handler),
+            "execute_outbound",
+            autospec=True,
+            return_value={
+                "status": "retry",
+                "note": "Retry by handler",
+                "seconds": 12,
+            },
+        ):
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
+                with self.assertRaisesRegex(RetryableJobError, "Retry by handler"):
+                    retry_delivery.process_delivery()
+        self.assertEqual(retry_delivery.state, "error")
+        self.assertEqual(retry_delivery.attempt_ids[:1].state, "error")
+        self.assertEqual(retry_delivery.processing_note, "Retry by handler")
+        request_mock.assert_not_called()
+
+        false_handler = self._create_handler(direction="outbound")
+        false_delivery = self._create_outbound_delivery(
+            self._create_outbound_endpoint(handler=false_handler)
+        )
+        with patch.object(
+            type(false_handler),
+            "execute_outbound",
+            autospec=True,
+            return_value=False,
+        ):
+            with patch.object(
+                outbound_delivery_model.requests, "request"
+            ) as request_mock:
+                false_delivery.process_delivery()
+        self.assertEqual(false_delivery.state, "canceled")
+        self.assertEqual(false_delivery.attempt_ids[:1].state, "canceled")
         request_mock.assert_not_called()
 
         dead_handler = self._create_handler(direction="outbound")
