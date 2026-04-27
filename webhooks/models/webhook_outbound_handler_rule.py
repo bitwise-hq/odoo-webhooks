@@ -27,6 +27,13 @@ class WebhookHandlerOutboundRule(models.Model):
         readonly=True,
         index=True,
     )
+    partner_id = fields.Many2one(
+        "res.partner",
+        related="handler_id.partner_id",
+        store=True,
+        readonly=True,
+        index=True,
+    )
     result_status = fields.Selection(
         selection=OUTBOUND_RULE_STATUS_SELECTION, required=True, default="send"
     )

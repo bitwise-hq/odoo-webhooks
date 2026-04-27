@@ -24,6 +24,13 @@ class WebhookHandlerInboundRuleLookup(models.Model):
         readonly=True,
         index=True,
     )
+    partner_id = fields.Many2one(
+        "res.partner",
+        related="rule_id.partner_id",
+        store=True,
+        readonly=True,
+        index=True,
+    )
     sequence = fields.Integer(required=True, default=10)
     target_field_name = fields.Char(required=True, string="Target Field")
     source_kind = fields.Selection(

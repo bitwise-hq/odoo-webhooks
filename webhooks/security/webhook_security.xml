@@ -7,10 +7,42 @@
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
     </record>
 
+    <record id="webhook_handler_operator_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record id="webhook_handler_admin_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <record id="webhook_handler_inbound_rule_company_rule" model="ir.rule">
       <field name="name">Webhook Handler Inbound Rule multi-company</field>
       <field name="model_id" ref="model_webhook_handler_inbound_rule" />
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record id="webhook_handler_inbound_rule_operator_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record id="webhook_handler_inbound_rule_admin_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler Inbound Rule admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
     <record id="webhook_handler_inbound_rule_condition_company_rule" model="ir.rule">
@@ -19,16 +51,91 @@
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
     </record>
 
+    <record
+      id="webhook_handler_inbound_rule_condition_operator_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Condition operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_condition" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record
+      id="webhook_handler_inbound_rule_condition_admin_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Condition admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_condition" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <record id="webhook_handler_inbound_rule_lookup_company_rule" model="ir.rule">
       <field name="name">Webhook Handler Inbound Rule Lookup multi-company</field>
       <field name="model_id" ref="model_webhook_handler_inbound_rule_lookup" />
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
     </record>
 
+    <record
+      id="webhook_handler_inbound_rule_lookup_operator_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Lookup operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_lookup" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record id="webhook_handler_inbound_rule_lookup_admin_partner_rule" model="ir.rule">
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Lookup admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_lookup" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <record id="webhook_handler_inbound_rule_assignment_company_rule" model="ir.rule">
       <field name="name">Webhook Handler Inbound Rule Assignment multi-company</field>
       <field name="model_id" ref="model_webhook_handler_inbound_rule_assignment" />
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record
+      id="webhook_handler_inbound_rule_assignment_operator_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Assignment operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_assignment" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record
+      id="webhook_handler_inbound_rule_assignment_admin_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Inbound Rule Assignment admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_inbound_rule_assignment" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
     <record id="webhook_inbound_rule_execution_operator_partner_rule" model="ir.rule">
@@ -228,16 +335,81 @@
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
     </record>
 
+    <record id="webhook_handler_outbound_rule_operator_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler Outbound Rule operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_rule" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record id="webhook_handler_outbound_rule_admin_partner_rule" model="ir.rule">
+      <field name="name">Webhook Handler Outbound Rule admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_rule" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <record id="webhook_handler_outbound_rule_condition_company_rule" model="ir.rule">
       <field name="name">Webhook Handler Outbound Rule Condition multi-company</field>
       <field name="model_id" ref="model_webhook_handler_outbound_rule_condition" />
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
     </record>
 
+    <record
+      id="webhook_handler_outbound_rule_condition_operator_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Outbound Rule Condition operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_rule_condition" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record
+      id="webhook_handler_outbound_rule_condition_admin_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Outbound Rule Condition admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_rule_condition" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
     <record id="webhook_handler_outbound_assignment_company_rule" model="ir.rule">
       <field name="name">Webhook Handler Outbound Assignment multi-company</field>
       <field name="model_id" ref="model_webhook_handler_outbound_assignment" />
       <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+
+    <record
+      id="webhook_handler_outbound_assignment_operator_partner_rule"
+      model="ir.rule"
+    >
+      <field
+        name="name"
+      >Webhook Handler Outbound Assignment operator partner scope</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_assignment" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_operator'))]" />
+      <field
+        name="domain_force"
+      >['|', ('partner_id', '=', False), ('partner_id', 'in', user.webhook_allowed_partner_ids.ids)]</field>
+    </record>
+
+    <record id="webhook_handler_outbound_assignment_admin_partner_rule" model="ir.rule">
+      <field
+        name="name"
+      >Webhook Handler Outbound Assignment admin partner override</field>
+      <field name="model_id" ref="model_webhook_handler_outbound_assignment" />
+      <field name="groups" eval="[(4, ref('webhooks.group_webhooks_admin'))]" />
+      <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
     <record id="webhook_endpoint_operator_partner_rule" model="ir.rule">

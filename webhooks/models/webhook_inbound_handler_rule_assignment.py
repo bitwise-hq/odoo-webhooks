@@ -27,6 +27,13 @@ class WebhookHandlerInboundRuleAssignment(models.Model):
         readonly=True,
         index=True,
     )
+    partner_id = fields.Many2one(
+        "res.partner",
+        related="rule_id.partner_id",
+        store=True,
+        readonly=True,
+        index=True,
+    )
     sequence = fields.Integer(required=True, default=10)
     target_kind = fields.Selection(
         selection=INBOUND_ASSIGNMENT_TARGET_KIND_SELECTION,

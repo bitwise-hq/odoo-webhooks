@@ -106,6 +106,7 @@
             <group>
               <field name="company_id" />
               <field name="partner_id" placeholder="Company-scoped only" />
+              <field name="execution_user_id" />
             </group>
           </group>
           <group string="Handler And Identity">
@@ -123,6 +124,15 @@
                   <field name="value_key" />
                   <field name="note" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <field name="semantic_name" />
+                      <field name="value_key" />
+                      <field name="note" />
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Value Resolution">
@@ -152,6 +162,47 @@
                   <field name="required" />
                   <field name="active" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="field_name" />
+                        <field name="candidate_sequence" />
+                        <field name="sequence" />
+                        <field name="joiner" />
+                        <field name="active" />
+                        <field name="required" />
+                      </group>
+                      <group>
+                        <field name="source_kind" />
+                        <field
+                          name="header_name"
+                          invisible="source_kind not in ['header', 'header_param']"
+                        />
+                        <field
+                          name="header_param_name"
+                          invisible="source_kind != 'header_param'"
+                        />
+                        <field
+                          name="payload_path"
+                          invisible="source_kind != 'payload_path'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                          widget="text"
+                        />
+                        <field
+                          name="computed_method"
+                          invisible="source_kind != 'computed'"
+                        />
+                        <field name="normalize_mode" />
+                        <field name="hash_algorithm" />
+                        <field name="note" />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Signature">
@@ -220,6 +271,40 @@
                   <field name="required" />
                   <field name="active" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="sequence" />
+                        <field name="source_kind" />
+                        <field name="required" />
+                        <field name="active" />
+                      </group>
+                      <group>
+                        <field
+                          name="header_name"
+                          invisible="source_kind not in ['header', 'header_param']"
+                        />
+                        <field
+                          name="header_param_name"
+                          invisible="source_kind != 'header_param'"
+                        />
+                        <field
+                          name="payload_path"
+                          invisible="source_kind != 'payload_path'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                        />
+                        <field
+                          name="computed_method"
+                          invisible="source_kind != 'computed'"
+                        />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Accepted Events">

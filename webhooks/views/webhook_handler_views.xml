@@ -7,8 +7,10 @@
       <search>
         <field name="name" />
         <field name="code" />
+        <field name="execution_mode" />
         <field name="direction" />
         <field name="company_id" />
+        <field name="partner_id" />
         <filter name="active" string="Active" domain="[('active', '=', True)]" />
         <filter name="inactive" string="Archived" domain="[('active', '=', False)]" />
       </search>
@@ -23,7 +25,9 @@
         <field name="name" />
         <field name="code" />
         <field name="direction" />
+        <field name="execution_mode" />
         <field name="company_id" />
+        <field name="partner_id" />
         <field name="active" />
       </list>
     </field>
@@ -35,16 +39,21 @@
     <field name="arch" type="xml">
       <form>
         <sheet>
-          <field name="execution_mode" invisible="1" />
           <group string="Handler">
             <group>
               <field name="name" />
               <field name="code" />
-              <field name="company_id" />
               <field name="active" />
             </group>
             <group>
               <field name="direction" />
+              <field name="execution_mode" />
+            </group>
+          </group>
+          <group string="Scope">
+            <group>
+              <field name="company_id" />
+              <field name="partner_id" placeholder="Company-scoped only" />
             </group>
           </group>
           <group string="Python Callback" invisible="execution_mode != 'python'">
@@ -104,6 +113,21 @@
                             <field name="operator" />
                             <field name="expected_value" />
                           </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="source_kind" />
+                                  <field name="source_expression" />
+                                </group>
+                                <group>
+                                  <field name="operator" />
+                                  <field name="expected_value" />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
                         </field>
                       </page>
                       <page
@@ -118,6 +142,28 @@
                             <field name="source_expression" />
                             <field name="literal_value" />
                           </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_field_name" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
                         </field>
                       </page>
                       <page
@@ -133,6 +179,29 @@
                             <field name="source_expression" />
                             <field name="literal_value" />
                           </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_kind" />
+                                  <field name="target_expression" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
                         </field>
                       </page>
                       <page string="Executions">
@@ -193,6 +262,21 @@
                             <field name="operator" />
                             <field name="expected_value" />
                           </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="source_kind" />
+                                  <field name="source_expression" />
+                                </group>
+                                <group>
+                                  <field name="operator" />
+                                  <field name="expected_value" />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
                         </field>
                       </page>
                       <page string="Assignments">
@@ -205,6 +289,29 @@
                             <field name="source_expression" />
                             <field name="literal_value" />
                           </list>
+                          <form>
+                            <sheet>
+                              <group>
+                                <group>
+                                  <field name="sequence" />
+                                  <field name="target_scope" />
+                                  <field name="target_expression" />
+                                </group>
+                                <group>
+                                  <field name="source_kind" />
+                                  <field
+                                    name="source_expression"
+                                    invisible="source_kind == 'literal'"
+                                  />
+                                  <field
+                                    name="literal_value"
+                                    invisible="source_kind != 'literal'"
+                                    widget="text"
+                                  />
+                                </group>
+                              </group>
+                            </sheet>
+                          </form>
                         </field>
                       </page>
                     </notebook>

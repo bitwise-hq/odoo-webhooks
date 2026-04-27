@@ -119,12 +119,12 @@
           </group>
           <notebook>
             <page string="Request">
-              <group string="Base Request">
+              <group string="Runtime Request Snapshots">
                 <group>
-                  <field name="request_headers_json" widget="text" />
+                  <field name="request_headers_json" widget="text" readonly="1" />
                 </group>
                 <group>
-                  <field name="payload_json" widget="text" />
+                  <field name="payload_json" widget="text" readonly="1" />
                 </group>
               </group>
             </page>
@@ -142,13 +142,36 @@
                   <field name="source_expression" />
                   <field name="literal_value" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="key_name" />
+                      </group>
+                      <group>
+                        <field name="source_kind" />
+                        <field
+                          name="source_expression"
+                          invisible="source_kind == 'literal'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                          widget="text"
+                        />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Response">
               <group>
-                <field name="response_status_code" />
-                <field name="response_headers_json" widget="text" />
-                <field name="response_body" widget="text" />
+                <field name="response_status_code" readonly="1" />
+                <field name="response_headers_json" widget="text" readonly="1" />
+                <field name="response_body" widget="text" readonly="1" />
               </group>
             </page>
             <page string="Attempts">

@@ -15,17 +15,32 @@
       <field name="code">demo_basic_handler</field>
       <field name="company_id" ref="base.main_company" />
       <field name="execution_mode">model_driven</field>
-      <field name="note">Smoke-test handler for regular JSON object deliveries.</field>
+      <field
+        name="note"
+      >Smoke-test handler for regular inbound object deliveries.</field>
     </record>
 
     <record id="webhook_demo_handler_signed" model="webhook.handler">
       <field name="name">Demo Signed Handler</field>
       <field name="code">demo_signed_handler</field>
       <field name="company_id" ref="base.main_company" />
+      <field name="partner_id" ref="webhook_demo_partner_alpha" />
       <field name="execution_mode">model_driven</field>
       <field
         name="note"
       >Smoke-test handler for partner-scoped signed deliveries.</field>
+    </record>
+
+    <record id="webhook_demo_handler_outbound_loopback" model="webhook.handler">
+      <field name="name">Demo Outbound Loopback Handler</field>
+      <field name="code">demo_outbound_loopback_handler</field>
+      <field name="company_id" ref="base.main_company" />
+      <field name="partner_id" ref="webhook_demo_partner_alpha" />
+      <field name="direction">outbound</field>
+      <field name="execution_mode">model_driven</field>
+      <field
+        name="note"
+      >Smoke-test handler for partner-scoped outbound loopback deliveries.</field>
     </record>
 
     <record
@@ -74,7 +89,7 @@
       <field name="expected_value">partner.sync</field>
     </record>
 
-    <!-- Basic company-scoped JSON object endpoint: X-Delivery-Id header + event_id in payload. -->
+    <!-- Basic company-scoped object endpoint: X-Delivery-Id header + event_id in payload. -->
     <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
       <field name="name">Demo Orders Endpoint</field>
       <field name="path">demo-orders</field>
@@ -258,7 +273,7 @@
       <field name="signature_secret">demo-shared-secret</field>
     </record>
 
-    <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
+    <!-- JSON-value, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
     <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
       <field name="name">Demo Any JSON Store-Only Endpoint</field>
       <field name="path">demo-any-json</field>
@@ -295,6 +310,7 @@
       <field name="company_id" ref="base.main_company" />
       <field name="partner_id" ref="webhook_demo_partner_alpha" />
       <field name="execution_user_id" ref="base.user_admin" />
+      <field name="handler_id" ref="webhook_demo_handler_outbound_loopback" />
       <field name="http_method">post</field>
       <field name="target_hostname">http://localhost:8069</field>
       <field name="target_path">/webhooks/in/demo-orders</field>
@@ -458,6 +474,51 @@
     </record>
 
     <record
+      id="webhook_demo_outbound_handler_rule_loopback"
+      model="webhook.handler.outbound.rule"
+    >
+      <field name="handler_id" ref="webhook_demo_handler_outbound_loopback" />
+      <field name="name">Annotate Demo Loopback Delivery</field>
+      <field name="result_status">send</field>
+      <field
+        name="note"
+      >Adds demo-specific headers and payload metadata through the relational outbound handler rule path.</field>
+    </record>
+
+    <record
+      id="webhook_demo_outbound_handler_rule_loopback_condition"
+      model="webhook.handler.outbound.rule.condition"
+    >
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="source_kind">context_key</field>
+      <field name="source_expression">topic</field>
+      <field name="operator">equals</field>
+      <field name="expected_value">demo.orders.created</field>
+    </record>
+
+    <record
+      id="webhook_demo_outbound_handler_rule_loopback_assignment_header"
+      model="webhook.handler.outbound.assignment"
+    >
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="target_scope">header</field>
+      <field name="target_expression">X-Demo-Handler</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">loopback-relational-handler</field>
+    </record>
+
+    <record
+      id="webhook_demo_outbound_handler_rule_loopback_assignment_payload"
+      model="webhook.handler.outbound.assignment"
+    >
+      <field name="rule_id" ref="webhook_demo_outbound_handler_rule_loopback" />
+      <field name="target_scope">payload</field>
+      <field name="target_expression">meta.handler_rule</field>
+      <field name="source_kind">literal</field>
+      <field name="literal_value">loopback-relational-handler</field>
+    </record>
+
+    <record
       id="webhook_demo_outbound_delivery_loopback_orders"
       model="webhook.outbound.delivery"
     >
@@ -465,7 +526,7 @@
       <field name="endpoint_id" ref="webhook_demo_outbound_endpoint_loopback_orders" />
       <field
         name="processing_note"
-      >Seeded demo delivery. Queue it after install to smoke-test relational outbound request assembly against the demo inbound orders endpoint.</field>
+      >Seeded demo delivery. Queue it after install to smoke-test relational outbound endpoint rules, handler rules, and delivery context against the demo inbound orders endpoint.</field>
     </record>
 
     <record

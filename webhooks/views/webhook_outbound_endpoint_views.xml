@@ -116,6 +116,7 @@
             <group>
               <field name="company_id" />
               <field name="partner_id" placeholder="Company-scoped only" />
+              <field name="execution_user_id" />
             </group>
           </group>
           <group string="Internal Notes">
@@ -136,6 +137,29 @@
                   <field name="source_expression" />
                   <field name="literal_value" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="header_name" />
+                      </group>
+                      <group>
+                        <field name="source_kind" />
+                        <field
+                          name="source_expression"
+                          invisible="source_kind == 'literal'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                          widget="text"
+                        />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Payload Rules">
@@ -152,6 +176,29 @@
                   <field name="source_expression" />
                   <field name="literal_value" />
                 </list>
+                <form>
+                  <sheet>
+                    <group>
+                      <group>
+                        <field name="sequence" />
+                        <field name="active" />
+                        <field name="target_path" />
+                      </group>
+                      <group>
+                        <field name="source_kind" />
+                        <field
+                          name="source_expression"
+                          invisible="source_kind == 'literal'"
+                        />
+                        <field
+                          name="literal_value"
+                          invisible="source_kind != 'literal'"
+                          widget="text"
+                        />
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
               </field>
             </page>
             <page string="Deliveries">

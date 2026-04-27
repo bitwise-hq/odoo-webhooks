@@ -32,6 +32,15 @@ class WebhookHandler(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
+    partner_id = fields.Many2one(
+        "res.partner",
+        string="Partner",
+        index=True,
+        check_company=True,
+        domain="[('is_company', '=', True)]",
+        tracking=True,
+        help="Optional handler-level tenant/account partner. Partner-scoped rule rows inherit this scope from the handler.",
+    )
     direction = fields.Selection(
         selection=_DIRECTION_SELECTION,
         required=True,
