@@ -1,5 +1,7 @@
 from odoo import _, fields, models
 
+from .const import HTTP_METHOD_SELECTION
+
 
 class WebhookOutboundDeliveryAttempt(models.Model):
     _name = 'webhook.outbound.delivery.attempt'
@@ -11,12 +13,6 @@ class WebhookOutboundDeliveryAttempt(models.Model):
         'unique(delivery_id, attempt_number)',
         'Each outbound delivery attempt number must be unique within the delivery.',
     )
-
-    _HTTP_METHOD_SELECTION = [
-        ('post', 'POST'),
-        ('put', 'PUT'),
-        ('patch', 'PATCH'),
-    ]
 
     name = fields.Char(required=True, default=lambda self: _('Outbound Delivery Attempt'))
     delivery_id = fields.Many2one('webhook.outbound.delivery', required=True, ondelete='cascade', index=True, check_company=True)
@@ -39,7 +35,7 @@ class WebhookOutboundDeliveryAttempt(models.Model):
         default='processing',
         index=True,
     )
-    http_method = fields.Selection(selection=_HTTP_METHOD_SELECTION, required=True, string='HTTP Method')
+    http_method = fields.Selection(selection=HTTP_METHOD_SELECTION, required=True, string='HTTP Method')
     target_url = fields.Char(required=True, string='Target URL')
     request_headers_json = fields.Text(required=True, string='Request Headers')
     payload_json = fields.Text(required=True, string='Payload JSON')

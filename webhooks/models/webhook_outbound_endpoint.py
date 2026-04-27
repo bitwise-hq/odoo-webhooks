@@ -3,6 +3,7 @@ from urllib.parse import urlsplit
 from odoo import SUPERUSER_ID, _, api, fields, models
 
 from ..exceptions import WebhookProcessingConfigurationError
+from .const import HTTP_METHOD_SELECTION
 
 
 class WebhookOutboundEndpoint(models.Model):
@@ -12,11 +13,6 @@ class WebhookOutboundEndpoint(models.Model):
     _order = 'name, id'
     _check_company_auto = True
 
-    _HTTP_METHOD_SELECTION = [
-        ('post', 'POST'),
-        ('put', 'PUT'),
-        ('patch', 'PATCH'),
-    ]
     _STATE_SELECTION = [
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -71,7 +67,7 @@ class WebhookOutboundEndpoint(models.Model):
         help='Optional handler that can adjust or veto outbound deliveries before the HTTP request is sent. When the selected handler uses Model Driven execution, its outbound rules can mutate, retry, cancel, or dead-letter deliveries.',
     )
     http_method = fields.Selection(
-        selection=_HTTP_METHOD_SELECTION,
+        selection=HTTP_METHOD_SELECTION,
         required=True,
         default='post',
         string='HTTP Method',

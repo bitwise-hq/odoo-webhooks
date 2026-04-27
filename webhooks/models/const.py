@@ -1,3 +1,9 @@
+HTTP_METHOD_SELECTION = [
+    ('post', 'POST'),
+    ('put', 'PUT'),
+    ('patch', 'PATCH'),
+]
+
 INBOUND_ACTION_SELECTION = [
     ('done', 'Mark Done'),
     ('dead_letter', 'Dead Letter'),

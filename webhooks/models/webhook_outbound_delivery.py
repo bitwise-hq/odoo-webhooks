@@ -18,12 +18,6 @@ class WebhookOutboundDelivery(models.Model):
     _order = 'create_date desc, id desc'
     _check_company_auto = True
 
-    _HTTP_METHOD_SELECTION = [
-        ('post', 'POST'),
-        ('put', 'PUT'),
-        ('patch', 'PATCH'),
-    ]
-
     name = fields.Char(required=True, default=lambda self: _('Outbound Webhook Delivery'))
     endpoint_id = fields.Many2one('webhook.outbound.endpoint', required=True, ondelete='cascade', index=True, check_company=True)
     execution_user_id = fields.Many2one(
