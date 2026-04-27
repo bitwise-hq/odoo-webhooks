@@ -1,5 +1,6 @@
 import json
 import traceback
+from datetime import date, datetime
 
 import requests
 
@@ -283,6 +284,7 @@ class WebhookOutboundDelivery(models.Model):
             raise WebhookProcessingConfigurationError(_('Could not resolve source expression %s.') % source_expression) from err
 
     def _set_payload_path(self, payload, target_path, value):
+        value = self._to_json_compatible(value)
         if not target_path:
             return value
         if payload in (False, None):
@@ -297,6 +299,20 @@ class WebhookOutboundDelivery(models.Model):
                 raise WebhookProcessingConfigurationError(_('Payload assignment path %s collides with a non-object value.') % target_path)
         current[path_parts[-1]] = value
         return payload
+
+    def _to_json_compatible(self, value):
+        if isinstance(value, datetime):
+            return fields.Datetime.to_string(value)
+        if isinstance(value, date):
+            return fields.Date.to_string(value)
+        if isinstance(value, dict):
+            return {
+                str(key): self._to_json_compatible(item)
+                for key, item in value.items()
+            }
+        if isinstance(value, (list, tuple)):
+            return [self._to_json_compatible(item) for item in value]
+        return value
 
     def _build_request_data(self):
         self.ensure_one()

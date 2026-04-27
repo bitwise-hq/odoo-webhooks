@@ -1,3 +1,5 @@
+from odoo import fields
+
 from .common import WebhookRuleTestCase
 
 
@@ -114,3 +116,22 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
         self.assertEqual(updated_request_data['headers']['X-Origin'], 'webhooks')
         self.assertEqual(updated_request_data['headers']['X-Mode'], 'retry')
         self.assertTrue(updated_request_data['payload']['meta']['retry'])
+
+    def test_build_request_data_normalizes_datetime_payload_values(self):
+        endpoint = self._create_outbound_endpoint()
+        self.env['webhook.outbound.endpoint.payload.rule'].create({
+            'endpoint_id': endpoint.id,
+            'target_path': 'meta.created_at',
+            'source_kind': 'delivery_field',
+            'source_expression': 'create_date',
+        })
+
+        delivery = self._create_outbound_delivery(endpoint)
+
+        request_data = delivery._build_request_data()
+
+        self.assertEqual(
+            request_data['payload']['meta']['created_at'],
+            fields.Datetime.to_string(delivery.create_date),
+        )
+        self.assertIn(fields.Datetime.to_string(delivery.create_date), delivery._serialize_payload(request_data['payload']))
