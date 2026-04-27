@@ -160,3 +160,84 @@ class WebhookRuleTestCase(TransactionCase):
         }
         create_vals.update(values)
         return self.env["webhook.outbound.delivery.context.line"].create(create_vals)
+
+
+class WebhookEndpointTestCase(WebhookRuleTestCase):
+    def _create_user(self, **values):
+        token = self._next_token("user")
+        create_vals = {
+            "name": values.pop("name", token),
+            "login": values.pop("login", f"{token}@example.com"),
+            "email": values.pop("email", f"{token}@example.com"),
+            "company_id": values.pop("company_id", self.company.id),
+            "company_ids": values.pop("company_ids", [(6, 0, [self.company.id])]),
+            "group_ids": values.pop(
+                "group_ids",
+                [
+                    (
+                        6,
+                        0,
+                        [self.internal_user_group.id, self.webhook_admin_group.id],
+                    )
+                ],
+            ),
+            "active": values.pop("active", True),
+        }
+        create_vals.update(values)
+        return (
+            self.env["res.users"]
+            .with_context(no_reset_password=True)
+            .create(create_vals)
+        )
+
+    def _create_source(self, endpoint, **values):
+        token = self._next_token("source")
+        create_vals = {
+            "endpoint_id": endpoint.id,
+            "field_name": values.pop("field_name", token),
+            "source_kind": values.pop("source_kind", "literal"),
+            "literal_value": values.pop("literal_value", token),
+        }
+        create_vals.update(values)
+        return self.env["webhook.endpoint.source"].create(create_vals)
+
+    def _create_binding(self, endpoint, **values):
+        create_vals = {
+            "endpoint_id": endpoint.id,
+            "semantic_name": values.pop("semantic_name", "topic"),
+            "value_key": values.pop("value_key", self._next_token("binding")),
+        }
+        create_vals.update(values)
+        return self.env["webhook.endpoint.semantic.binding"].create(create_vals)
+
+    def _create_signature_part(self, endpoint, **values):
+        token = self._next_token("signature_part")
+        create_vals = {
+            "endpoint_id": endpoint.id,
+            "source_kind": values.pop("source_kind", "raw_body"),
+            "literal_value": values.pop("literal_value", token),
+        }
+        create_vals.update(values)
+        return self.env["webhook.endpoint.signature.part"].create(create_vals)
+
+
+class WebhookInboundEventTestCase(WebhookEndpointTestCase):
+    def _create_inbound_rule(self, handler, **values):
+        create_vals = {
+            "handler_id": handler.id,
+            "name": values.pop("name", self._next_token("inbound_rule")),
+            "action_type": values.pop("action_type", "done"),
+        }
+        create_vals.update(values)
+        return self.env["webhook.handler.inbound.rule"].create(create_vals)
+
+
+class WebhookOutboundDeliveryTestCase(WebhookRuleTestCase):
+    def _create_outbound_rule(self, handler, **values):
+        create_vals = {
+            "handler_id": handler.id,
+            "name": values.pop("name", self._next_token("outbound_rule")),
+            "result_status": values.pop("result_status", "send"),
+        }
+        create_vals.update(values)
+        return self.env["webhook.handler.outbound.rule"].create(create_vals)
