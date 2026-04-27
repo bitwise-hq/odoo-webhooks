@@ -65,8 +65,8 @@
             <field name="execution_user_id" ref="base.user_admin"/>
             <field name="handler_id" ref="webhook_demo_handler_basic"/>
             <field name="payload_contract">json_object</field>
-            <field name="delivery_identity_policy">delivery_id</field>
-            <field name="replay_identity_policy">event_id</field>
+            <field name="delivery_identity_policy">body_sha256</field>
+            <field name="replay_identity_policy">none</field>
         </record>
 
         <record id="webhook_demo_orders_source_delivery_id" model="webhook.endpoint.source">
@@ -121,6 +121,11 @@
             <field name="value_key">topic</field>
         </record>
 
+        <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+            <field name="delivery_identity_policy">delivery_id</field>
+            <field name="replay_identity_policy">event_id</field>
+        </record>
+
         <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
         <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
             <field name="name">Demo Signed Partner Endpoint</field>
@@ -130,10 +135,9 @@
             <field name="execution_user_id" ref="base.user_admin"/>
             <field name="handler_id" ref="webhook_demo_handler_signed"/>
             <field name="payload_contract">json_object</field>
-            <field name="delivery_identity_policy">idempotency_key</field>
-            <field name="replay_identity_policy">event_id</field>
-            <field name="signature_verification_mode">hmac</field>
-            <field name="signature_secret">demo-shared-secret</field>
+            <field name="delivery_identity_policy">body_sha256</field>
+            <field name="replay_identity_policy">none</field>
+            <field name="signature_verification_mode">none</field>
             <field name="signature_max_age_seconds">0</field>
             <field name="signature_max_future_skew_seconds">0</field>
         </record>
@@ -201,6 +205,13 @@
             <field name="endpoint_id" ref="webhook_demo_endpoint_signed_partner"/>
             <field name="semantic_name">topic</field>
             <field name="value_key">topic</field>
+        </record>
+
+        <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+            <field name="delivery_identity_policy">idempotency_key</field>
+            <field name="replay_identity_policy">event_id</field>
+            <field name="signature_verification_mode">hmac</field>
+            <field name="signature_secret">demo-shared-secret</field>
         </record>
 
         <!-- Any-JSON, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
