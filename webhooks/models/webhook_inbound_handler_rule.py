@@ -18,27 +18,30 @@ class WebhookHandlerInboundRule(models.Model):
     action_type = fields.Selection(selection=INBOUND_ACTION_SELECTION, required=True, default='done')
     note = fields.Text()
     retry_seconds = fields.Integer(default=0)
-    target_model_name = fields.Char(string='Target Model')
-    outbound_endpoint_id = fields.Many2one('webhook.outbound.endpoint', string='Outbound Endpoint', check_company=True)
+    target_model_name = fields.Char(
+        string='Target Model',
+        help='Technical model name used by create, update, and upsert actions.',
+    )
+    outbound_endpoint_id = fields.Many2one(
+        'webhook.outbound.endpoint',
+        string='Outbound Endpoint',
+        check_company=True,
+        help='Outbound endpoint used when this rule queues an outbound delivery.',
+    )
     condition_ids = fields.One2many('webhook.handler.inbound.rule.condition', 'rule_id', string='Conditions')
-    lookup_ids = fields.One2many('webhook.handler.inbound.rule.lookup', 'rule_id', string='Lookup Keys')
-    assignment_ids = fields.One2many('webhook.handler.inbound.rule.assignment', 'rule_id', string='Assignments')
+    lookup_ids = fields.One2many(
+        'webhook.handler.inbound.rule.lookup',
+        'rule_id',
+        string='Lookup Keys',
+        help='Lookup keys identify the existing target record for update and upsert actions.',
+    )
+    assignment_ids = fields.One2many(
+        'webhook.handler.inbound.rule.assignment',
+        'rule_id',
+        string='Assignments',
+        help='Assignments define the values written to created or updated records, or to queued outbound payloads.',
+    )
     execution_ids = fields.One2many('webhook.inbound.rule.execution', 'rule_id', string='Executions')
-    configuration_warning = fields.Text(compute='_compute_configuration_warning')
-
-    @api.depends('action_type', 'target_model_name', 'outbound_endpoint_id', 'assignment_ids', 'lookup_ids')
-    def _compute_configuration_warning(self):
-        for rule in self:
-            messages = []
-            if rule.action_type in ('create_record', 'update_record', 'upsert_record') and not rule.target_model_name:
-                messages.append(_('Target Model is required for record-creation and record-update rules.'))
-            if rule.action_type in ('update_record', 'upsert_record') and not rule.lookup_ids:
-                messages.append(_('At least one Lookup Key is recommended for update and upsert rules.'))
-            if rule.action_type == 'queue_outbound' and not rule.outbound_endpoint_id:
-                messages.append(_('Outbound Endpoint is required for queue-outbound rules.'))
-            if rule.action_type in ('create_record', 'update_record', 'upsert_record', 'queue_outbound') and not rule.assignment_ids:
-                messages.append(_('This rule has no Assignments yet. It will not produce a useful payload or record update.'))
-            rule.configuration_warning = '\n'.join(messages) or False
 
     @api.constrains('action_type', 'retry_seconds', 'target_model_name', 'outbound_endpoint_id')
     def _check_rule_configuration(self):

@@ -77,9 +77,6 @@
                             <field name="replay_identity_policy"/>
                         </group>
                     </group>
-                    <group string="Configuration Guidance" invisible="not configuration_warning">
-                        <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
-                    </group>
                     <notebook>
                         <page string="Semantic Bindings">
                             <field name="semantic_binding_ids" nolabel="1">

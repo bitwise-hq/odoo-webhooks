@@ -57,6 +57,7 @@ class WebhookInboundEvent(models.Model):
         default='received',
         index=True,
         tracking=True,
+        help='Lifecycle of the inbound event. Reset failed or dead-letter events back to Received before queueing them again. Rejected events stay blocked until the endpoint configuration is corrected.',
     )
     topic = fields.Char(index=True)
     event_type = fields.Char(index=True)
@@ -123,44 +124,28 @@ class WebhookInboundEvent(models.Model):
     processing_note = fields.Text()
     processing_error = fields.Text()
     matched_inbound_rule_id = fields.Many2one('webhook.handler.inbound.rule', string='Matched Rule', ondelete='set null', index=True, tracking=True)
-    rule_execution_ids = fields.One2many('webhook.inbound.rule.execution', 'event_id', string='Rule Executions')
+    rule_execution_ids = fields.One2many(
+        'webhook.inbound.rule.execution',
+        'event_id',
+        string='Rule Executions',
+        help='Per-rule execution log captured when a model-driven inbound handler processes this event.',
+    )
     rejection_category = fields.Char(index=True)
     rejection_reason = fields.Text()
-    operator_action_hint = fields.Text(
-        compute='_compute_operator_action_hint',
-        string='Operator Guidance',
-    )
     queue_job_identity_key = fields.Char(
         compute='_compute_queue_job_identity_key',
         string='Queue Job Identity Key',
         help='Identity key used when enqueuing background processing for this event.',
     )
-    queue_job_ids = fields.Many2many('queue.job', compute='_compute_queue_job_observability', string='Queue Jobs')
+    queue_job_ids = fields.Many2many(
+        'queue.job',
+        compute='_compute_queue_job_observability',
+        string='Queue Jobs',
+        help='Background queue jobs created to process this inbound event.',
+    )
     queue_job_count = fields.Integer(compute='_compute_queue_job_observability', string='Queue Jobs')
     latest_queue_job_id = fields.Many2one('queue.job', compute='_compute_queue_job_observability', string='Latest Queue Job')
     latest_queue_job_state = fields.Char(compute='_compute_queue_job_observability', string='Latest Queue Job State')
-
-    @api.depends('state', 'handler_id', 'delivery_kind', 'replayed_from_event_id', 'processing_note', 'processing_error', 'rejection_reason')
-    def _compute_operator_action_hint(self):
-        for event in self:
-            if event.state == 'received' and event.delivery_kind == 'replay' and event.replayed_from_event_id:
-                event.operator_action_hint = _(
-                    'This delivery is a replay or redelivery of event %s. Queue processing only if reprocessing is safe for the downstream handler.'
-                ) % event.replayed_from_event_id.display_name
-            elif event.state == 'received':
-                event.operator_action_hint = _('Queue processing to hand this delivery to the background worker.')
-            elif event.state == 'processing':
-                event.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
-            elif event.state == 'error':
-                event.operator_action_hint = _('Review the processing error, correct the handler or endpoint configuration, then replay if it is safe to do so.')
-            elif event.state == 'dead_letter':
-                event.operator_action_hint = _('The handler explicitly moved this delivery to dead letter. Confirm replay is safe before resetting it.')
-            elif event.state == 'rejected':
-                event.operator_action_hint = _('This request was rejected during intake validation. Replay is intentionally unavailable until the endpoint configuration is fixed.')
-            elif event.state == 'done' and not event.handler_id:
-                event.operator_action_hint = _('This delivery was stored successfully, but no handler was resolved so no business action ran.')
-            else:
-                event.operator_action_hint = False
 
     def _compute_queue_job_identity_key(self):
         for event in self:

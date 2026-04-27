@@ -64,7 +64,7 @@ class WebhookOutboundEndpoint(models.Model):
         check_company=True,
         domain="[('outbound_enabled', '=', True)]",
         tracking=True,
-        help='Optional handler that can adjust or veto outbound deliveries before the HTTP request is sent.',
+        help='Optional handler that can adjust or veto outbound deliveries before the HTTP request is sent. When the selected handler uses Model Driven execution, its outbound rules can mutate, retry, cancel, or dead-letter deliveries.',
     )
     http_method = fields.Selection(
         selection=_HTTP_METHOD_SELECTION,
@@ -85,8 +85,18 @@ class WebhookOutboundEndpoint(models.Model):
         help='Request timeout in seconds for outbound deliveries.',
     )
     note = fields.Text()
-    header_rule_ids = fields.One2many('webhook.outbound.endpoint.header.rule', 'endpoint_id', string='Header Rules')
-    payload_rule_ids = fields.One2many('webhook.outbound.endpoint.payload.rule', 'endpoint_id', string='Payload Rules')
+    header_rule_ids = fields.One2many(
+        'webhook.outbound.endpoint.header.rule',
+        'endpoint_id',
+        string='Header Rules',
+        help='Ordered rules that build the outbound request headers from literals and delivery, endpoint, company, partner, or context values.',
+    )
+    payload_rule_ids = fields.One2many(
+        'webhook.outbound.endpoint.payload.rule',
+        'endpoint_id',
+        string='Payload Rules',
+        help='Ordered rules that build the outbound JSON payload through target paths such as order.id or meta.source.',
+    )
     outbound_delivery_ids = fields.One2many('webhook.outbound.delivery', 'endpoint_id', string='Outbound Deliveries')
     outbound_delivery_count = fields.Integer(compute='_compute_related_counts')
     failed_delivery_count = fields.Integer(compute='_compute_related_counts')
@@ -96,16 +106,8 @@ class WebhookOutboundEndpoint(models.Model):
             ('paused', 'Paused'),
             ('archived', 'Archived'),
         ],
-        compute='_compute_admin_guidance',
+        compute='_compute_operational_state',
         string='Operational State',
-    )
-    configuration_warning = fields.Text(
-        compute='_compute_admin_guidance',
-        string='Configuration Guidance',
-    )
-    template_guidance = fields.Text(
-        compute='_compute_template_guidance',
-        string='Template Guidance',
     )
 
     def _compute_related_counts(self):
@@ -119,20 +121,8 @@ class WebhookOutboundEndpoint(models.Model):
                 ('state', 'in', ('error', 'dead_letter')),
             ])
 
-    @api.depends(
-        'active',
-        'is_paused',
-        'partner_id',
-        'execution_user_id',
-        'handler_id',
-        'handler_id.execution_mode',
-        'http_method',
-        'target_url',
-        'timeout_seconds',
-        'header_rule_ids.active',
-        'payload_rule_ids.active',
-    )
-    def _compute_admin_guidance(self):
+    @api.depends('active', 'is_paused')
+    def _compute_operational_state(self):
         for endpoint in self:
             if not endpoint.active:
                 endpoint.operational_state = 'archived'
@@ -140,46 +130,6 @@ class WebhookOutboundEndpoint(models.Model):
                 endpoint.operational_state = 'paused'
             else:
                 endpoint.operational_state = 'live'
-
-            messages = []
-            if not endpoint.active:
-                messages.append(_('Archived outbound endpoints stay available for audit history but do not send new deliveries.'))
-            elif endpoint.is_paused:
-                messages.append(_('Paused outbound endpoints keep their configuration but do not queue or send deliveries.'))
-
-            if endpoint.partner_id:
-                messages.append(
-                    _('This outbound endpoint is scoped to partner %s. Deliveries inherit that scope from the endpoint.')
-                    % endpoint._get_scoped_partner().display_name
-                )
-            else:
-                messages.append(_('This outbound endpoint is company-scoped only. Deliveries do not store a partner from endpoint scope.'))
-
-            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'model_driven':
-                messages.append(_('The selected outbound handler uses model-driven rules and can mutate, cancel, dead-letter, or retry deliveries without authored JSON.'))
-
-            if not endpoint.header_rule_ids.filtered('active'):
-                messages.append(_('No active Header Rules are configured on this endpoint yet.'))
-            if not endpoint.payload_rule_ids.filtered('active'):
-                messages.append(_('No active Payload Rules are configured on this endpoint yet.'))
-
-            if endpoint.timeout_seconds <= 0:
-                messages.append(_('Outbound timeout should be greater than zero seconds.'))
-
-            endpoint.configuration_warning = '\n'.join(messages) or False
-
-    @api.depends('partner_id', 'handler_id', 'handler_id.execution_mode', 'header_rule_ids.active', 'payload_rule_ids.active')
-    def _compute_template_guidance(self):
-        for endpoint in self:
-            messages = [
-                _('Header Rules build the outbound headers one row at a time from literals, delivery fields, endpoint fields, company fields, partner fields, and delivery context keys.'),
-                _('Payload Rules build nested payload structures through free-form target paths such as order.id or meta.source.')
-            ]
-            if not endpoint.partner_id:
-                messages.append(_('Partner-derived rule values resolve false when the endpoint is company-scoped only.'))
-            if endpoint.handler_id and endpoint.handler_id.execution_mode == 'model_driven':
-                messages.append(_('Model-driven outbound handler rules can inspect delivery fields, endpoint fields, delivery context keys, and the pre-send request snapshot built from these endpoint rules.'))
-            endpoint.template_guidance = '\n'.join(messages)
 
     @api.constrains('execution_user_id', 'company_id')
     def _check_execution_user_configuration(self):

@@ -54,48 +54,18 @@ class WebhookHandler(models.Model):
     )
     note = fields.Text()
     endpoint_ids = fields.One2many('webhook.endpoint', 'handler_id', string='Endpoints')
-    inbound_rule_ids = fields.One2many('webhook.handler.inbound.rule', 'handler_id', string='Inbound Rules')
-    outbound_rule_ids = fields.One2many('webhook.handler.outbound.rule', 'handler_id', string='Outbound Rules')
-    configuration_warning = fields.Text(
-        compute='_compute_configuration_warning',
-        string='Configuration Guidance',
+    inbound_rule_ids = fields.One2many(
+        'webhook.handler.inbound.rule',
+        'handler_id',
+        string='Inbound Rules',
+        help='Active inbound rules are evaluated in sequence when this handler runs in Model Driven mode.',
     )
-
-    @api.depends(
-        'execution_mode',
-        'python_model_name',
-        'python_method_name',
-        'inbound_enabled',
-        'outbound_enabled',
-        'inbound_rule_ids.active',
-        'inbound_rule_ids.action_type',
-        'outbound_rule_ids.active',
-        'outbound_rule_ids.result_status',
+    outbound_rule_ids = fields.One2many(
+        'webhook.handler.outbound.rule',
+        'handler_id',
+        string='Outbound Rules',
+        help='Active outbound rules are evaluated in sequence when this handler runs in Model Driven mode.',
     )
-    def _compute_configuration_warning(self):
-        for handler in self:
-            messages = []
-            if handler.execution_mode == 'model_driven':
-                inbound_rule_count = len(handler.inbound_rule_ids.filtered('active'))
-                outbound_rule_count = len(handler.outbound_rule_ids.filtered('active'))
-                if handler.inbound_enabled:
-                    if inbound_rule_count:
-                        messages.append(_('Inbound model-driven execution is configured through %s active inbound rule(s).') % inbound_rule_count)
-                    else:
-                        messages.append(_('Inbound model-driven execution is enabled but no active inbound rules are configured yet.'))
-                if handler.outbound_enabled:
-                    if outbound_rule_count:
-                        messages.append(_('Outbound model-driven execution is configured through %s active outbound rule(s).') % outbound_rule_count)
-                    else:
-                        messages.append(_('Outbound model-driven execution is enabled but no active outbound rules are configured yet.'))
-            else:
-                if not handler.python_model_name or not handler.python_method_name:
-                    messages.append(_('Python callback mode requires both a technical model name and a method name.'))
-                else:
-                    messages.append(_('Python callbacks are resolved at runtime. Use a technical model name such as integration.webhook and a method name such as handle_event.'))
-            if not handler.inbound_enabled and not handler.outbound_enabled:
-                messages.append(_('This handler is disabled for both inbound and outbound flows.'))
-            handler.configuration_warning = '\n'.join(messages) or False
 
     @api.constrains('execution_mode', 'python_model_name', 'python_method_name')
     def _check_python_callback_configuration(self):

@@ -115,7 +115,7 @@ class WebhookEndpoint(models.Model):
         check_company=True,
         domain="[('inbound_enabled', '=', True)]",
         tracking=True,
-        help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only.',
+        help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only. When the selected handler uses Model Driven execution, its inbound rules control what business action runs.',
     )
     source_ids = fields.One2many(
         'webhook.endpoint.source',
@@ -210,6 +210,7 @@ class WebhookEndpoint(models.Model):
         'endpoint_id',
         string='Signature Message Parts',
         copy=True,
+        help='Optional ordered signature parts used to assemble the signed message. If no parts are configured, the raw request body is used as the signed message.',
     )
     inbound_event_ids = fields.One2many('webhook.inbound.event', 'endpoint_id', string='Inbound Events')
     inbound_event_count = fields.Integer(compute='_compute_related_counts')
@@ -220,13 +221,8 @@ class WebhookEndpoint(models.Model):
             ('paused', 'Paused'),
             ('archived', 'Archived'),
         ],
-        compute='_compute_admin_guidance',
+        compute='_compute_operational_state',
         string='Operational State',
-    )
-    configuration_warning = fields.Text(
-        compute='_compute_admin_guidance',
-        string='Configuration Guidance',
-        help='Human-readable guidance about the current endpoint configuration.',
     )
 
     @api.depends('code')
@@ -246,27 +242,8 @@ class WebhookEndpoint(models.Model):
                 ('state', '=', 'rejected'),
             ])
 
-    @api.depends(
-        'active',
-        'is_paused',
-        'partner_id',
-        'execution_user_id',
-        'handler_id',
-        'handler_id.execution_mode',
-        'payload_contract',
-        'signature_verification_mode',
-        'signature_secret',
-        'signature_max_age_seconds',
-        'signature_max_future_skew_seconds',
-        'delivery_identity_policy',
-        'replay_identity_policy',
-        'source_ids.active',
-        'source_ids.field_name',
-        'semantic_binding_ids.semantic_name',
-        'semantic_binding_ids.value_key',
-        'signature_part_ids.active',
-    )
-    def _compute_admin_guidance(self):
+    @api.depends('active', 'is_paused')
+    def _compute_operational_state(self):
         for endpoint in self:
             if not endpoint.active:
                 endpoint.operational_state = 'archived'
@@ -274,87 +251,6 @@ class WebhookEndpoint(models.Model):
                 endpoint.operational_state = 'paused'
             else:
                 endpoint.operational_state = 'live'
-
-            messages = []
-            if not endpoint.active:
-                messages.append(_('Archived endpoints are not matched by the public inbound webhook route.'))
-            elif endpoint.is_paused:
-                messages.append(_('Paused endpoints keep their configuration but reject new deliveries.'))
-
-            binding_map = endpoint._get_semantic_binding_map()
-
-            if endpoint.partner_id:
-                messages.append(
-                    _('This endpoint is scoped to partner %s. Accepted and rejected records inherit that scope from the endpoint.')
-                    % endpoint._get_scoped_partner().display_name
-                )
-            else:
-                messages.append(_('This endpoint is company-scoped only. Accepted and rejected records do not store a partner from endpoint scope.'))
-
-            if endpoint.payload_contract == 'json_object':
-                messages.append(_('This endpoint currently accepts only top-level JSON objects.'))
-            else:
-                messages.append(_('This endpoint accepts any valid JSON value, including arrays and scalars.'))
-
-            if not endpoint.handler_id:
-                messages.append(_('No default handler is configured. Requests without a resolved handler selector will be stored only.'))
-            elif endpoint.handler_id.execution_mode == 'model_driven':
-                messages.append(_('The selected default handler uses model-driven execution through the configured inbound rules.'))
-
-            if endpoint.delivery_identity_policy != 'body_sha256':
-                delivery_key = binding_map.get(endpoint.delivery_identity_policy)
-                if not delivery_key:
-                    messages.append(
-                        _('Delivery identity policy %s needs a semantic binding before duplicate detection can work.')
-                        % dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy]
-                    )
-                elif not endpoint._has_active_source_for_key(delivery_key):
-                    messages.append(
-                        _('Delivery identity policy %s is bound to %s, but no active value resolution rule currently produces that key.')
-                        % (dict(self._DELIVERY_IDENTITY_POLICY_SELECTION)[endpoint.delivery_identity_policy], delivery_key)
-                    )
-            elif endpoint.replay_identity_policy == 'none':
-                messages.append(_('Replay detection is disabled, so only exact duplicate deliveries will be linked automatically.'))
-
-            if endpoint.replay_identity_policy != 'none':
-                replay_key = binding_map.get(endpoint.replay_identity_policy)
-                if not replay_key:
-                    messages.append(
-                        _('Replay identity policy %s needs a semantic binding before distinct deliveries of the same event can be linked.')
-                        % dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy]
-                    )
-                elif not endpoint._has_active_source_for_key(replay_key):
-                    messages.append(
-                        _('Replay identity policy %s is bound to %s, but no active value resolution rule currently produces that key.')
-                        % (dict(self._REPLAY_IDENTITY_POLICY_SELECTION)[endpoint.replay_identity_policy], replay_key)
-                    )
-
-            if endpoint.signature_verification_mode == 'hmac':
-                signature_key = binding_map.get('signature')
-                timestamp_key = binding_map.get('signature_timestamp')
-                if not endpoint.signature_secret:
-                    messages.append(_('HMAC verification needs a primary signature secret.'))
-                if not signature_key:
-                    messages.append(_('HMAC verification needs a semantic binding for Signature.'))
-                elif not endpoint._has_active_source_for_key(signature_key):
-                    messages.append(
-                        _('HMAC verification is bound to %s for Signature, but no active value resolution rule currently produces that key.')
-                        % signature_key
-                    )
-                if (
-                    (endpoint.signature_max_age_seconds > 0 or endpoint.signature_max_future_skew_seconds > 0)
-                    and not timestamp_key
-                ):
-                    messages.append(_('Freshness checks are enabled, so add a semantic binding for Signature Timestamp or set both freshness windows to 0.'))
-                elif timestamp_key and not endpoint._has_active_source_for_key(timestamp_key):
-                    messages.append(
-                        _('Signature Timestamp is bound to %s, but no active value resolution rule currently produces that key.')
-                        % timestamp_key
-                    )
-                if not endpoint.signature_part_ids.filtered('active'):
-                    messages.append(_('No signature message parts are configured. The raw request body will be used as the signed message.'))
-
-            endpoint.configuration_warning = '\n'.join(messages) or False
 
     @api.constrains('execution_user_id', 'company_id')
     def _check_execution_user_configuration(self):

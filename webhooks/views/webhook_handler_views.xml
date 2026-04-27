@@ -49,9 +49,6 @@
                             <field name="outbound_enabled"/>
                         </group>
                     </group>
-                    <group string="Configuration Guidance" invisible="not configuration_warning">
-                        <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
-                    </group>
                     <group string="Python Callback" invisible="execution_mode != 'python'">
                         <field name="python_model_name"/>
                         <field name="python_method_name"/>
@@ -82,9 +79,6 @@
                                                 <field name="outbound_endpoint_id" invisible="action_type != 'queue_outbound'"/>
                                                 <field name="retry_seconds" invisible="action_type != 'retry'"/>
                                             </group>
-                                        </group>
-                                        <group string="Configuration Guidance" invisible="not configuration_warning">
-                                            <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
                                         </group>
                                         <group string="Notes">
                                             <field name="note" nolabel="1" widget="text"/>

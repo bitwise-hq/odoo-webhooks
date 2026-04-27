@@ -57,14 +57,25 @@ class WebhookOutboundDelivery(models.Model):
         default='draft',
         index=True,
         tracking=True,
+        help='Lifecycle of the outbound delivery. Reset failed, dead-letter, or canceled deliveries to Draft before queueing them again. Use replay when the downstream system requires an audited resend.',
     )
     queued_at = fields.Datetime(index=True)
     processed_at = fields.Datetime(index=True)
     http_method = fields.Selection(selection=_HTTP_METHOD_SELECTION, required=True, default='post', string='HTTP Method', tracking=True)
     target_url = fields.Char(required=True, string='Target URL', tracking=True)
     timeout_seconds = fields.Integer(required=True, default=30)
-    request_headers_json = fields.Text(required=True, default='{}', string='Request Headers')
-    payload_json = fields.Text(required=True, default='{}', string='Payload JSON')
+    request_headers_json = fields.Text(
+        required=True,
+        default='{}',
+        string='Request Headers',
+        help='Base outbound request headers snapshot. Endpoint Header Rules and outbound handler logic can still adjust the final request before sending.',
+    )
+    payload_json = fields.Text(
+        required=True,
+        default='{}',
+        string='Payload JSON',
+        help='Base outbound JSON payload snapshot. Endpoint Payload Rules and outbound handler logic can still adjust the final request before sending.',
+    )
     response_status_code = fields.Integer(index=True, string='Response Status', tracking=True)
     response_headers_json = fields.Text(string='Response Headers')
     response_body = fields.Text(string='Response Body')
@@ -79,45 +90,40 @@ class WebhookOutboundDelivery(models.Model):
         check_company=True,
         tracking=True,
     )
-    replay_delivery_ids = fields.One2many('webhook.outbound.delivery', 'replayed_from_delivery_id', string='Replay Deliveries')
+    replay_delivery_ids = fields.One2many(
+        'webhook.outbound.delivery',
+        'replayed_from_delivery_id',
+        string='Replay Deliveries',
+        help='Audited replay deliveries created from this delivery.',
+    )
     replay_count = fields.Integer(compute='_compute_replay_count')
-    context_line_ids = fields.One2many('webhook.outbound.delivery.context.line', 'delivery_id', string='Context Lines')
-    attempt_ids = fields.One2many('webhook.outbound.delivery.attempt', 'delivery_id', string='Attempts')
+    context_line_ids = fields.One2many(
+        'webhook.outbound.delivery.context.line',
+        'delivery_id',
+        string='Context Lines',
+        help='Additional named values available to outbound handler rules when mutating, retrying, canceling, or dead-lettering this delivery.',
+    )
+    attempt_ids = fields.One2many(
+        'webhook.outbound.delivery.attempt',
+        'delivery_id',
+        string='Attempts',
+        help='HTTP attempt log for this delivery, including response details and processing errors.',
+    )
     attempt_count = fields.Integer(compute='_compute_attempt_count')
-    operator_action_hint = fields.Text(compute='_compute_operator_action_hint', string='Operator Guidance')
-    template_guidance = fields.Text(compute='_compute_template_guidance', string='Template Guidance')
     queue_job_identity_key = fields.Char(
         compute='_compute_queue_job_identity_key',
         string='Queue Job Identity Key',
         help='Identity key used when enqueuing background delivery processing for this outbound delivery.',
     )
-    queue_job_ids = fields.Many2many('queue.job', compute='_compute_queue_job_observability', string='Queue Jobs')
+    queue_job_ids = fields.Many2many(
+        'queue.job',
+        compute='_compute_queue_job_observability',
+        string='Queue Jobs',
+        help='Background queue jobs created to process this outbound delivery.',
+    )
     queue_job_count = fields.Integer(compute='_compute_queue_job_observability', string='Queue Jobs')
     latest_queue_job_id = fields.Many2one('queue.job', compute='_compute_queue_job_observability', string='Latest Queue Job')
     latest_queue_job_state = fields.Char(compute='_compute_queue_job_observability', string='Latest Queue Job State')
-
-    @api.depends('state', 'handler_id', 'replayed_from_delivery_id', 'processing_note', 'processing_error', 'response_status_code')
-    def _compute_operator_action_hint(self):
-        for delivery in self:
-            if delivery.state == 'draft':
-                delivery.operator_action_hint = _('Queue this delivery to send the stored payload to the configured outbound endpoint.')
-            elif delivery.state == 'queued':
-                delivery.operator_action_hint = _('This delivery is queued and waiting for the background worker.')
-            elif delivery.state == 'processing':
-                delivery.operator_action_hint = _('This delivery is currently being processed by the queue worker.')
-            elif delivery.state == 'error':
-                delivery.operator_action_hint = _('Review the delivery error, adjust the endpoint, templates, or model-driven handler if needed, then reset to draft or create a replay when the remote system allows another send.')
-            elif delivery.state == 'dead_letter':
-                delivery.operator_action_hint = _('The remote endpoint returned a non-retryable failure. Confirm replay is safe before resetting this delivery or creating a new replay copy.')
-            elif delivery.state == 'canceled':
-                delivery.operator_action_hint = _('This delivery was canceled before sending. Reset it to draft or create a replay copy if you need a fresh audited send.')
-            elif delivery.state == 'done':
-                if delivery.replayed_from_delivery_id:
-                    delivery.operator_action_hint = _('This delivery is a replay of %s. Create another replay only if the downstream system accepts duplicates.') % delivery.replayed_from_delivery_id.display_name
-                else:
-                    delivery.operator_action_hint = _('This delivery completed successfully. Use Create Replay only when the downstream system allows a new audited send of the same business event.')
-            else:
-                delivery.operator_action_hint = False
 
     @api.depends('attempt_ids')
     def _compute_attempt_count(self):
@@ -128,24 +134,6 @@ class WebhookOutboundDelivery(models.Model):
     def _compute_replay_count(self):
         for delivery in self:
             delivery.replay_count = len(delivery.replay_delivery_ids)
-
-    @api.depends(
-        'handler_id',
-        'handler_id.execution_mode',
-        'replayed_from_delivery_id',
-        'context_line_ids.active',
-        'endpoint_id.header_rule_ids.active',
-        'endpoint_id.payload_rule_ids.active',
-    )
-    def _compute_template_guidance(self):
-        for delivery in self:
-            messages = [
-                _('Header Rules and Payload Rules on the endpoint build the base request snapshot without authored JSON.'),
-                _('Context Lines on this delivery provide additional named values that outbound handler rules can consume when deciding how to send, cancel, dead-letter, or retry.'),
-            ]
-            if delivery.replayed_from_delivery_id:
-                messages.append(_('This delivery was created as a replay of %s. Its context lines and request snapshot were copied from that delivery.') % delivery.replayed_from_delivery_id.display_name)
-            delivery.template_guidance = '\n'.join(messages)
 
     def _compute_queue_job_identity_key(self):
         for delivery in self:

@@ -68,9 +68,6 @@
                         </button>
                     </div>
                     <field name="execution_user_id" invisible="1"/>
-                    <group string="Operator Guidance" invisible="not operator_action_hint">
-                        <field name="operator_action_hint" nolabel="1" widget="text" readonly="1"/>
-                    </group>
                     <group string="Context">
                         <group>
                             <field name="name"/>

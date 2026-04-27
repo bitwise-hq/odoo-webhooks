@@ -73,12 +73,6 @@
                             <field name="partner_id" placeholder="Company-scoped only"/>
                         </group>
                     </group>
-                    <group string="Template Guidance">
-                        <field name="template_guidance" nolabel="1" widget="text" readonly="1"/>
-                    </group>
-                    <group string="Configuration Guidance" invisible="not configuration_warning">
-                        <field name="configuration_warning" nolabel="1" widget="text" readonly="1"/>
-                    </group>
                     <group string="Internal Notes">
                         <field name="note"/>
                     </group>
