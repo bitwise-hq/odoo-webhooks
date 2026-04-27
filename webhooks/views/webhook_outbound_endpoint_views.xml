@@ -8,13 +8,14 @@
             <search>
                 <field name="name"/>
                 <field name="code"/>
+                <field name="state"/>
                 <field name="company_id"/>
                 <field name="partner_id"/>
                 <field name="handler_id"/>
                 <field name="http_method"/>
-                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
-                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
-                <filter name="paused" string="Paused" domain="[('is_paused', '=', True)]"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="archived" string="Archived" domain="[('state', '=', 'archived')]"/>
             </search>
         </field>
     </record>
@@ -26,11 +27,12 @@
             <list>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="operational_state"/>
+                <field name="state"/>
                 <field name="company_id"/>
                 <field name="partner_id"/>
                 <field name="http_method"/>
-                <field name="target_url"/>
+                <field name="target_hostname"/>
+                <field name="target_path"/>
                 <field name="outbound_delivery_count" string="Deliveries"/>
                 <field name="failed_delivery_count" string="Failures"/>
             </list>
@@ -42,6 +44,9 @@
         <field name="model">webhook.outbound.endpoint</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
+                </header>
                 <sheet>
                     <field name="execution_user_id" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
@@ -56,13 +61,12 @@
                         <group>
                             <field name="name"/>
                             <field name="code"/>
-                            <field name="operational_state" readonly="1"/>
-                            <field name="active"/>
-                            <field name="is_paused"/>
                         </group>
                         <group>
                             <field name="http_method"/>
-                            <field name="target_url" widget="url"/>
+                            <field name="target_hostname" placeholder="https://api.example.com"/>
+                            <field name="target_path" placeholder="/webhooks/orders"/>
+                            <field name="target_url" widget="url" readonly="1"/>
                             <field name="timeout_seconds"/>
                             <field name="handler_id"/>
                         </group>

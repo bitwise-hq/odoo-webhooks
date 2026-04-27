@@ -14,14 +14,10 @@ class WebhookHandler(models.Model):
         'The webhook handler code must be unique.',
     )
 
-    def init(self):
-        self.env.cr.execute(
-            """
-            UPDATE webhook_handler
-               SET execution_mode = 'model_driven'
-             WHERE execution_mode = 'low_code'
-            """
-        )
+    _DIRECTION_SELECTION = [
+        ('inbound', 'Inbound'),
+        ('outbound', 'Outbound'),
+    ]
 
     name = fields.Char(required=True)
     code = fields.Char(required=True, copy=False, index=True)
@@ -32,8 +28,13 @@ class WebhookHandler(models.Model):
         default=lambda self: self.env.company,
         index=True,
     )
-    inbound_enabled = fields.Boolean(default=True, tracking=True, help='Allow this handler to be selected for inbound webhook processing.')
-    outbound_enabled = fields.Boolean(default=False, tracking=True, help='Reserve this handler for future outbound webhook processing.')
+    direction = fields.Selection(
+        selection=_DIRECTION_SELECTION,
+        required=True,
+        default='inbound',
+        tracking=True,
+        help='Choose whether this handler processes inbound webhook events or outbound webhook deliveries.',
+    )
     execution_mode = fields.Selection(
         selection=[
             ('model_driven', 'Model Driven'),
@@ -77,6 +78,8 @@ class WebhookHandler(models.Model):
 
     def execute_inbound(self, event):
         self.ensure_one()
+        if self.direction != 'inbound':
+            raise ValidationError(_('Outbound handlers cannot process inbound webhook events.'))
         if self.execution_mode == 'python':
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)
@@ -90,6 +93,8 @@ class WebhookHandler(models.Model):
 
     def execute_outbound(self, delivery, request_data=None):
         self.ensure_one()
+        if self.direction != 'outbound':
+            raise ValidationError(_('Inbound handlers cannot process outbound webhook deliveries.'))
         if self.execution_mode == 'python':
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)

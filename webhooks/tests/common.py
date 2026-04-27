@@ -27,15 +27,14 @@ class WebhookRuleTestCase(TransactionCase):
     def _serialize(self, value):
         return json.dumps(value, indent=2, sort_keys=True)
 
-    def _create_handler(self, *, inbound_enabled=True, outbound_enabled=False, **values):
+    def _create_handler(self, *, direction='inbound', **values):
         token = self._next_token('handler')
         create_vals = {
             'name': values.pop('name', token),
             'code': values.pop('code', token),
             'company_id': self.company.id,
+            'direction': values.pop('direction', direction),
             'execution_mode': values.pop('execution_mode', 'model_driven'),
-            'inbound_enabled': inbound_enabled,
-            'outbound_enabled': outbound_enabled,
         }
         create_vals.update(values)
         return self.env['webhook.handler'].create(create_vals)
@@ -45,6 +44,7 @@ class WebhookRuleTestCase(TransactionCase):
         create_vals = {
             'name': values.pop('name', token),
             'code': values.pop('code', token),
+            'state': values.pop('state', 'active'),
             'company_id': self.company.id,
             'execution_user_id': values.pop('execution_user_id', self.execution_user.id),
             'handler_id': values.pop('handler_id', handler.id if handler else False),
@@ -60,6 +60,7 @@ class WebhookRuleTestCase(TransactionCase):
         create_vals = {
             'name': values.pop('name', token),
             'code': values.pop('code', token),
+            'state': values.pop('state', 'active'),
             'company_id': self.company.id,
             'execution_user_id': values.pop('execution_user_id', self.execution_user.id),
             'handler_id': values.pop('handler_id', handler.id if handler else False),

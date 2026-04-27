@@ -8,6 +8,7 @@
             <search>
                 <field name="name"/>
                 <field name="code"/>
+                <field name="direction"/>
                 <field name="company_id"/>
                 <filter name="active" string="Active" domain="[('active', '=', True)]"/>
                 <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
@@ -22,8 +23,7 @@
             <list>
                 <field name="name"/>
                 <field name="code"/>
-                <field name="inbound_enabled"/>
-                <field name="outbound_enabled"/>
+                <field name="direction"/>
                 <field name="company_id"/>
                 <field name="active"/>
             </list>
@@ -45,8 +45,7 @@
                             <field name="active"/>
                         </group>
                         <group>
-                            <field name="inbound_enabled"/>
-                            <field name="outbound_enabled"/>
+                            <field name="direction"/>
                         </group>
                     </group>
                     <group string="Python Callback" invisible="execution_mode != 'python'">
@@ -54,7 +53,7 @@
                         <field name="python_method_name"/>
                     </group>
                     <notebook invisible="execution_mode != 'model_driven'">
-                        <page string="Inbound Rules" invisible="not inbound_enabled">
+                        <page string="Inbound Rules" invisible="direction != 'inbound'">
                             <field name="inbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
                                 <list editable="bottom">
                                     <field name="sequence"/>
@@ -134,7 +133,7 @@
                                 </form>
                             </field>
                         </page>
-                        <page string="Outbound Rules" invisible="not outbound_enabled">
+                        <page string="Outbound Rules" invisible="direction != 'outbound'">
                             <field name="outbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
                                 <list editable="bottom">
                                     <field name="sequence"/>

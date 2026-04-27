@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from odoo import fields
+from odoo.exceptions import ValidationError
 
 from .common import WebhookRuleTestCase
 
@@ -53,7 +54,7 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
         self.assertEqual(request_data['payload']['meta']['company'], self.company.name)
 
     def test_handler_rule_mutates_request_and_requests_retry(self):
-        handler = self._create_handler(inbound_enabled=False, outbound_enabled=True)
+        handler = self._create_handler(direction='outbound')
         endpoint = self._create_outbound_endpoint(handler=handler)
         self.env['webhook.outbound.endpoint.header.rule'].create({
             'endpoint_id': endpoint.id,
@@ -119,6 +120,18 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
         self.assertEqual(updated_request_data['headers']['X-Mode'], 'retry')
         self.assertTrue(updated_request_data['payload']['meta']['retry'])
 
+    def test_delivery_uses_current_endpoint_target_url(self):
+        endpoint = self._create_outbound_endpoint(target_url='https://example.com/original')
+        delivery = self._create_outbound_delivery(endpoint)
+
+        endpoint.write({'target_url': 'https://override.example.com/hooks/orders'})
+        request_data = delivery._build_request_data()
+
+        self.assertEqual(endpoint.target_hostname, 'https://override.example.com')
+        self.assertEqual(endpoint.target_path, '/hooks/orders')
+        self.assertEqual(delivery.target_url, 'https://override.example.com/hooks/orders')
+        self.assertEqual(request_data['target_url'], 'https://override.example.com/hooks/orders')
+
     def test_build_request_data_normalizes_datetime_payload_values(self):
         endpoint = self._create_outbound_endpoint()
         self.env['webhook.outbound.endpoint.payload.rule'].create({
@@ -148,3 +161,11 @@ class TestOutboundModelDrivenRules(WebhookRuleTestCase):
 
         self.assertEqual(delivery.state, 'error')
         self.assertIn('attempt logging failed', delivery.processing_error)
+
+    def test_inbound_handler_cannot_execute_outbound_delivery(self):
+        handler = self._create_handler(direction='inbound')
+        endpoint = self._create_outbound_endpoint()
+        delivery = self._create_outbound_delivery(endpoint)
+
+        with self.assertRaisesRegex(ValidationError, 'cannot process outbound'):
+            handler.execute_outbound(delivery)

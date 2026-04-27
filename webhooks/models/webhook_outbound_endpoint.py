@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from odoo import SUPERUSER_ID, _, api, fields, models
 
 from ..exceptions import WebhookProcessingConfigurationError
@@ -15,6 +17,11 @@ class WebhookOutboundEndpoint(models.Model):
         ('put', 'PUT'),
         ('patch', 'PATCH'),
     ]
+    _STATE_SELECTION = [
+        ('draft', 'Draft'),
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+    ]
 
     _code_uniq = models.Constraint(
         'unique(code)',
@@ -23,16 +30,13 @@ class WebhookOutboundEndpoint(models.Model):
 
     name = fields.Char(required=True)
     code = fields.Char(required=True, copy=False, index=True)
-    active = fields.Boolean(
-        default=True,
+    state = fields.Selection(
+        selection=_STATE_SELECTION,
+        required=True,
+        default='active',
+        index=True,
         tracking=True,
-        help='Archived outbound endpoints stay available for audit history but can no longer queue new deliveries.',
-    )
-    is_paused = fields.Boolean(
-        string='Paused',
-        default=False,
-        tracking=True,
-        help='Paused outbound endpoints keep their configuration but will not queue or send deliveries.',
+        help='Draft outbound endpoints keep their configuration without queueing deliveries. Archived endpoints remain available for audit history but cannot be used for new work.',
     )
     company_id = fields.Many2one(
         'res.company',
@@ -62,7 +66,7 @@ class WebhookOutboundEndpoint(models.Model):
         'webhook.handler',
         string='Default Handler',
         check_company=True,
-        domain="[('outbound_enabled', '=', True)]",
+        domain="[('direction', '=', 'outbound')]",
         tracking=True,
         help='Optional handler that can adjust or veto outbound deliveries before the HTTP request is sent. When the selected handler uses Model Driven execution, its outbound rules can mutate, retry, cancel, or dead-letter deliveries.',
     )
@@ -73,10 +77,23 @@ class WebhookOutboundEndpoint(models.Model):
         string='HTTP Method',
         tracking=True,
     )
-    target_url = fields.Char(
+    target_hostname = fields.Char(
         required=True,
-        string='Target URL',
+        string='Target Hostname',
         tracking=True,
+        help='Absolute target hostname, including the URL scheme and optional port, for example https://api.example.com.',
+    )
+    target_path = fields.Char(
+        required=True,
+        default='/',
+        string='Target Path',
+        tracking=True,
+        help='Request path appended to the target hostname. Query parameters may be included here when needed.',
+    )
+    target_url = fields.Char(
+        compute='_compute_target_url',
+        store=True,
+        string='Target URL',
         help='Absolute URL that will receive the outbound webhook delivery.',
     )
     timeout_seconds = fields.Integer(
@@ -100,15 +117,6 @@ class WebhookOutboundEndpoint(models.Model):
     outbound_delivery_ids = fields.One2many('webhook.outbound.delivery', 'endpoint_id', string='Outbound Deliveries')
     outbound_delivery_count = fields.Integer(compute='_compute_related_counts')
     failed_delivery_count = fields.Integer(compute='_compute_related_counts')
-    operational_state = fields.Selection(
-        selection=[
-            ('live', 'Live'),
-            ('paused', 'Paused'),
-            ('archived', 'Archived'),
-        ],
-        compute='_compute_operational_state',
-        string='Operational State',
-    )
 
     def _compute_related_counts(self):
         delivery_model = self.env['webhook.outbound.delivery']
@@ -121,15 +129,58 @@ class WebhookOutboundEndpoint(models.Model):
                 ('state', 'in', ('error', 'dead_letter')),
             ])
 
-    @api.depends('active', 'is_paused')
-    def _compute_operational_state(self):
+    @api.model
+    def _normalize_target_path(self, target_path):
+        target_path = str(target_path or '').strip()
+        if not target_path:
+            return '/'
+        if target_path.startswith('?'):
+            return f'/{target_path}'
+        if not target_path.startswith('/'):
+            return f'/{target_path}'
+        return target_path
+
+    @api.model
+    def _split_target_url(self, target_url):
+        target_url = str(target_url or '').strip()
+        if not target_url:
+            return False, '/'
+        parsed = urlsplit(target_url)
+        if not parsed.scheme or not parsed.netloc:
+            raise WebhookProcessingConfigurationError(_('Outbound endpoints require an absolute target URL.'))
+        if parsed.fragment:
+            raise WebhookProcessingConfigurationError(_('Outbound endpoint target URLs cannot include URL fragments.'))
+        target_hostname = f'{parsed.scheme}://{parsed.netloc}'
+        target_path = parsed.path or '/'
+        if parsed.query:
+            target_path = f'{target_path}?{parsed.query}'
+        return target_hostname, target_path
+
+    @api.model
+    def _join_target_url(self, target_hostname, target_path):
+        target_hostname = str(target_hostname or '').strip().rstrip('/')
+        if not target_hostname:
+            return False
+        return f'{target_hostname}{self._normalize_target_path(target_path)}'
+
+    @api.model
+    def _normalize_target_url_vals(self, vals):
+        normalized_vals = dict(vals)
+        if 'target_url' in normalized_vals and 'target_hostname' not in normalized_vals and 'target_path' not in normalized_vals:
+            target_hostname, target_path = self._split_target_url(normalized_vals.get('target_url'))
+            normalized_vals['target_hostname'] = target_hostname
+            normalized_vals['target_path'] = target_path
+        normalized_vals.pop('target_url', None)
+        if 'target_hostname' in normalized_vals and normalized_vals.get('target_hostname'):
+            normalized_vals['target_hostname'] = str(normalized_vals['target_hostname']).strip().rstrip('/')
+        if 'target_path' in normalized_vals:
+            normalized_vals['target_path'] = self._normalize_target_path(normalized_vals.get('target_path'))
+        return normalized_vals
+
+    @api.depends('target_hostname', 'target_path')
+    def _compute_target_url(self):
         for endpoint in self:
-            if not endpoint.active:
-                endpoint.operational_state = 'archived'
-            elif endpoint.is_paused:
-                endpoint.operational_state = 'paused'
-            else:
-                endpoint.operational_state = 'live'
+            endpoint.target_url = endpoint._join_target_url(endpoint.target_hostname, endpoint.target_path)
 
     @api.constrains('execution_user_id', 'company_id')
     def _check_execution_user_configuration(self):
@@ -146,13 +197,33 @@ class WebhookOutboundEndpoint(models.Model):
             if endpoint.company_id and endpoint.company_id not in user.company_ids:
                 raise WebhookProcessingConfigurationError(_('Execution user must have access to the outbound endpoint company.'))
 
-    @api.constrains('target_url', 'timeout_seconds')
+    @api.constrains('target_hostname', 'target_path', 'timeout_seconds')
     def _check_outbound_configuration(self):
         for endpoint in self:
+            if not endpoint.target_hostname or not str(endpoint.target_hostname).strip():
+                raise WebhookProcessingConfigurationError(_('Outbound endpoints require a target hostname.'))
+            parsed_hostname = urlsplit(str(endpoint.target_hostname).strip())
+            if not parsed_hostname.scheme or not parsed_hostname.netloc:
+                raise WebhookProcessingConfigurationError(_('Outbound endpoint hostnames must include a URL scheme and hostname.'))
+            if parsed_hostname.query or parsed_hostname.fragment:
+                raise WebhookProcessingConfigurationError(_('Outbound endpoint hostnames cannot include query parameters or URL fragments.'))
+            hostname_path = parsed_hostname.path or ''
+            if hostname_path not in ('', '/'):
+                raise WebhookProcessingConfigurationError(_('Store the outbound request path separately from the target hostname.'))
+            if '#' in (endpoint.target_path or ''):
+                raise WebhookProcessingConfigurationError(_('Outbound endpoint target paths cannot include URL fragments.'))
             if not endpoint.target_url or not str(endpoint.target_url).strip():
                 raise WebhookProcessingConfigurationError(_('Outbound endpoints require a target URL.'))
             if endpoint.timeout_seconds <= 0:
                 raise WebhookProcessingConfigurationError(_('Outbound endpoint timeout must be greater than zero seconds.'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        normalized_vals_list = [self._normalize_target_url_vals(vals) for vals in vals_list]
+        return super().create(normalized_vals_list)
+
+    def write(self, vals):
+        return super().write(self._normalize_target_url_vals(vals))
 
     def _get_scoped_partner(self):
         self.ensure_one()

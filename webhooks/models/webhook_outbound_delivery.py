@@ -35,13 +35,16 @@ class WebhookOutboundDelivery(models.Model):
         string='Execution User',
         help='Queued outbound delivery processing runs as this user.',
     )
-    handler_id = fields.Many2one('webhook.handler', ondelete='set null', index=True, check_company=True, tracking=True)
-    company_id = fields.Many2one('res.company', required=True, index=True)
+    handler_id = fields.Many2one('webhook.handler', related='endpoint_id.handler_id', store=True, readonly=True, index=True, check_company=True)
+    company_id = fields.Many2one('res.company', related='endpoint_id.company_id', store=True, readonly=True, index=True)
     partner_id = fields.Many2one(
         'res.partner',
+        related='endpoint_id.partner_id',
+        store=True,
+        readonly=True,
         index=True,
         check_company=True,
-        help='Endpoint-level tenant/account partner inherited by this outbound delivery.',
+        help='Endpoint-level tenant/account partner derived from the outbound endpoint.',
     )
     state = fields.Selection(
         selection=[
@@ -61,9 +64,9 @@ class WebhookOutboundDelivery(models.Model):
     )
     queued_at = fields.Datetime(index=True)
     processed_at = fields.Datetime(index=True)
-    http_method = fields.Selection(selection=_HTTP_METHOD_SELECTION, required=True, default='post', string='HTTP Method', tracking=True)
-    target_url = fields.Char(required=True, string='Target URL', tracking=True)
-    timeout_seconds = fields.Integer(required=True, default=30)
+    http_method = fields.Selection(related='endpoint_id.http_method', string='HTTP Method', readonly=True)
+    target_url = fields.Char(related='endpoint_id.target_url', string='Target URL', readonly=True)
+    timeout_seconds = fields.Integer(related='endpoint_id.timeout_seconds', readonly=True)
     request_headers_json = fields.Text(
         required=True,
         default='{}',
@@ -215,12 +218,6 @@ class WebhookOutboundDelivery(models.Model):
     def _prepare_endpoint_snapshot_vals(self, endpoint, vals):
         prepared_vals = dict(vals)
         prepared_vals.setdefault('execution_user_id', self._get_runtime_execution_user_id())
-        prepared_vals.setdefault('handler_id', endpoint.handler_id.id if endpoint.handler_id else False)
-        prepared_vals.setdefault('company_id', endpoint.company_id.id)
-        prepared_vals.setdefault('partner_id', endpoint._get_scoped_partner().id if endpoint._get_scoped_partner() else False)
-        prepared_vals.setdefault('http_method', endpoint.http_method)
-        prepared_vals.setdefault('target_url', endpoint.target_url)
-        prepared_vals.setdefault('timeout_seconds', endpoint.timeout_seconds)
         prepared_vals.setdefault('request_headers_json', '{}')
         prepared_vals.setdefault('payload_json', '{}')
         prepared_vals.setdefault('name', '%s / %s' % (endpoint.display_name, fields.Datetime.now()))
@@ -400,7 +397,7 @@ class WebhookOutboundDelivery(models.Model):
             values['finished_at'] = fields.Datetime.now()
         return self.env['webhook.outbound.delivery.attempt'].create(values)
 
-    @api.constrains('target_url', 'timeout_seconds', 'request_headers_json', 'payload_json')
+    @api.constrains('endpoint_id', 'request_headers_json', 'payload_json')
     def _check_delivery_configuration(self):
         for delivery in self:
             if not delivery.target_url or not str(delivery.target_url).strip():
@@ -412,9 +409,9 @@ class WebhookOutboundDelivery(models.Model):
 
     def _queue_processing(self):
         for delivery in self:
-            if delivery.endpoint_id.is_paused:
-                raise ValidationError(_('Outbound endpoint %s is paused and cannot queue new deliveries.') % delivery.endpoint_id.display_name)
-            if not delivery.endpoint_id.active:
+            if delivery.endpoint_id.state == 'draft':
+                raise ValidationError(_('Draft outbound endpoint %s cannot queue new deliveries.') % delivery.endpoint_id.display_name)
+            if delivery.endpoint_id.state == 'archived':
                 raise ValidationError(_('Archived outbound endpoint %s cannot queue new deliveries.') % delivery.endpoint_id.display_name)
             if delivery.state not in ('draft', 'error'):
                 continue

@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timezone
 
 from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo.exceptions import ValidationError
 
 from ..exceptions import (
     WebhookFreshnessValidationError,
@@ -56,29 +57,32 @@ class WebhookEndpoint(models.Model):
         ('event_id', 'Business Event Identity'),
         ('idempotency_key', 'Explicit Idempotency Key'),
     ]
+    _STATE_SELECTION = [
+        ('draft', 'Draft'),
+        ('active', 'Active'),
+        ('archived', 'Archived'),
+    ]
 
     _code_uniq = models.Constraint(
         'unique(code)',
-        'The webhook endpoint code must be unique.',
+        'The inbound webhook path must be unique.',
     )
 
     name = fields.Char(required=True)
     code = fields.Char(
+        string='Path',
         required=True,
         copy=False,
         index=True,
-        help='Unique identifier used in the public inbound webhook URL. Changing this value changes the route path consumed by upstream providers.',
+        help='Unique public inbound webhook path segment. This value becomes part of the route URL and cannot be changed after the endpoint is created.',
     )
-    active = fields.Boolean(
-        default=True,
+    state = fields.Selection(
+        selection=_STATE_SELECTION,
+        required=True,
+        default='active',
+        index=True,
         tracking=True,
-        help='Archived endpoints are not matched by the public inbound webhook route.',
-    )
-    is_paused = fields.Boolean(
-        string='Paused',
-        default=False,
-        tracking=True,
-        help='Paused endpoints keep their configuration but reject new webhook deliveries.',
+        help='Draft endpoints keep their configuration without accepting traffic. Archived endpoints stay available for audit history but are not matched by the public route.',
     )
     company_id = fields.Many2one(
         'res.company',
@@ -107,13 +111,13 @@ class WebhookEndpoint(models.Model):
     route_path = fields.Char(
         compute='_compute_route_path',
         string='Public Route',
-        help='Computed public path derived from the endpoint code.',
+        help='Computed public path derived from the immutable endpoint path.',
     )
     handler_id = fields.Many2one(
         'webhook.handler',
         string='Default Handler',
         check_company=True,
-        domain="[('inbound_enabled', '=', True)]",
+        domain="[('direction', '=', 'inbound')]",
         tracking=True,
         help='Fallback handler used when no handler selector resolves another handler. If this is empty and no selector resolves, the event is stored only. When the selected handler uses Model Driven execution, its inbound rules control what business action runs.',
     )
@@ -215,15 +219,6 @@ class WebhookEndpoint(models.Model):
     inbound_event_ids = fields.One2many('webhook.inbound.event', 'endpoint_id', string='Inbound Events')
     inbound_event_count = fields.Integer(compute='_compute_related_counts')
     rejected_event_count = fields.Integer(compute='_compute_related_counts')
-    operational_state = fields.Selection(
-        selection=[
-            ('live', 'Live'),
-            ('paused', 'Paused'),
-            ('archived', 'Archived'),
-        ],
-        compute='_compute_operational_state',
-        string='Operational State',
-    )
 
     @api.depends('code')
     def _compute_route_path(self):
@@ -242,15 +237,36 @@ class WebhookEndpoint(models.Model):
                 ('state', '=', 'rejected'),
             ])
 
-    @api.depends('active', 'is_paused')
-    def _compute_operational_state(self):
+
+    @api.model
+    def _normalize_path_vals(self, vals):
+        normalized_vals = dict(vals)
+        if 'code' in normalized_vals and normalized_vals.get('code') is not False:
+            normalized_vals['code'] = str(normalized_vals['code']).strip().strip('/')
+        return normalized_vals
+
+    @api.constrains('code')
+    def _check_path_configuration(self):
         for endpoint in self:
-            if not endpoint.active:
-                endpoint.operational_state = 'archived'
-            elif endpoint.is_paused:
-                endpoint.operational_state = 'paused'
-            else:
-                endpoint.operational_state = 'live'
+            if not endpoint.code:
+                continue
+            if '/' in endpoint.code:
+                raise ValidationError(_('Inbound endpoint paths must be a single URL path segment without slashes.'))
+            if any(character.isspace() for character in endpoint.code):
+                raise ValidationError(_('Inbound endpoint paths cannot contain whitespace.'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        normalized_vals_list = [self._normalize_path_vals(vals) for vals in vals_list]
+        return super().create(normalized_vals_list)
+
+    def write(self, vals):
+        normalized_vals = self._normalize_path_vals(vals)
+        if 'code' in normalized_vals:
+            for endpoint in self:
+                if endpoint.id and endpoint.code and normalized_vals['code'] != endpoint.code:
+                    raise ValidationError(_('Inbound endpoint paths cannot be changed after the endpoint is created.'))
+        return super().write(normalized_vals)
 
     @api.constrains('execution_user_id', 'company_id')
     def _check_execution_user_configuration(self):
@@ -342,7 +358,7 @@ class WebhookEndpoint(models.Model):
 
     @api.model
     def _find_active_endpoint_by_code(self, code):
-        return self.search([('code', '=', code), ('active', '=', True)], limit=1)
+        return self.search([('code', '=', code), ('state', '=', 'active')], limit=1)
 
     def _normalize_headers(self, headers):
         normalized = {}
@@ -662,8 +678,10 @@ class WebhookEndpoint(models.Model):
 
     def _validate_inbound_request(self, body, headers, payload, metadata):
         self.ensure_one()
-        if self.is_paused:
-            raise WebhookValidationError(_('Endpoint %s is paused and cannot accept webhook deliveries.') % self.display_name)
+        if self.state != 'active':
+            if self.state == 'draft':
+                raise WebhookValidationError(_('Endpoint %s is in draft and cannot accept webhook deliveries.') % self.display_name)
+            raise WebhookValidationError(_('Archived endpoint %s cannot accept webhook deliveries.') % self.display_name)
         if self.payload_contract == 'json_object' and not isinstance(payload, dict):
             raise WebhookPayloadValidationError(_('This endpoint requires a top-level JSON object payload.'))
         self._verify_signature(body, headers, payload, metadata)
@@ -674,7 +692,7 @@ class WebhookEndpoint(models.Model):
         if selector:
             handler = self.env['webhook.handler'].search([
                 ('code', '=', selector),
-                ('inbound_enabled', '=', True),
+                ('direction', '=', 'inbound'),
                 ('active', '=', True),
                 ('company_id', '=', self.company_id.id),
             ], limit=1)

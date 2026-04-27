@@ -1,9 +1,11 @@
+from odoo.exceptions import ValidationError
+
 from .common import WebhookRuleTestCase
 
 
 class TestInboundModelDrivenRules(WebhookRuleTestCase):
     def test_create_record_rule_creates_target_record_and_execution_log(self):
-        handler = self._create_handler(inbound_enabled=True, outbound_enabled=False)
+        handler = self._create_handler(direction='inbound')
         endpoint = self._create_inbound_endpoint(handler=handler)
 
         rule = self.env['webhook.handler.inbound.rule'].create({
@@ -60,7 +62,7 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
             'name': 'Old Name',
             'ref': 'EXT-UPSERT-1',
         })
-        handler = self._create_handler(inbound_enabled=True, outbound_enabled=False)
+        handler = self._create_handler(direction='inbound')
         endpoint = self._create_inbound_endpoint(handler=handler)
 
         rule = self.env['webhook.handler.inbound.rule'].create({
@@ -108,3 +110,17 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
         self.assertEqual(updated_partner.name, 'New Name')
         self.assertEqual(self.env['res.partner'].search_count([('ref', '=', 'EXT-UPSERT-1')]), 1)
         self.assertEqual(event.rule_execution_ids.record_reference, f'res.partner:{existing_partner.id}')
+
+    def test_inbound_endpoint_path_is_immutable(self):
+        endpoint = self._create_inbound_endpoint(code='immutable-path')
+
+        with self.assertRaisesRegex(ValidationError, 'cannot be changed'):
+            endpoint.write({'code': 'changed-path'})
+
+    def test_outbound_handler_cannot_execute_inbound_event(self):
+        handler = self._create_handler(direction='outbound')
+        endpoint = self._create_inbound_endpoint()
+        event = self._create_inbound_event(endpoint)
+
+        with self.assertRaisesRegex(ValidationError, 'cannot process inbound'):
+            handler.execute_inbound(event)
