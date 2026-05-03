@@ -62,7 +62,9 @@ class ConnectorBackend(models.AbstractModel):
 
     def _ensure_webhook_link(self, field_name):
         self.ensure_one()
-        if not getattr(self, field_name) and hasattr(self, "_sync_webhook_configuration"):
+        if not getattr(self, field_name) and hasattr(
+            self, "_sync_webhook_configuration"
+        ):
             self._sync_webhook_configuration()
         return getattr(self, field_name)
 
