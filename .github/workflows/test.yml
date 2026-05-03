@@ -66,10 +66,23 @@ jobs:
             queue_job
           sparse-checkout-cone-mode: true
           persist-credentials: false
+      - name: Checkout connector fork
+        uses: actions/checkout@v4
+        with:
+          repository: bitwise-hq/odoo-oca-connector
+          ref: "19.0"
+          path: deps/odoo-oca-connector
+          fetch-depth: 1
+          sparse-checkout: |
+            connector
+          sparse-checkout-cone-mode: true
+          persist-credentials: false
       - name: Preinstall unreleased addon dependencies
         run: |
           git config --global --add safe.directory $PWD/deps/odoo-oca-queue
+          git config --global --add safe.directory $PWD/deps/odoo-oca-connector
           python -m pip install ./deps/odoo-oca-queue/queue_job
+          python -m pip install ./deps/odoo-oca-connector/connector
       - name: Install addons and dependencies
         run: oca_install_addons
       - name: Check licenses
