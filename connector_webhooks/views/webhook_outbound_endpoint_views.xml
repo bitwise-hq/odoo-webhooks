@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_webhook_outbound_endpoint_list_connector_backend" model="ir.ui.view">
+    <field name="name">webhook.outbound.endpoint.list.connector.backend</field>
+    <field name="model">webhook.outbound.endpoint</field>
+    <field name="inherit_id" ref="webhooks.view_webhook_outbound_endpoint_list" />
+    <field name="arch" type="xml">
+      <xpath expr="//list/field[@name='partner_id']" position="after">
+        <field name="connector_backend_ref" string="Backend" />
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_webhook_outbound_endpoint_form_connector_backend" model="ir.ui.view">
+    <field name="name">webhook.outbound.endpoint.form.connector.backend</field>
+    <field name="model">webhook.outbound.endpoint</field>
+    <field name="inherit_id" ref="webhooks.view_webhook_outbound_endpoint_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//group[@string='Scope']/group" position="inside">
+        <field name="connector_backend_ref" />
+      </xpath>
+    </field>
+  </record>
+</odoo>
