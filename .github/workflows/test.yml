@@ -74,15 +74,19 @@ jobs:
           path: deps/odoo-oca-connector
           fetch-depth: 1
           sparse-checkout: |
+            component
+            component_event
             connector
           sparse-checkout-cone-mode: true
           persist-credentials: false
+      - name: Configure external addon paths
+        run: |
+          echo "ADDONS_PATH=$ADDONS_PATH,$PWD/deps/odoo-oca-queue,$PWD/deps/odoo-oca-connector" >> $GITHUB_ENV
       - name: Preinstall unreleased addon dependencies
         run: |
           git config --global --add safe.directory $PWD/deps/odoo-oca-queue
           git config --global --add safe.directory $PWD/deps/odoo-oca-connector
-          python -m pip install ./deps/odoo-oca-queue/queue_job
-          python -m pip install ./deps/odoo-oca-connector/connector
+          python -m pip install cachetools
       - name: Install addons and dependencies
         run: oca_install_addons
       - name: Check licenses
