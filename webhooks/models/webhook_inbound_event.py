@@ -28,7 +28,7 @@ class WebhookInboundEvent(models.Model):
         default=lambda self: self.env._("Inbound Webhook Event"),
     )
     endpoint_id = fields.Many2one(
-        "webhook.endpoint",
+        "webhook.inbound.endpoint",
         required=True,
         ondelete="cascade",
         index=True,

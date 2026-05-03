@@ -69,7 +69,7 @@ class WebhookRuleTestCase(TransactionCase):
             "replay_identity_policy": values.pop("replay_identity_policy", "none"),
         }
         create_vals.update(values)
-        return self.env["webhook.endpoint"].create(create_vals)
+        return self.env["webhook.inbound.endpoint"].create(create_vals)
 
     def _create_outbound_endpoint(self, *, handler=False, **values):
         token = self._next_token("outbound_endpoint")

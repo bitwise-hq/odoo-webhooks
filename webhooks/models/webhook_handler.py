@@ -67,7 +67,9 @@ class WebhookHandler(models.Model):
         help="Method called on the configured model when execution mode is Python Callback.",
     )
     note = fields.Text()
-    endpoint_ids = fields.One2many("webhook.endpoint", "handler_id", string="Endpoints")
+    endpoint_ids = fields.One2many(
+        "webhook.inbound.endpoint", "handler_id", string="Endpoints"
+    )
     inbound_rule_ids = fields.One2many(
         "webhook.handler.inbound.rule",
         "handler_id",

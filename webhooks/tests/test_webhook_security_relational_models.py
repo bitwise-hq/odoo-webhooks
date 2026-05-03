@@ -165,7 +165,7 @@ class TestWebhookSecurityRelationalModels(WebhookEndpointTestCase):
             "webhook.handler.inbound.rule.condition": inbound_condition,
             "webhook.handler.inbound.rule.lookup": inbound_lookup,
             "webhook.handler.inbound.rule.assignment": inbound_assignment,
-            "webhook.endpoint": inbound_endpoint,
+            "webhook.inbound.endpoint": inbound_endpoint,
             "webhook.endpoint.source": source,
             "webhook.endpoint.semantic.binding": binding,
             "webhook.endpoint.signature.part": signature_part,

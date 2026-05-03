@@ -25,7 +25,7 @@ the handler.
        }
    )
 
-   endpoint = self.env["webhook.endpoint"].create(
+    endpoint = self.env["webhook.inbound.endpoint"].create(
        {
            "name": "Shop Orders Endpoint",
            "path": "shop-orders",

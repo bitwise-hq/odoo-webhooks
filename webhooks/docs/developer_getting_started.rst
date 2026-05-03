@@ -23,7 +23,7 @@ Core developer model
 
 As a developer, you will usually work with these layers:
 
-* ``webhook.endpoint`` for inbound configuration
+* ``webhook.inbound.endpoint`` for inbound configuration
 * ``webhook.handler`` for execution strategy
 * inbound rule families for model-driven business actions
 * ``webhook.outbound.endpoint`` for outbound targets

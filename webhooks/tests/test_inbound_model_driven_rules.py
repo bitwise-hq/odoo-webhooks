@@ -156,10 +156,14 @@ class TestInboundModelDrivenRules(WebhookRuleTestCase):
         active_endpoint = self._create_inbound_endpoint(path="lookup-active")
         self._create_inbound_endpoint(path="lookup-draft", state="draft")
 
-        found_endpoint = self.env["webhook.endpoint"]._find_active_endpoint_by_path(
+        found_endpoint = self.env[
+            "webhook.inbound.endpoint"
+        ]._find_active_endpoint_by_path(
             "lookup-active"
         )
-        missing_endpoint = self.env["webhook.endpoint"]._find_active_endpoint_by_path(
+        missing_endpoint = self.env[
+            "webhook.inbound.endpoint"
+        ]._find_active_endpoint_by_path(
             "lookup-draft"
         )
 

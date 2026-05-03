@@ -25,7 +25,7 @@ Core model families
 -------------------
 
 Configuration models
-  ``webhook.endpoint``, ``webhook.endpoint.source``,
+  ``webhook.inbound.endpoint``, ``webhook.endpoint.source``,
   ``webhook.endpoint.semantic.binding``,
   ``webhook.endpoint.signature.part``, ``webhook.handler``,
   ``webhook.outbound.endpoint``, and the relational child rule models.

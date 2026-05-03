@@ -18,7 +18,7 @@ class WebhookEndpointSignaturePart(models.Model):
     ]
 
     endpoint_id = fields.Many2one(
-        "webhook.endpoint",
+        "webhook.inbound.endpoint",
         required=True,
         ondelete="cascade",
         index=True,

@@ -90,7 +90,7 @@
     </record>
 
     <!-- Basic company-scoped object endpoint: X-Delivery-Id header + event_id in payload. -->
-    <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+    <record id="webhook_demo_endpoint_orders" model="webhook.inbound.endpoint">
       <field name="name">Demo Orders Endpoint</field>
       <field name="path">demo-orders</field>
       <field name="company_id" ref="base.main_company" />
@@ -165,13 +165,13 @@
       <field name="value_key">topic</field>
     </record>
 
-    <record id="webhook_demo_endpoint_orders" model="webhook.endpoint">
+    <record id="webhook_demo_endpoint_orders" model="webhook.inbound.endpoint">
       <field name="delivery_identity_policy">delivery_id</field>
       <field name="replay_identity_policy">event_id</field>
     </record>
 
     <!-- Partner-scoped signed endpoint: raw-body SHA256 HMAC in X-Signature, no freshness window. -->
-    <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+    <record id="webhook_demo_endpoint_signed_partner" model="webhook.inbound.endpoint">
       <field name="name">Demo Signed Partner Endpoint</field>
       <field name="path">demo-signed-partner</field>
       <field name="company_id" ref="base.main_company" />
@@ -266,7 +266,7 @@
       <field name="value_key">topic</field>
     </record>
 
-    <record id="webhook_demo_endpoint_signed_partner" model="webhook.endpoint">
+    <record id="webhook_demo_endpoint_signed_partner" model="webhook.inbound.endpoint">
       <field name="delivery_identity_policy">idempotency_key</field>
       <field name="replay_identity_policy">event_id</field>
       <field name="signature_verification_mode">hmac</field>
@@ -274,7 +274,7 @@
     </record>
 
     <!-- JSON-value, store-only endpoint: body SHA256 dedupe, no handler, literal topic. -->
-    <record id="webhook_demo_endpoint_any_json" model="webhook.endpoint">
+    <record id="webhook_demo_endpoint_any_json" model="webhook.inbound.endpoint">
       <field name="name">Demo Any JSON Store-Only Endpoint</field>
       <field name="path">demo-any-json</field>
       <field name="company_id" ref="base.main_company" />

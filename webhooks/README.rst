@@ -35,7 +35,7 @@ evidence only. They are not the supported authoring surface.
 Core concepts
 -------------
 
-* ``webhook.endpoint`` receives inbound HTTP traffic on an immutable public path
+* ``webhook.inbound.endpoint`` receives inbound HTTP traffic on an immutable public path
 * ``webhook.outbound.endpoint`` defines where outbound deliveries are sent
 * ``webhook.handler`` chooses between model-driven rules and Python callbacks
 * source lines resolve raw request data into reusable keys

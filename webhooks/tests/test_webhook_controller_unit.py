@@ -65,10 +65,10 @@ class TestWebhookControllerUnit(WebhookRuleTestCase):
         request_env = FakeRequestEnv(
             {"lang": "en_US", "test_flag": True},
             [
-                FakeIndexedEnv({"webhook.endpoint": lookup_model}),
+                FakeIndexedEnv({"webhook.inbound.endpoint": lookup_model}),
                 FakeIndexedEnv(
                     {
-                        "webhook.endpoint": endpoint_model,
+                        "webhook.inbound.endpoint": endpoint_model,
                         "webhook.inbound.event": event_model,
                     }
                 ),
