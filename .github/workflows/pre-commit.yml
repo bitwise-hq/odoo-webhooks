@@ -4,10 +4,12 @@ on:
   pull_request:
     branches:
       - main
+      - "17.0*"
       - "18.0*"
   push:
     branches:
       - main
+      - "17.0*"
       - "18.0*"
 
 jobs:
