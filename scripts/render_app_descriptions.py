@@ -185,10 +185,7 @@ def _render_guide_rst_to_html(
     }
 
     def _p(text: str) -> str:
-        return (
-            f'      <p style="color:{BRAND_INK}; font-family:\'IBM Plex Sans\',sans-serif;'
-            f' font-size:15px; line-height:1.7; margin:0 0 12px;">{_strip_rst(text)}</p>'
-        )
+        return f"      <p style=\"color:{BRAND_INK}; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;\">{_strip_rst(text)}</p>"
 
     while i < n:
         line = lines[i]
@@ -205,16 +202,13 @@ def _render_guide_rst_to_html(
                 char = nxt[0]
                 tag, color, size = _HEADING_STYLE.get(char, ("h4", BRAND_SLATE, "15px"))
                 text = _strip_rst(line.strip())
-                html_parts.append(
-                    f'      <{tag} style="color:{color}; font-family:\'Space Grotesk\',sans-serif;'
-                    f' font-size:{size}; font-weight:600; margin:28px 0 10px;">{text}</{tag}>'
-                )
+                html_parts.append(f"      <{tag} style=\"color:{color}; font-family:'Space Grotesk',sans-serif; font-size:{size}; font-weight:600; margin:28px 0 10px;\">{text}</{tag}>")
                 i += 2
                 continue
 
         # -- image directive: render as <img>, adjusting addon-relative path ----
         if line.strip().startswith(".. image::"):
-            src = line.strip()[len(".. image::"):].strip()
+            src = line.strip()[len(".. image::") :].strip()
             # Guide RST files use ../static/description/ prefix; strip it so the
             # path is relative to static/description/index.html at render time.
             src = re.sub(r"^\.\./static/description/", "", src)
@@ -227,11 +221,7 @@ def _render_guide_rst_to_html(
                 i += 1
             if skip_image_srcs and src in skip_image_srcs:
                 continue
-            html_parts.append(
-                f'      <div style="text-align:center; margin:24px 0;">'
-                f'<img src="{html.escape(src)}" alt="{alt}"'
-                f' style="max-width:100%; height:auto; border-radius:6px;"/></div>'
-            )
+            html_parts.append(f'      <div style="text-align:center; margin:24px 0;"><img src="{html.escape(src)}" alt="{alt}" style="max-width:100%; height:auto; border-radius:6px;"/></div>')
             continue
 
         # -- other directives (skip block) ------------------------------------
@@ -258,14 +248,8 @@ def _render_guide_rst_to_html(
                     break
                 else:
                     break
-            lis = "\n".join(
-                f'        <li style="margin-bottom:6px;">{_strip_rst(item)}</li>' for item in items
-            )
-            html_parts.append(
-                f'      <ul style="color:{BRAND_INK}; font-family:\'IBM Plex Sans\',sans-serif;'
-                f' font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">\n'
-                f"{lis}\n      </ul>"
-            )
+            lis = "\n".join(f'        <li style="margin-bottom:6px;">{_strip_rst(item)}</li>' for item in items)
+            html_parts.append(f"      <ul style=\"color:{BRAND_INK}; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;\">\n{lis}\n      </ul>")
             continue
 
         # -- numbered list -----------------------------------------------------
@@ -285,14 +269,8 @@ def _render_guide_rst_to_html(
                     break
                 else:
                     break
-            lis = "\n".join(
-                f'        <li style="margin-bottom:8px;">{_strip_rst(item)}</li>' for item in items
-            )
-            html_parts.append(
-                f'      <ol style="color:{BRAND_INK}; font-family:\'IBM Plex Sans\',sans-serif;'
-                f' font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">\n'
-                f"{lis}\n      </ol>"
-            )
+            lis = "\n".join(f'        <li style="margin-bottom:8px;">{_strip_rst(item)}</li>' for item in items)
+            html_parts.append(f"      <ol style=\"color:{BRAND_INK}; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;\">\n{lis}\n      </ol>")
             continue
 
         # -- paragraph (may end with :: intro for a code block) ----------------
@@ -305,7 +283,7 @@ def _render_guide_rst_to_html(
             i += 1
             continue
 
-        full_text = " ".join(l.strip() for l in para_lines)
+        full_text = " ".join(line.strip() for line in para_lines)
 
         if full_text.rstrip().endswith("::"):
             # Code block: intro paragraph + indented block
@@ -328,16 +306,14 @@ def _render_guide_rst_to_html(
             while code_lines and not code_lines[-1]:
                 code_lines.pop()
             # remove common indentation
-            indented = [l for l in code_lines if l.strip()]
+            indented = [line for line in code_lines if line.strip()]
             if indented:
-                min_ind = min(len(l) - len(l.lstrip()) for l in indented)
-                code_lines = [l[min_ind:] if l.strip() else "" for l in code_lines]
+                min_ind = min(len(line) - len(line.lstrip()) for line in indented)
+                code_lines = [line[min_ind:] if line.strip() else "" for line in code_lines]
             code_content = html.escape("\n".join(code_lines)).replace("\u2014", "-").replace("\u2013", "-").replace("\u2192", "->")
             if intro:
                 html_parts.append(_p(intro))
-            html_parts.append(
-                f"      <pre>{code_content}</pre>"
-            )
+            html_parts.append(f"      <pre>{code_content}</pre>")
         else:
             html_parts.append(_p(full_text))
 
@@ -354,14 +330,14 @@ def _render_guide_rst_to_html(
 
 
 def _copy_banners(repo_root: Path) -> None:
-  banner_root = repo_root / "assets" / "banners"
-  for addon in BANNER_ADDONS:
-    source = banner_root / f"{addon}.png"
-    if not source.exists():
-      raise FileNotFoundError(f"Missing banner asset: {source}")
-    target = repo_root / addon / "static" / "description" / "banner.png"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, target)
+    banner_root = repo_root / "assets" / "banners"
+    for addon in BANNER_ADDONS:
+        source = banner_root / f"{addon}.png"
+        if not source.exists():
+            raise FileNotFoundError(f"Missing banner asset: {source}")
+        target = repo_root / addon / "static" / "description" / "banner.png"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
 
 
 def _copy_covers(repo_root: Path) -> None:

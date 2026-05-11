@@ -415,9 +415,7 @@ def _require_pillow() -> None:
         raise RuntimeError("Pillow is required for banner text rendering. Install with `pip install pillow`.")
 
 
-def _apply_font_variations(
-    font: "ImageFont.FreeTypeFont", wght: int | None = None, wdth: int | None = None
-) -> None:
+def _apply_font_variations(font: "ImageFont.FreeTypeFont", wght: int | None = None, wdth: int | None = None) -> None:
     if not hasattr(font, "get_variation_axes"):
         return
     axes = font.get_variation_axes()
@@ -433,9 +431,7 @@ def _apply_font_variations(
     font.set_variation_by_axes(values)
 
 
-def _load_font(
-    font_path: Path, size: int, *, wght: int | None = None, wdth: int | None = None
-) -> "ImageFont.FreeTypeFont":
+def _load_font(font_path: Path, size: int, *, wght: int | None = None, wdth: int | None = None) -> "ImageFont.FreeTypeFont":
     _require_pillow()
     font = ImageFont.truetype(str(font_path), size=size)
     _apply_font_variations(font, wght=wght, wdth=wdth)
@@ -446,9 +442,7 @@ def _line_gap(font: "ImageFont.FreeTypeFont") -> int:
     return max(2, int(round(font.size * 0.12)))
 
 
-def _text_bbox(
-    draw: "ImageDraw.ImageDraw", text: str, font: "ImageFont.FreeTypeFont"
-) -> tuple[int, int, int, int]:
+def _text_bbox(draw: "ImageDraw.ImageDraw", text: str, font: "ImageFont.FreeTypeFont") -> tuple[int, int, int, int]:
     if "\n" not in text:
         if hasattr(draw, "textbbox"):
             return draw.textbbox((0, 0), text, font=font)
@@ -728,9 +722,7 @@ def resolve_repo_root() -> Path:
 def resolve_banner_font(repo_root: Path) -> Path:
     font_path = repo_root / "assets" / "fonts" / "space-grotesk" / "SpaceGrotesk[wght].ttf"
     if not font_path.exists():
-        raise FileNotFoundError(
-            "Banner font not found. Expected assets/fonts/space-grotesk/SpaceGrotesk[wght].ttf"
-        )
+        raise FileNotFoundError("Banner font not found. Expected assets/fonts/space-grotesk/SpaceGrotesk[wght].ttf")
     return font_path
 
 
