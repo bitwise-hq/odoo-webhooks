@@ -22,10 +22,13 @@ class WebhookOutboundEndpoint(models.Model):
         help=("Stable per-spec identifier shipped by connector addon XML data (e.g. ``customer-create``). When the endpoint is linked to a connector backend the effective ``code`` is derived as ``<backend-prefix>-<code_suffix>`` so multiple backends of the same connector can coexist in one database."),
     )
 
-    _connector_backend_code_suffix_uniq = models.Constraint(
-        "unique(connector_backend_ref, code_suffix)",
-        "An outbound endpoint code suffix must be unique per connector backend.",
-    )
+    _sql_constraints = [
+        (
+            "connector_backend_code_suffix_uniq",
+            "unique(connector_backend_ref, code_suffix)",
+            "An outbound endpoint code suffix must be unique per connector backend.",
+        ),
+    ]
 
     @api.constrains("connector_backend_ref", "company_id")
     def _check_connector_backend_company(self):

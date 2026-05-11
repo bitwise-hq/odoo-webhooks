@@ -22,8 +22,6 @@
     "author": "Bitwise Technologies LLC",
     "contributors": ["Youssef Egla"],
     "license": "OPL-1",
-    "price": 0.0,
-    "currency": "USD",
     "images": ["static/description/banner.png", "static/description/icon.png"],
     "installable": True,
 }

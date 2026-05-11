@@ -25,10 +25,13 @@ class WebhookInboundEndpointSemanticBinding(models.Model):
     _order = "semantic_name, id"
     _check_company_auto = True
 
-    _endpoint_semantic_uniq = models.Constraint(
-        "unique(endpoint_id, semantic_name)",
-        "Each semantic can be bound only once per endpoint.",
-    )
+    _sql_constraints = [
+        (
+            "endpoint_semantic_uniq",
+            "unique(endpoint_id, semantic_name)",
+            "Each semantic can be bound only once per endpoint.",
+        ),
+    ]
 
     endpoint_id = fields.Many2one(
         "bwt.webhook.inbound.endpoint",

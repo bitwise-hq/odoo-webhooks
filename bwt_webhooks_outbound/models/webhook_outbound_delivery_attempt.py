@@ -12,10 +12,13 @@ class WebhookOutboundDeliveryAttempt(models.Model):
     _order = "attempt_number desc, id desc"
     _check_company_auto = True
 
-    _delivery_attempt_number_uniq = models.Constraint(
-        "unique(delivery_id, attempt_number)",
-        "Each outbound delivery attempt number must be unique within the delivery.",
-    )
+    _sql_constraints = [
+        (
+            "delivery_attempt_number_uniq",
+            "unique(delivery_id, attempt_number)",
+            "Each outbound delivery attempt number must be unique within the delivery.",
+        ),
+    ]
 
     name = fields.Char(
         required=True,

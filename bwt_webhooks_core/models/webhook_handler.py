@@ -9,10 +9,9 @@ class WebhookHandler(models.Model):
     _order = "name, id"
     _check_company_auto = True
 
-    _code_uniq = models.Constraint(
-        "unique(code)",
-        "The webhook handler code must be unique.",
-    )
+    _sql_constraints = [
+        ("code_uniq", "unique(code)", "The webhook handler code must be unique."),
+    ]
 
     _DIRECTION_SELECTION = [
         ("inbound", "Inbound"),

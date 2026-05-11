@@ -92,10 +92,9 @@ class WebhookInboundEndpoint(models.Model):
     _REPLAY_IDENTITY_POLICY_SELECTION = REPLAY_IDENTITY_POLICY_SELECTION
     _STATE_SELECTION = ENDPOINT_STATE_SELECTION
 
-    _path_uniq = models.Constraint(
-        "unique(path)",
-        "The inbound webhook path must be unique.",
-    )
+    _sql_constraints = [
+        ("path_uniq", "unique(path)", "The inbound webhook path must be unique."),
+    ]
 
     # -- Fields --------------------------------------------------------------
 

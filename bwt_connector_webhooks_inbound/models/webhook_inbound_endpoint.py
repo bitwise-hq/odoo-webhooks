@@ -7,10 +7,13 @@ from odoo.exceptions import ValidationError
 class WebhookInboundEndpoint(models.Model):
     _inherit = "bwt.webhook.inbound.endpoint"
 
-    _connector_backend_ref_uniq = models.Constraint(
-        "unique(connector_backend_ref)",
-        "A connector backend can only be linked to one inbound webhook endpoint.",
-    )
+    _sql_constraints = [
+        (
+            "connector_backend_ref_uniq",
+            "unique(connector_backend_ref)",
+            "A connector backend can only be linked to one inbound webhook endpoint.",
+        ),
+    ]
 
     connector_backend_ref = fields.Reference(
         selection=lambda self: self.env["connector.backend"]._selection_connector_webhook_backend_models(),

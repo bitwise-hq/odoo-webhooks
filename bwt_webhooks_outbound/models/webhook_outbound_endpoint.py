@@ -29,10 +29,9 @@ class WebhookOutboundEndpoint(models.Model):
         ("archived", "Archived"),
     ]
 
-    _code_uniq = models.Constraint(
-        "unique(code)",
-        "The outbound webhook endpoint code must be unique.",
-    )
+    _sql_constraints = [
+        ("code_uniq", "unique(code)", "The outbound webhook endpoint code must be unique."),
+    ]
 
     name = fields.Char(required=True)
     code = fields.Char(required=True, copy=False, index=True)

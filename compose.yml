@@ -30,7 +30,7 @@ services:
   # ---------------------------------------------------------------------------
   test:
     profiles: [test]
-    image: ghcr.io/oca/oca-ci/py3.12-odoo18.0:latest
+    image: ghcr.io/oca/oca-ci/py3.10-odoo18.0:latest
     pull_policy: missing
     depends_on:
       postgres:
@@ -58,18 +58,21 @@ services:
       - -c
       - |
         set -e
+        # Capture all test output into a repo-local log file.
+        exec > >(tee -a "/mnt/repo/test.log") 2>&1
         # Reset odoo.cfg to avoid duplicate addons_path lines confusing manifestoo
         printf "[options]\n" > /etc/odoo.cfg
+        echo "without_demo=all" >> /etc/odoo.cfg
         rm -f test-constraints.txt test-requirements.txt
         pip install --quiet cachetools
-        export ADDONS_PATH="${ADDONS_PATH:+${ADDONS_PATH},}/mnt/deps/queue,/mnt/deps/connector"
+        export ADDONS_PATH="${ADDONS_PATH:+${ADDONS_PATH},}/mnt/deps/queue,/mnt/deps/connector,/opt/odoo/odoo/addons,/opt/odoo/addons"
         oca_install_addons
         dropdb --if-exists "$$PGDATABASE"
         # queue_job and connector are runtime deps but intentionally NOT in
         # depends/ for Apps Store compatibility; pre-install them so the
         # pre_init_hook checks pass when our addons load.
         odoo -d "$$PGDATABASE" -i queue_job,connector --stop-after-init \
-            --with-demo --http-interface=127.0.0.1
+            --http-interface=127.0.0.1
         oca_init_test_database
         oca_run_tests
         python -m coverage html -d /mnt/repo/htmlcov
@@ -83,7 +86,7 @@ services:
   # ---------------------------------------------------------------------------
   odoo:
     profiles: [dev]
-    image: ghcr.io/oca/oca-ci/py3.12-odoo18.0:latest
+    image: ghcr.io/oca/oca-ci/py3.10-odoo18.0:latest
     pull_policy: missing
     restart: unless-stopped
     depends_on:

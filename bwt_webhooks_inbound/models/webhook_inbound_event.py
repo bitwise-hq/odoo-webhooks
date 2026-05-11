@@ -29,10 +29,13 @@ class WebhookInboundEvent(models.Model):
     _order = "received_at desc, id desc"
     _check_company_auto = True
 
-    _endpoint_dedupe_uniq = models.Constraint(
-        "unique(endpoint_id, delivery_identity_key)",
-        "The webhook delivery has already been stored for this endpoint.",
-    )
+    _sql_constraints = [
+        (
+            "endpoint_dedupe_uniq",
+            "unique(endpoint_id, delivery_identity_key)",
+            "The webhook delivery has already been stored for this endpoint.",
+        ),
+    ]
 
     name = fields.Char(
         required=True,
