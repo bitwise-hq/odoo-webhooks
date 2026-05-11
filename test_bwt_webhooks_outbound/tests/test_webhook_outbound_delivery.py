@@ -316,9 +316,7 @@ class TestDeliveryQueueJobObservability(WebhookTestCase):
         identity_key = delivery.queue_job_identity_key
         self.assertTrue(identity_key)
         QueueJob = self.env["queue.job"]
-        job_a = QueueJob.with_context(
-            _job_edit_sentinel=QueueJob.EDIT_SENTINEL
-        ).create(
+        job_a = QueueJob.with_context(_job_edit_sentinel=QueueJob.EDIT_SENTINEL).create(
             {
                 "uuid": "out-job-a-%s" % delivery.id,
                 "identity_key": identity_key,
@@ -328,9 +326,7 @@ class TestDeliveryQueueJobObservability(WebhookTestCase):
                 "func_string": "d.process_delivery()",
             }
         )
-        job_b = QueueJob.with_context(
-            _job_edit_sentinel=QueueJob.EDIT_SENTINEL
-        ).create(
+        job_b = QueueJob.with_context(_job_edit_sentinel=QueueJob.EDIT_SENTINEL).create(
             {
                 "uuid": "out-job-b-%s" % delivery.id,
                 "identity_key": identity_key,
