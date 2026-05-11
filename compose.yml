@@ -30,8 +30,8 @@ services:
   # ---------------------------------------------------------------------------
   test:
     profiles: [test]
-    image: bitwise-odoo:ee-19
-    pull_policy: never
+    image: ghcr.io/oca/oca-ci/py3.12-odoo18.0:latest
+    pull_policy: missing
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,8 +83,8 @@ services:
   # ---------------------------------------------------------------------------
   odoo:
     profiles: [dev]
-    image: bitwise-odoo:ee-19
-    pull_policy: never
+    image: ghcr.io/oca/oca-ci/py3.12-odoo18.0:latest
+    pull_policy: missing
     restart: unless-stopped
     depends_on:
       postgres:

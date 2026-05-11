@@ -1,7 +1,7 @@
 Odoo Webhooks
 =============
 
-This repository contains the ``webhooks`` family of addons for Odoo 19.0.
+This repository contains the ``webhooks`` family of addons for Odoo 18.0.
 
 The addon provides a generic inbound and outbound webhook framework for Odoo,
 with relational configuration for endpoints, handlers, rules, security scope,
