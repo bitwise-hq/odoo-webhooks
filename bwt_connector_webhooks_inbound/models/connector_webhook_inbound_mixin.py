@@ -14,7 +14,7 @@ addon (e.g. ``bwt_stripe_core``); this mixin does not create or update
 ``bwt.webhook.inbound.endpoint`` rows.
 """
 
-from odoo import fields, models
+from odoo import fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -69,7 +69,7 @@ class ConnectorWebhookInboundMixin(models.AbstractModel):
         self.ensure_one()
         endpoint = self.webhook_endpoint_id
         if not endpoint:
-            raise ValidationError(self.env._("No inbound webhook endpoint is linked to this backend."))
+            raise ValidationError(_("No inbound webhook endpoint is linked to this backend."))
         action = self.env.ref("bwt_webhooks_inbound.action_webhook_endpoint").read()[0]
         action.update(
             {

@@ -8,14 +8,14 @@
       <notebook name="rules" position="inside">
         <page string="Inbound Rules" invisible="direction != 'inbound'">
           <field name="inbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
-            <list editable="bottom">
+            <tree editable="bottom">
               <field name="sequence" />
               <field name="active" />
               <field name="name" />
               <field name="action_type" />
               <field name="target_model_name" />
               <field name="retry_seconds" />
-            </list>
+            </tree>
             <form>
               <sheet>
                 <group>
@@ -36,47 +36,47 @@
                 <notebook>
                   <page string="Conditions">
                     <field name="condition_ids" nolabel="1">
-                      <list editable="bottom">
+                      <tree editable="bottom">
                         <field name="sequence" />
                         <field name="source_kind" />
                         <field name="source_expression" />
                         <field name="operator" />
                         <field name="expected_value" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                   <page string="Lookup Keys" invisible="action_type not in ['update_record', 'upsert_record']">
                     <field name="lookup_ids" nolabel="1">
-                      <list editable="bottom">
+                      <tree editable="bottom">
                         <field name="sequence" />
                         <field name="target_field_name" />
                         <field name="source_kind" />
                         <field name="source_expression" />
                         <field name="literal_value" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                   <page string="Assignments" invisible="action_type not in ['create_record', 'update_record', 'upsert_record']">
                     <field name="assignment_ids" nolabel="1">
-                      <list editable="bottom">
+                      <tree editable="bottom">
                         <field name="sequence" />
                         <field name="target_kind" />
                         <field name="target_expression" />
                         <field name="source_kind" />
                         <field name="source_expression" />
                         <field name="literal_value" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                   <page string="Executions">
                     <field name="execution_ids" nolabel="1" readonly="1">
-                      <list>
+                      <tree>
                         <field name="create_date" string="Executed" />
                         <field name="event_id" />
                         <field name="state" />
                         <field name="record_reference" />
                         <field name="note" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                 </notebook>

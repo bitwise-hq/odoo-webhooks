@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.models.const import INBOUND_ACTION_SELECTION
@@ -10,7 +10,7 @@ class WebhookInboundHandlerRule(models.Model):
     _order = "sequence, id"
     _check_company_auto = True
 
-    name = fields.Char(required=True, default=lambda self: self.env._("Inbound Rule"))
+    name = fields.Char(required=True, default=lambda self: _("Inbound Rule"))
     sequence = fields.Integer(required=True, default=10)
     active = fields.Boolean(default=True)
     handler_id = fields.Many2one(
@@ -53,6 +53,6 @@ class WebhookInboundHandlerRule(models.Model):
     def _check_rule_configuration(self):
         for rule in self:
             if rule.action_type == "retry" and rule.retry_seconds < 0:
-                raise ValidationError(self.env._("Retry delay must be zero or greater."))
+                raise ValidationError(_("Retry delay must be zero or greater."))
             if rule.action_type in ("create_record", "update_record", "upsert_record") and not rule.target_model_name:
-                raise ValidationError(self.env._("Target Model is required for record-creation and record-update rules."))
+                raise ValidationError(_("Target Model is required for record-creation and record-update rules."))

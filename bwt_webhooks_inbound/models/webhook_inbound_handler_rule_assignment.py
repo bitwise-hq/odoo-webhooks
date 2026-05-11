@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.models.const import (
@@ -42,4 +42,4 @@ class WebhookInboundHandlerRuleAssignment(models.Model):
     def _check_assignment_configuration(self):
         for assignment in self:
             if assignment.source_kind != "literal" and not assignment.source_expression:
-                raise ValidationError(self.env._("Assignment rows require Source Key unless the source kind is Literal."))
+                raise ValidationError(_("Assignment rows require Source Key unless the source kind is Literal."))

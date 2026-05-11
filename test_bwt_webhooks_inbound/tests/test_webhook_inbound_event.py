@@ -977,7 +977,10 @@ class TestInboundEventQueueJobObservabilityWithJobs(WebhookTestCase):
         event = self.factory.inbound_event(endpoint)
         identity_key = event.queue_job_identity_key
         self.assertTrue(identity_key)
-        job_a = self.env["queue.job"].create(
+        QueueJob = self.env["queue.job"]
+        job_a = QueueJob.with_context(
+            _job_edit_sentinel=QueueJob.EDIT_SENTINEL
+        ).create(
             {
                 "uuid": "job-a-%s" % event.id,
                 "identity_key": identity_key,
@@ -987,7 +990,9 @@ class TestInboundEventQueueJobObservabilityWithJobs(WebhookTestCase):
                 "func_string": "ev.process_event()",
             }
         )
-        job_b = self.env["queue.job"].create(
+        job_b = QueueJob.with_context(
+            _job_edit_sentinel=QueueJob.EDIT_SENTINEL
+        ).create(
             {
                 "uuid": "job-b-%s" % event.id,
                 "identity_key": identity_key,

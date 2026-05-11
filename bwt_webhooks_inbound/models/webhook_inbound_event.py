@@ -5,7 +5,7 @@ import traceback
 
 from psycopg2 import IntegrityError
 
-from odoo import SUPERUSER_ID, api, fields, models
+from odoo import SUPERUSER_ID, api, fields, models, _
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
 
@@ -39,7 +39,7 @@ class WebhookInboundEvent(models.Model):
 
     name = fields.Char(
         required=True,
-        default=lambda self: self.env._("Inbound Webhook Event"),
+        default=lambda self: _("Inbound Webhook Event"),
     )
     endpoint_id = fields.Many2one(
         "bwt.webhook.inbound.endpoint",
@@ -256,7 +256,7 @@ class WebhookInboundEvent(models.Model):
     def action_view_queue_jobs(self):
         self.ensure_one()
         action = self.env.ref("queue_job.action_queue_job").read()[0]
-        action["name"] = self.env._("Inbound Queue Jobs")
+        action["name"] = _("Inbound Queue Jobs")
         action["domain"] = self._get_queue_job_action_domain()
         return action
 
@@ -268,7 +268,7 @@ class WebhookInboundEvent(models.Model):
             return json.loads(body_text)
         except json.JSONDecodeError as err:
             if raise_on_invalid:
-                raise WebhookPayloadValidationError(self.env._("The webhook payload must be valid JSON.")) from err
+                raise WebhookPayloadValidationError(_("The webhook payload must be valid JSON.")) from err
             return False
 
     @api.model
@@ -317,7 +317,7 @@ class WebhookInboundEvent(models.Model):
         body_text = body.decode("utf-8", errors="replace")
         body_sha256 = hashlib.sha256(body).hexdigest()
         return {
-            "name": metadata.get("event_type") or metadata.get("topic") or endpoint.display_name or self.env._("Inbound Webhook Event"),
+            "name": metadata.get("event_type") or metadata.get("topic") or endpoint.display_name or _("Inbound Webhook Event"),
             "endpoint_id": endpoint.id,
             "handler_id": handler.id if handler else False,
             "company_id": endpoint.company_id.id,
@@ -387,7 +387,7 @@ class WebhookInboundEvent(models.Model):
                 replay_identity_key = False
                 replay_identity_source = False
         values = {
-            "name": self.env._("Rejected Webhook Request"),
+            "name": _("Rejected Webhook Request"),
             "endpoint_id": endpoint.id if endpoint else False,
             "handler_id": False,
             "company_id": endpoint.company_id.id if endpoint else self.env.company.id,
@@ -524,7 +524,7 @@ class WebhookInboundEvent(models.Model):
 
     def _queue_processing(self):
         if self.filtered(lambda event: event.state not in ("received", "error")):
-            raise ValidationError(self.env._("Only received or failed webhook events can be queued for processing."))
+            raise ValidationError(_("Only received or failed webhook events can be queued for processing."))
         for event in self:
             event.write({"processing_error": False})
             event.with_user(SUPERUSER_ID).with_delay(identity_key=event._get_queue_job_identity_key()).process_event()
@@ -536,7 +536,7 @@ class WebhookInboundEvent(models.Model):
     def action_reset_to_received(self):
         for event in self:
             if event.state not in ("error", "dead_letter"):
-                raise ValidationError(self.env._("Only failed or dead-letter webhook events can be reset to received."))
+                raise ValidationError(_("Only failed or dead-letter webhook events can be reset to received."))
             event.write(
                 {
                     "state": "received",
@@ -554,7 +554,7 @@ class WebhookInboundEvent(models.Model):
         if not matched_rule:
             return {
                 "status": "done",
-                "note": self.env._(
+                "note": _(
                     "No inbound model-driven rule matched on handler %(handler)s. The event was stored only.",
                     handler=handler.display_name,
                 ),
@@ -626,7 +626,7 @@ class WebhookInboundEvent(models.Model):
         elif rule.action_type == "update_record":
             if not target_record:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "No target record matched inbound update rule %(rule)s.",
                         rule=rule.display_name,
                     )
@@ -672,7 +672,7 @@ class WebhookInboundEvent(models.Model):
             return evaluate_condition(actual_value, condition.operator, condition.expected_value)
         except UnsupportedOperator as exc:
             raise ValidationError(
-                self.env._(
+                _(
                     "Unsupported inbound rule condition operator %(operator)s.",
                     operator=exc.operator,
                 )
@@ -712,7 +712,7 @@ class WebhookInboundEvent(models.Model):
                             {
                                 "state": "done",
                                 "processed_at": fields.Datetime.now(),
-                                "processing_note": self.env._("No handler was resolved. The event was stored only."),
+                                "processing_note": _("No handler was resolved. The event was stored only."),
                                 "processing_error": False,
                             }
                         )
@@ -758,7 +758,7 @@ class WebhookInboundEvent(models.Model):
                     }
                 )
                 raise RetryableJobError(
-                    note or self.env._("Retry requested by handler."),
+                    note or _("Retry requested by handler."),
                     seconds=result.get("seconds"),
                 )
             if status == "dead_letter":

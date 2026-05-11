@@ -5,7 +5,7 @@
     <field name="model">bwt.webhook.inbound.endpoint</field>
     <field name="inherit_id" ref="bwt_webhooks_inbound.view_webhook_endpoint_list" />
     <field name="arch" type="xml">
-      <xpath expr="//list/field[@name='handler_id']" position="after">
+      <xpath expr="//tree/field[@name='handler_id']" position="after">
         <field name="connector_backend_ref" string="Backend" />
       </xpath>
     </field>

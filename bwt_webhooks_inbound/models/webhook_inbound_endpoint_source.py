@@ -1,6 +1,6 @@
 import hashlib
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -131,17 +131,17 @@ class WebhookInboundEndpointSource(models.Model):
     def _check_source_configuration(self):
         for line in self:
             if not (line.field_name or "").strip():
-                raise ValidationError(self.env._("Source lines require a field key."))
+                raise ValidationError(_("Source lines require a field key."))
             if line.source_kind in ("header", "header_param") and not line.header_name:
-                raise ValidationError(self.env._("Header-based source lines require a header name."))
+                raise ValidationError(_("Header-based source lines require a header name."))
             if line.source_kind == "header_param" and not line.header_param_name:
-                raise ValidationError(self.env._("Structured header parameter lines require a parameter name."))
+                raise ValidationError(_("Structured header parameter lines require a parameter name."))
             if line.source_kind == "payload_path" and not line.payload_path:
-                raise ValidationError(self.env._("Payload path source lines require a payload path."))
+                raise ValidationError(_("Payload path source lines require a payload path."))
             if line.source_kind == "literal" and line.literal_value in (False, None):
-                raise ValidationError(self.env._("Literal source lines require a literal value."))
+                raise ValidationError(_("Literal source lines require a literal value."))
             if line.source_kind == "computed" and not line.computed_method:
-                raise ValidationError(self.env._("Computed source lines require a computed method name."))
+                raise ValidationError(_("Computed source lines require a computed method name."))
 
     @api.model
     def _normalize_vals(self, vals):

@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, _
 
 
 class WebhookInboundRuleExecution(models.Model):
@@ -9,7 +9,7 @@ class WebhookInboundRuleExecution(models.Model):
 
     name = fields.Char(
         required=True,
-        default=lambda self: self.env._("Inbound Rule Execution"),
+        default=lambda self: _("Inbound Rule Execution"),
     )
     event_id = fields.Many2one(
         "bwt.webhook.inbound.event",

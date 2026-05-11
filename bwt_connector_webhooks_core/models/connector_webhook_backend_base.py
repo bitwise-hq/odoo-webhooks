@@ -20,7 +20,7 @@ are seeded as XML data by concrete connector addons such as
 endpoints, signature parts, sources, or semantic bindings.
 """
 
-from odoo import api, models
+from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_connector_webhooks_core.services.naming import (
@@ -112,14 +112,14 @@ class ConnectorWebhookBackendBase(models.AbstractModel):
         value = getattr(self, self._webhook_code_field)
         if not value:
             raise ValidationError(
-                self.env._(
+                _(
                     "%(model)s requires a technical code.",
                     model=self._description or self._name,
                 )
             )
         if value != slugify_identifier(value):
             raise ValidationError(
-                self.env._(
+                _(
                     "%(model)s codes may contain only letters, digits, and separators.",
                     model=self._description or self._name,
                 )

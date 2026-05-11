@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, _
 
 from odoo.addons.bwt_webhooks_core.models.const import (
     HTTP_METHOD_SELECTION,
@@ -22,7 +22,7 @@ class WebhookOutboundDeliveryAttempt(models.Model):
 
     name = fields.Char(
         required=True,
-        default=lambda self: self.env._("Outbound Delivery Attempt"),
+        default=lambda self: _("Outbound Delivery Attempt"),
     )
     delivery_id = fields.Many2one(
         "bwt.webhook.outbound.delivery",

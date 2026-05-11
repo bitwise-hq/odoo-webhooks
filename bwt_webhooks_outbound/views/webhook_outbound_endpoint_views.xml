@@ -27,7 +27,7 @@
     <field name="name">webhook.outbound.endpoint.list</field>
     <field name="model">bwt.webhook.outbound.endpoint</field>
     <field name="arch" type="xml">
-      <list>
+      <tree>
         <field name="name" />
         <field name="code" />
         <field name="state" />
@@ -38,7 +38,7 @@
         <field name="target_path" />
         <field name="outbound_delivery_count" string="Deliveries" />
         <field name="failed_delivery_count" string="Failures" />
-      </list>
+      </tree>
     </field>
   </record>
 
@@ -88,14 +88,14 @@
           <notebook>
             <page string="Header Rules">
               <field name="header_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="sequence" />
                   <field name="active" />
                   <field name="header_name" />
                   <field name="source_kind" />
                   <field name="source_expression" />
                   <field name="literal_value" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -116,14 +116,14 @@
             </page>
             <page string="Payload Rules">
               <field name="payload_rule_ids" nolabel="1" context="{'default_endpoint_id': id}">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="sequence" />
                   <field name="active" />
                   <field name="target_path" />
                   <field name="source_kind" />
                   <field name="source_expression" />
                   <field name="literal_value" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -144,12 +144,12 @@
             </page>
             <page string="Deliveries">
               <field name="outbound_delivery_ids" readonly="1">
-                <list>
+                <tree>
                   <field name="create_date" string="Created" />
                   <field name="state" />
                   <field name="response_status_code" />
                   <field name="processed_at" />
-                </list>
+                </tree>
               </field>
             </page>
           </notebook>

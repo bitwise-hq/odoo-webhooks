@@ -1,6 +1,6 @@
 {
     "name": "Webhooks Framework - Outbound Delivery",
-    "version": "18.0.1.1.0",
+    "version": "17.0.1.1.0",
     "category": "Tools",
     "summary": "Reliable outbound webhook delivery with templated requests and robust retries.",
     "development_status": "Production",

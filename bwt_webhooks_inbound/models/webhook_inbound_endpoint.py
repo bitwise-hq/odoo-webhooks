@@ -13,7 +13,7 @@ signatures form a stable internal API.
 
 from typing import Optional
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.exceptions import (
@@ -251,11 +251,11 @@ class WebhookInboundEndpoint(models.Model):
     @api.model
     def _validate_webhook_path_segment(self, value, *, required=True, label=False):
         normalized = self._normalize_webhook_path_segment(value)
-        error_label = label or self.env._("Inbound endpoint paths")
+        error_label = label or _("Inbound endpoint paths")
         if not normalized:
             if required:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "%(error_label)s require a single URL path segment.",
                         error_label=error_label,
                     )
@@ -263,14 +263,14 @@ class WebhookInboundEndpoint(models.Model):
             return normalized
         if "/" in normalized:
             raise ValidationError(
-                self.env._(
+                _(
                     "%(error_label)s must be a single URL path segment without slashes.",
                     error_label=error_label,
                 )
             )
         if any(character.isspace() for character in normalized):
             raise ValidationError(
-                self.env._(
+                _(
                     "%(error_label)s cannot contain whitespace.",
                     error_label=error_label,
                 )
@@ -302,7 +302,7 @@ class WebhookInboundEndpoint(models.Model):
         if new_path:
             changed = self.filtered(lambda endpoint: endpoint.id and endpoint.path and endpoint.path != new_path)
             if changed:
-                raise ValidationError(self.env._("Inbound endpoint paths cannot be changed after the endpoint is created."))
+                raise ValidationError(_("Inbound endpoint paths cannot be changed after the endpoint is created."))
         return super().write(normalized)
 
     # -- Configuration constraints ------------------------------------------
@@ -352,14 +352,14 @@ class WebhookInboundEndpoint(models.Model):
             return
 
         if not self.signature_secret:
-            raise WebhookProcessingConfigurationError(self.env._("HMAC verification requires a primary signature secret."))
+            raise WebhookProcessingConfigurationError(_("HMAC verification requires a primary signature secret."))
 
         signature_key = binding_map.get("signature")
         if not signature_key:
-            raise WebhookProcessingConfigurationError(self.env._("HMAC verification requires a semantic binding for Signature."))
+            raise WebhookProcessingConfigurationError(_("HMAC verification requires a semantic binding for Signature."))
         if not self._has_active_source_for_key(signature_key):
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "HMAC verification is bound to %(key)s for Signature, but no active value resolution rule produces that key.",
                     key=signature_key,
                 )
@@ -368,10 +368,10 @@ class WebhookInboundEndpoint(models.Model):
         if self.signature_max_age_seconds > 0 or self.signature_max_future_skew_seconds > 0:
             timestamp_key = binding_map.get("signature_timestamp")
             if not timestamp_key:
-                raise WebhookProcessingConfigurationError(self.env._("Freshness checks require a semantic binding for Signature Timestamp."))
+                raise WebhookProcessingConfigurationError(_("Freshness checks require a semantic binding for Signature Timestamp."))
             if not self._has_active_source_for_key(timestamp_key):
                 raise WebhookProcessingConfigurationError(
-                    self.env._(
+                    _(
                         "Freshness checks are bound to %(key)s for Signature Timestamp, but no active value resolution rule produces that key.",
                         key=timestamp_key,
                     )
@@ -384,17 +384,17 @@ class WebhookInboundEndpoint(models.Model):
         bound_key = binding_map.get(semantic_name)
         if not bound_key:
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "%(kind_label)s identity policy %(policy)s requires a semantic binding.",
-                    kind_label=self.env._("Delivery") if kind == "delivery" else self.env._("Replay"),
+                    kind_label=_("Delivery") if kind == "delivery" else _("Replay"),
                     policy=policy_label,
                 )
             )
         if not self._has_active_source_for_key(bound_key):
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "%(kind_label)s identity policy %(policy)s is bound to %(key)s, but no active value resolution rule produces that key.",
-                    kind_label=self.env._("Delivery") if kind == "delivery" else self.env._("Replay"),
+                    kind_label=_("Delivery") if kind == "delivery" else _("Replay"),
                     policy=policy_label,
                     key=bound_key,
                 )
@@ -424,7 +424,7 @@ class WebhookInboundEndpoint(models.Model):
 
     def _transition_state(self, *, target, allowed_from, error_message):
         if self.filtered(lambda endpoint: endpoint.state not in allowed_from):
-            raise ValidationError(self.env._(error_message))
+            raise ValidationError(_(error_message))
         self.write({"state": target})
         return True
 
@@ -476,7 +476,7 @@ class WebhookInboundEndpoint(models.Model):
         method = getattr(self, method_name or "", None)
         if not method:
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "Computed %(owner)s method %(method)s is not implemented on endpoint %(endpoint)s.",
                     owner=owner_label,
                     method=method_name,
@@ -488,7 +488,7 @@ class WebhookInboundEndpoint(models.Model):
     def _compute_source_value(self, source_line, body, headers, payload):
         return self._dispatch_computed_method(
             source_line.computed_method,
-            self.env._("source"),
+            _("source"),
             source_line,
             body,
             headers,
@@ -498,7 +498,7 @@ class WebhookInboundEndpoint(models.Model):
     def _compute_signature_part_value(self, signature_part, body, headers, payload):
         return self._dispatch_computed_method(
             signature_part.computed_method,
-            self.env._("signature part"),
+            _("signature part"),
             signature_part,
             body,
             headers,
@@ -645,7 +645,7 @@ class WebhookInboundEndpoint(models.Model):
             return resolve_delivery_identity(body_sha256, metadata, policy=self.delivery_identity_policy)
         except IdentityNotResolvable as exc:
             raise WebhookValidationError(
-                self.env._(
+                _(
                     "The configured delivery identity %(policy)s could not be resolved.",
                     policy=_DELIVERY_POLICY_LABELS[exc.policy],
                 )
@@ -657,7 +657,7 @@ class WebhookInboundEndpoint(models.Model):
             return resolve_replay_identity(metadata, policy=self.replay_identity_policy)
         except IdentityNotResolvable as exc:
             raise WebhookValidationError(
-                self.env._(
+                _(
                     "The configured replay identity %(policy)s could not be resolved.",
                     policy=_REPLAY_POLICY_LABELS[exc.policy],
                 )
@@ -679,7 +679,7 @@ class WebhookInboundEndpoint(models.Model):
             value = part._resolve_value(self, body, headers, payload)
             if value in _BLANK_VALUES:
                 if part.required:
-                    raise WebhookSignatureValidationError(self.env._("A required signature message part could not be resolved."))
+                    raise WebhookSignatureValidationError(_("A required signature message part could not be resolved."))
                 continue
             values.append(str(value))
         return (self.signature_message_joiner or "").join(values)
@@ -702,7 +702,7 @@ class WebhookInboundEndpoint(models.Model):
         if self.signature_max_age_seconds <= 0 and self.signature_max_future_skew_seconds <= 0:
             return
         if not raw_timestamp:
-            raise WebhookFreshnessValidationError(self.env._("A signature timestamp is required for freshness validation."))
+            raise WebhookFreshnessValidationError(_("A signature timestamp is required for freshness validation."))
         received_at = self._parse_signature_timestamp(raw_timestamp)
         verdict = validate_signature_freshness(
             received_at,
@@ -710,9 +710,9 @@ class WebhookInboundEndpoint(models.Model):
             max_future_skew_seconds=self.signature_max_future_skew_seconds,
         )
         if verdict == "too_old":
-            raise WebhookFreshnessValidationError(self.env._("The webhook signature timestamp is too old."))
+            raise WebhookFreshnessValidationError(_("The webhook signature timestamp is too old."))
         if verdict == "too_future":
-            raise WebhookFreshnessValidationError(self.env._("The webhook signature timestamp is too far in the future."))
+            raise WebhookFreshnessValidationError(_("The webhook signature timestamp is too far in the future."))
 
     def _strip_signature_prefix(self, candidates) -> list:
         return strip_signature_prefix(candidates, self.signature_prefix)
@@ -724,7 +724,7 @@ class WebhookInboundEndpoint(models.Model):
 
         incoming = self._extract_semantic_candidates("signature", body, headers, payload)
         if not incoming:
-            raise WebhookSignatureValidationError(self.env._("The webhook signature could not be resolved."))
+            raise WebhookSignatureValidationError(_("The webhook signature could not be resolved."))
 
         secrets = self._get_signature_secrets()
 
@@ -741,7 +741,7 @@ class WebhookInboundEndpoint(models.Model):
             self._validate_signature_freshness(metadata.get("signature_timestamp"))
             return
 
-        raise WebhookSignatureValidationError(self.env._("The webhook signature could not be verified."))
+        raise WebhookSignatureValidationError(_("The webhook signature could not be verified."))
 
     # -- Top-level inbound request validation ------------------------------
 
@@ -750,20 +750,20 @@ class WebhookInboundEndpoint(models.Model):
         if self.state != "active":
             self._raise_inactive_endpoint_error()
         if self.payload_contract == "json_object" and not isinstance(payload, dict):
-            raise WebhookPayloadValidationError(self.env._("This endpoint requires a top-level JSON object payload."))
+            raise WebhookPayloadValidationError(_("This endpoint requires a top-level JSON object payload."))
         self._verify_signature(body, headers, payload, metadata)
 
     def _raise_inactive_endpoint_error(self):
         self.ensure_one()
         if self.state == "draft":
             raise WebhookValidationError(
-                self.env._(
+                _(
                     "Endpoint %(endpoint)s is in draft and cannot accept webhook deliveries.",
                     endpoint=self.display_name,
                 )
             )
         raise WebhookValidationError(
-            self.env._(
+            _(
                 "Archived endpoint %(endpoint)s cannot accept webhook deliveries.",
                 endpoint=self.display_name,
             )

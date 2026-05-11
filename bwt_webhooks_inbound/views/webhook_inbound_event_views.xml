@@ -72,7 +72,7 @@
     <field name="name">webhook.inbound.event.list</field>
     <field name="model">bwt.webhook.inbound.event</field>
     <field name="arch" type="xml">
-      <list decoration-danger="state in ('error','dead_letter','rejected')" decoration-warning="state == 'received'" decoration-success="state == 'done'">
+      <tree decoration-danger="state in ('error','dead_letter','rejected')" decoration-warning="state == 'received'" decoration-success="state == 'done'">
         <field name="received_at" />
         <field name="endpoint_id" />
         <field name="company_id" />
@@ -87,7 +87,7 @@
         <field name="processing_seconds" optional="hide" />
         <field name="queue_job_count" string="Jobs" />
         <field name="latest_queue_job_state" string="Latest Job State" />
-      </list>
+      </tree>
     </field>
   </record>
 
@@ -181,7 +181,7 @@
             </page>
             <page string="Jobs">
               <field name="queue_job_ids" nolabel="1" readonly="1">
-                <list>
+                <tree>
                   <field name="date_created" />
                   <field name="name" />
                   <field name="uuid" />
@@ -189,19 +189,19 @@
                   <field name="retry" />
                   <field name="max_retries" />
                   <field name="date_done" />
-                </list>
+                </tree>
               </field>
             </page>
             <page string="Rule Executions">
               <field name="rule_execution_ids" nolabel="1" readonly="1">
-                <list>
+                <tree>
                   <field name="create_date" string="Executed" />
                   <field name="rule_id" />
                   <field name="state" />
                   <field name="record_reference" />
                   <field name="note" />
                   <field name="error" />
-                </list>
+                </tree>
               </field>
             </page>
           </notebook>

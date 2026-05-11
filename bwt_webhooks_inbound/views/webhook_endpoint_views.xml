@@ -25,7 +25,7 @@
     <field name="name">webhook.inbound.endpoint.list</field>
     <field name="model">bwt.webhook.inbound.endpoint</field>
     <field name="arch" type="xml">
-      <list>
+      <tree>
         <field name="name" />
         <field name="path" />
         <field name="state" />
@@ -34,7 +34,7 @@
         <field name="route_path" />
         <field name="inbound_event_count" string="Accepted" />
         <field name="rejected_event_count" string="Rejected" />
-      </list>
+      </tree>
     </field>
   </record>
 
@@ -83,11 +83,11 @@
           <notebook>
             <page string="Semantic Bindings">
               <field name="semantic_binding_ids" nolabel="1">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="semantic_name" />
                   <field name="value_key" />
                   <field name="note" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -101,7 +101,7 @@
             </page>
             <page string="Value Resolution">
               <field name="source_ids" nolabel="1">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="field_name" />
                   <field name="candidate_sequence" />
                   <field name="sequence" widget="handle" />
@@ -116,7 +116,7 @@
                   <field name="hash_algorithm" />
                   <field name="required" />
                   <field name="active" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -163,7 +163,7 @@
                 <field name="signature_message_joiner" />
               </group>
               <field name="signature_part_ids" nolabel="1" invisible="signature_verification_mode != 'hmac'">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="sequence" widget="handle" />
                   <field name="source_kind" />
                   <field name="header_name" invisible="source_kind not in ['header', 'header_param']" />
@@ -173,7 +173,7 @@
                   <field name="computed_method" invisible="source_kind != 'computed'" />
                   <field name="required" />
                   <field name="active" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -197,7 +197,7 @@
             </page>
             <page string="Accepted Events">
               <field name="inbound_event_ids" domain="[('state', '!=', 'rejected')]" readonly="1">
-                <list>
+                <tree>
                   <field name="received_at" />
                   <field name="event_type" />
                   <field name="event_id" />
@@ -207,19 +207,19 @@
                   <field name="delivery_kind" />
                   <field name="handler_id" />
                   <field name="state" />
-                </list>
+                </tree>
               </field>
             </page>
             <page string="Rejected Requests">
               <field name="inbound_event_ids" domain="[('state', '=', 'rejected')]" readonly="1">
-                <list>
+                <tree>
                   <field name="received_at" />
                   <field name="event_type" />
                   <field name="event_id" />
                   <field name="delivery_id" />
                   <field name="rejection_category" />
                   <field name="state" />
-                </list>
+                </tree>
               </field>
             </page>
           </notebook>

@@ -25,7 +25,7 @@ from typing import Any
 
 import requests
 
-from odoo import SUPERUSER_ID, api, fields, models
+from odoo import SUPERUSER_ID, api, fields, models, _
 from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.exceptions import ValidationError
 
@@ -71,7 +71,7 @@ class WebhookOutboundDelivery(models.Model):
 
     name = fields.Char(
         required=True,
-        default=lambda self: self.env._("Outbound Webhook Delivery"),
+        default=lambda self: _("Outbound Webhook Delivery"),
     )
     endpoint_id = fields.Many2one(
         "bwt.webhook.outbound.endpoint",
@@ -285,7 +285,7 @@ class WebhookOutboundDelivery(models.Model):
     def action_view_queue_jobs(self):
         self.ensure_one()
         action = self.env.ref("queue_job.action_queue_job").read()[0]
-        action["name"] = self.env._("Outbound Queue Jobs")
+        action["name"] = _("Outbound Queue Jobs")
         action["domain"] = self._get_queue_job_action_domain()
         return action
 
@@ -298,9 +298,9 @@ class WebhookOutboundDelivery(models.Model):
         try:
             headers = json.loads(value or "{}")
         except json.JSONDecodeError as err:
-            raise ValidationError(self.env._("%(label)s must be valid JSON.", label=label)) from err
+            raise ValidationError(_("%(label)s must be valid JSON.", label=label)) from err
         if not isinstance(headers, dict):
-            raise ValidationError(self.env._("%(label)s must be a JSON object.", label=label))
+            raise ValidationError(_("%(label)s must be a JSON object.", label=label))
         return serialize_headers(headers)
 
     @api.model
@@ -308,7 +308,7 @@ class WebhookOutboundDelivery(models.Model):
         try:
             payload = json.loads(value or "{}")
         except json.JSONDecodeError as err:
-            raise ValidationError(self.env._("%(label)s must be valid JSON.", label=label)) from err
+            raise ValidationError(_("%(label)s must be valid JSON.", label=label)) from err
         return serialize_payload(payload)
 
     @api.model
@@ -398,7 +398,7 @@ class WebhookOutboundDelivery(models.Model):
             return self._resolve_expression_value(source, source_expression)
         except AttributeError as err:
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "Could not resolve source expression %(expression)s.",
                     expression=source_expression,
                 )
@@ -473,14 +473,14 @@ class WebhookOutboundDelivery(models.Model):
         try:
             return json.loads(self.request_headers_json or "{}")
         except json.JSONDecodeError as err:
-            raise WebhookProcessingConfigurationError(self.env._("Request Headers must be valid JSON.")) from err
+            raise WebhookProcessingConfigurationError(_("Request Headers must be valid JSON.")) from err
 
     def _get_payload(self):
         self.ensure_one()
         try:
             return json.loads(self.payload_json or "{}")
         except json.JSONDecodeError as err:
-            raise WebhookProcessingConfigurationError(self.env._("Payload JSON must be valid JSON.")) from err
+            raise WebhookProcessingConfigurationError(_("Payload JSON must be valid JSON.")) from err
 
     def _apply_handler_result(self, raw, request_data):
         """Return ``(raw, updated_request_dict)``."""
@@ -585,7 +585,7 @@ class WebhookOutboundDelivery(models.Model):
             return evaluate_condition(actual_value, condition.operator, condition.expected_value)
         except UnsupportedOperator as exc:
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "Unsupported outbound condition operator %(operator)s.",
                     operator=exc.operator,
                 )
@@ -657,20 +657,20 @@ class WebhookOutboundDelivery(models.Model):
             endpoint_state = delivery.endpoint_id.state
             if endpoint_state == "draft":
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "Draft outbound endpoint %(endpoint)s cannot queue new deliveries.",
                         endpoint=delivery.endpoint_id.display_name,
                     )
                 )
             if endpoint_state == "archived":
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "Archived outbound endpoint %(endpoint)s cannot queue new deliveries.",
                         endpoint=delivery.endpoint_id.display_name,
                     )
                 )
             if delivery.state not in ("draft", "error"):
-                raise ValidationError(self.env._("Only draft or failed deliveries can be queued."))
+                raise ValidationError(_("Only draft or failed deliveries can be queued."))
         for delivery in self:
             delivery.write(
                 {
@@ -688,7 +688,7 @@ class WebhookOutboundDelivery(models.Model):
     def action_reset_to_draft(self):
         for delivery in self:
             if delivery.state not in ("error", "dead_letter", "canceled"):
-                raise ValidationError(self.env._("Only failed, dead-letter, or canceled deliveries can be reset to draft."))
+                raise ValidationError(_("Only failed, dead-letter, or canceled deliveries can be reset to draft."))
             delivery.write(
                 {
                     "state": "draft",
@@ -706,7 +706,7 @@ class WebhookOutboundDelivery(models.Model):
     def action_cancel_delivery(self):
         for delivery in self:
             if delivery.state not in ("draft", "error"):
-                raise ValidationError(self.env._("Only draft or failed deliveries can be canceled."))
+                raise ValidationError(_("Only draft or failed deliveries can be canceled."))
             delivery.write({"state": "canceled"})
         return True
 
@@ -717,7 +717,7 @@ class WebhookOutboundDelivery(models.Model):
     def action_create_replay_delivery(self):
         self.ensure_one()
         if self.state in ("queued", "processing"):
-            raise ValidationError(self.env._("Queued or processing deliveries cannot be replayed."))
+            raise ValidationError(_("Queued or processing deliveries cannot be replayed."))
         replay = self.copy(
             {
                 "name": f"{self.display_name} / Replay {self._get_next_replay_number()}",
@@ -809,7 +809,7 @@ class WebhookOutboundDelivery(models.Model):
 
     def _finalize_retry(self, request: OutboundRequest, outcome: HandlerOutcome):
         """Record an error attempt and raise :class:`RetryableJobError`."""
-        message = outcome.note or self.env._("Retry requested by outbound handler.")
+        message = outcome.note or _("Retry requested by outbound handler.")
         self._create_attempt(request, state="error", note=outcome.note or False, error=message)
         self.write(
             {
@@ -894,7 +894,7 @@ class WebhookOutboundDelivery(models.Model):
         error_message = (
             False
             if state == "done"
-            else self.env._(
+            else _(
                 "Remote endpoint returned HTTP %(status)s.",
                 status=response.status_code,
             )

@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -34,18 +34,18 @@ class WebhookHandler(models.Model):
             if handler.execution_mode != "python":
                 continue
             if not handler.python_model_name or not handler.python_method_name:
-                raise ValidationError(self.env._("Python callback handlers require both a model name and a method name."))
+                raise ValidationError(_("Python callback handlers require both a model name and a method name."))
 
     def execute_inbound(self, event):
         self.ensure_one()
         if self.direction != "inbound":
-            raise ValidationError(self.env._("Outbound handlers cannot process inbound webhook events."))
+            raise ValidationError(_("Outbound handlers cannot process inbound webhook events."))
         if self.execution_mode == "python":
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)
             if not callback:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "Python callback %(model)s.%(method)s could not be found.",
                         model=self.python_model_name,
                         method=self.python_method_name,
@@ -57,13 +57,13 @@ class WebhookHandler(models.Model):
     def execute_outbound(self, delivery, request_data=None):
         self.ensure_one()
         if self.direction != "outbound":
-            raise ValidationError(self.env._("Inbound handlers cannot process outbound webhook deliveries."))
+            raise ValidationError(_("Inbound handlers cannot process outbound webhook deliveries."))
         if self.execution_mode == "python":
             model = self.env[self.python_model_name]
             callback = getattr(model, self.python_method_name, None)
             if not callback:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "Python callback %(model)s.%(method)s could not be found.",
                         model=self.python_model_name,
                         method=self.python_method_name,

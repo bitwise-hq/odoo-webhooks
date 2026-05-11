@@ -18,7 +18,7 @@ addon; this mixin does not create or update
 
 import json
 
-from odoo import fields, models
+from odoo import fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_connector_webhooks_core.services.values import (
@@ -76,16 +76,16 @@ class ConnectorWebhookOutboundMixin(models.AbstractModel):
         linked = self._get_linked_outbound_endpoints()
         if code_suffix:
             linked = linked.filtered(lambda r: r.code_suffix == code_suffix)
-            selector = self.env._("code suffix '%(value)s'", value=code_suffix)
+            selector = _("code suffix '%(value)s'", value=code_suffix)
         elif endpoint_code:
             linked = linked.filtered(lambda r: r.code == endpoint_code)
-            selector = self.env._("code '%(value)s'", value=endpoint_code)
+            selector = _("code '%(value)s'", value=endpoint_code)
         else:
             selector = None
         if selector and not linked:
             if required:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "No outbound webhook endpoint with %(selector)s is linked to connector backend %(name)s.",
                         selector=selector,
                         name=self.display_name,
@@ -97,7 +97,7 @@ class ConnectorWebhookOutboundMixin(models.AbstractModel):
         if not linked:
             if required:
                 raise ValidationError(
-                    self.env._(
+                    _(
                         "No outbound webhook endpoint is linked to connector backend %(name)s.",
                         name=self.display_name,
                     )
@@ -105,7 +105,7 @@ class ConnectorWebhookOutboundMixin(models.AbstractModel):
             return self.env["bwt.webhook.outbound.endpoint"]
         if len(linked) > 1:
             raise ValidationError(
-                self.env._(
+                _(
                     "Multiple outbound webhook endpoints are linked to connector backend %(name)s; specify ``code_suffix`` or ``endpoint_code``.",
                     name=self.display_name,
                 )
@@ -253,10 +253,10 @@ class ConnectorWebhookOutboundMixin(models.AbstractModel):
 
     def _validate_outbound_endpoint_for_queue(self, endpoint):
         if not endpoint or endpoint._name != "bwt.webhook.outbound.endpoint":
-            raise ValidationError(self.env._("An outbound webhook endpoint record must be provided when queueing a delivery."))
+            raise ValidationError(_("An outbound webhook endpoint record must be provided when queueing a delivery."))
         linked_backend = endpoint.connector_backend_ref
         if not linked_backend or linked_backend._name != self._name or linked_backend.id != self.id:
-            raise ValidationError(self.env._("The selected outbound webhook endpoint is not linked to this connector backend."))
+            raise ValidationError(_("The selected outbound webhook endpoint is not linked to this connector backend."))
 
     # ==================================================================
     # Helpers
@@ -297,7 +297,7 @@ class ConnectorWebhookOutboundMixin(models.AbstractModel):
         self.ensure_one()
         endpoints = self._get_linked_outbound_endpoints()
         if not endpoints:
-            raise ValidationError(self.env._("No outbound webhook endpoint is linked to this backend."))
+            raise ValidationError(_("No outbound webhook endpoint is linked to this backend."))
         if len(endpoints) == 1:
             return self._action_view_single_outbound_endpoint(endpoints)
         return self._action_view_outbound_endpoint_list()

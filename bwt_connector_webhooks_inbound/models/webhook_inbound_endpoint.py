@@ -1,6 +1,6 @@
 """Reference field linking inbound webhook endpoints to connector backends."""
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -29,4 +29,4 @@ class WebhookInboundEndpoint(models.Model):
             if not backend:
                 continue
             if backend.company_id and backend.company_id != endpoint.company_id:
-                raise ValidationError(self.env._("The linked connector backend company must match the inbound endpoint company."))
+                raise ValidationError(_("The linked connector backend company must match the inbound endpoint company."))

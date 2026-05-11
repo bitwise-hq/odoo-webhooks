@@ -47,7 +47,7 @@ repos:
       - id: oca-gen-addon-readme
         args:
           - --addons-dir=.
-          - --branch=18.0
+          - --branch=17.0
           - --org-name=BitwiseHQ
           - --repo-name=odoo-webhooks
           - --if-source-changed

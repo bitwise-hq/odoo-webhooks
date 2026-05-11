@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlsplit
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.exceptions import WebhookProcessingConfigurationError
@@ -182,7 +182,7 @@ class WebhookOutboundEndpoint(models.Model):
         hostname = self._get_outbound_target_hostname(delivery=delivery)
         if not hostname:
             raise WebhookProcessingConfigurationError(
-                self.env._(
+                _(
                     "Outbound endpoint %(name)s has no resolvable target hostname.",
                     name=self.display_name,
                 )
@@ -205,7 +205,7 @@ class WebhookOutboundEndpoint(models.Model):
             token = match.group(1)
             if token not in context_values or context_values[token] in (None, False, ""):
                 raise WebhookProcessingConfigurationError(
-                    self.env._(
+                    _(
                         "Outbound delivery context is missing value for path token %(token)s.",
                         token=token,
                     )
@@ -240,20 +240,20 @@ class WebhookOutboundEndpoint(models.Model):
                 # - records are being installed from XML (install_mode), where
                 #   downstream addons may link a backend afterwards.
                 if not endpoint._outbound_hostname_resolved_externally() and endpoint.state != "draft" and not self.env.context.get("install_mode"):
-                    raise WebhookProcessingConfigurationError(self.env._("Outbound endpoints require a target hostname."))
+                    raise WebhookProcessingConfigurationError(_("Outbound endpoints require a target hostname."))
             else:
                 parsed_hostname = urlsplit(hostname)
                 if not parsed_hostname.scheme or not parsed_hostname.netloc:
-                    raise WebhookProcessingConfigurationError(self.env._("Outbound endpoint hostnames must include a URL scheme and hostname."))
+                    raise WebhookProcessingConfigurationError(_("Outbound endpoint hostnames must include a URL scheme and hostname."))
                 if parsed_hostname.query or parsed_hostname.fragment:
-                    raise WebhookProcessingConfigurationError(self.env._("Outbound endpoint hostnames cannot include query parameters or URL fragments."))
+                    raise WebhookProcessingConfigurationError(_("Outbound endpoint hostnames cannot include query parameters or URL fragments."))
                 hostname_path = parsed_hostname.path or ""
                 if hostname_path not in ("", "/"):
-                    raise WebhookProcessingConfigurationError(self.env._("Store the outbound request path separately from the target hostname."))
+                    raise WebhookProcessingConfigurationError(_("Store the outbound request path separately from the target hostname."))
             if "#" in (endpoint.target_path or ""):
-                raise WebhookProcessingConfigurationError(self.env._("Outbound endpoint target paths cannot include URL fragments."))
+                raise WebhookProcessingConfigurationError(_("Outbound endpoint target paths cannot include URL fragments."))
             if endpoint.timeout_seconds <= 0:
-                raise WebhookProcessingConfigurationError(self.env._("Outbound endpoint timeout must be greater than zero seconds."))
+                raise WebhookProcessingConfigurationError(_("Outbound endpoint timeout must be greater than zero seconds."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -282,18 +282,18 @@ class WebhookOutboundEndpoint(models.Model):
 
     def action_activate(self):
         if self.filtered(lambda endpoint: endpoint.state != "draft"):
-            raise ValidationError(self.env._("Only draft outbound endpoints can be activated."))
+            raise ValidationError(_("Only draft outbound endpoints can be activated."))
         self.write({"state": "active"})
         return True
 
     def action_set_draft(self):
         if self.filtered(lambda endpoint: endpoint.state not in ("active", "archived")):
-            raise ValidationError(self.env._("Only active or archived outbound endpoints can be moved to draft."))
+            raise ValidationError(_("Only active or archived outbound endpoints can be moved to draft."))
         self.write({"state": "draft"})
         return True
 
     def action_archive(self):
         if self.filtered(lambda endpoint: endpoint.state not in ("draft", "active")):
-            raise ValidationError(self.env._("Only draft or active outbound endpoints can be archived."))
+            raise ValidationError(_("Only draft or active outbound endpoints can be archived."))
         self.write({"state": "archived"})
         return True

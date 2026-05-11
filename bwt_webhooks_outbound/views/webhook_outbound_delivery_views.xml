@@ -68,7 +68,7 @@
     <field name="name">webhook.outbound.delivery.list</field>
     <field name="model">bwt.webhook.outbound.delivery</field>
     <field name="arch" type="xml">
-      <list decoration-danger="state in ('error','dead_letter')" decoration-warning="state in ('queued','processing')" decoration-success="state == 'done'">
+      <tree decoration-danger="state in ('error','dead_letter')" decoration-warning="state in ('queued','processing')" decoration-success="state == 'done'">
         <field name="create_date" string="Created" />
         <field name="endpoint_id" />
         <field name="company_id" />
@@ -83,7 +83,7 @@
         <field name="end_to_end_seconds" optional="hide" />
         <field name="queued_at" />
         <field name="processed_at" />
-      </list>
+      </tree>
     </field>
   </record>
 
@@ -139,14 +139,14 @@
             </page>
             <page string="Context Lines">
               <field name="context_line_ids" nolabel="1" context="{'default_delivery_id': id}">
-                <list editable="bottom">
+                <tree editable="bottom">
                   <field name="sequence" />
                   <field name="active" />
                   <field name="key_name" />
                   <field name="source_kind" />
                   <field name="source_expression" />
                   <field name="literal_value" />
-                </list>
+                </tree>
                 <form>
                   <sheet>
                     <group>
@@ -174,7 +174,7 @@
             </page>
             <page string="Attempts">
               <field name="attempt_ids" readonly="1">
-                <list>
+                <tree>
                   <field name="attempt_number" />
                   <field name="started_at" />
                   <field name="finished_at" />
@@ -185,18 +185,18 @@
                   <field name="target_url" />
                   <field name="response_status_code" />
                   <field name="processing_error" />
-                </list>
+                </tree>
               </field>
             </page>
             <page string="Replays">
               <field name="replay_delivery_ids" readonly="1">
-                <list>
+                <tree>
                   <field name="create_date" string="Created" />
                   <field name="name" />
                   <field name="state" />
                   <field name="response_status_code" />
                   <field name="processed_at" />
-                </list>
+                </tree>
               </field>
             </page>
             <page string="Processing">
@@ -211,7 +211,7 @@
             </page>
             <page string="Jobs">
               <field name="queue_job_ids" nolabel="1" readonly="1">
-                <list>
+                <tree>
                   <field name="date_created" />
                   <field name="name" />
                   <field name="uuid" />
@@ -219,7 +219,7 @@
                   <field name="retry" />
                   <field name="max_retries" />
                   <field name="date_done" />
-                </list>
+                </tree>
               </field>
             </page>
           </notebook>

@@ -1,6 +1,6 @@
 {
     "name": "Webhooks Connector - Outbound Delivery",
-    "version": "18.0.1.1.0",
+    "version": "17.0.1.1.0",
     "category": "Tools",
     "summary": "Outbound webhook integration for connector backends.",
     "depends": [

@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 WEBHOOK_SEMANTIC_SELECTION = [
@@ -60,7 +60,7 @@ class WebhookInboundEndpointSemanticBinding(models.Model):
     def _check_value_key(self):
         for binding in self:
             if not (binding.value_key or "").strip():
-                raise ValidationError(self.env._("Semantic bindings require a resolved key."))
+                raise ValidationError(_("Semantic bindings require a resolved key."))
 
     @api.model
     def _normalize_vals(self, vals):

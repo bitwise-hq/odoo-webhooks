@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.models.const import OUTBOUND_RULE_SOURCE_SELECTION
@@ -35,4 +35,4 @@ class WebhookOutboundEndpointHeaderRule(models.Model):
     def _check_header_rule_configuration(self):
         for rule in self:
             if rule.source_kind != "literal" and not rule.source_expression:
-                raise ValidationError(self.env._("Header rules require Source Key unless the source kind is Literal."))
+                raise ValidationError(_("Header rules require Source Key unless the source kind is Literal."))

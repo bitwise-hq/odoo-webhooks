@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.bwt_webhooks_core.models.const import OUTBOUND_RULE_STATUS_SELECTION
@@ -10,7 +10,7 @@ class WebhookOutboundHandlerRule(models.Model):
     _order = "sequence, id"
     _check_company_auto = True
 
-    name = fields.Char(required=True, default=lambda self: self.env._("Outbound Rule"))
+    name = fields.Char(required=True, default=lambda self: _("Outbound Rule"))
     sequence = fields.Integer(required=True, default=10)
     active = fields.Boolean(default=True)
     handler_id = fields.Many2one(
@@ -37,4 +37,4 @@ class WebhookOutboundHandlerRule(models.Model):
     def _check_outbound_rule_configuration(self):
         for rule in self:
             if rule.result_status == "retry" and rule.retry_seconds < 0:
-                raise ValidationError(self.env._("Retry delay must be zero or greater."))
+                raise ValidationError(_("Retry delay must be zero or greater."))

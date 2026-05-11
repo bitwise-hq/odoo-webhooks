@@ -8,13 +8,13 @@
       <notebook name="rules" position="inside">
         <page string="Outbound Rules" invisible="direction != 'outbound'">
           <field name="outbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
-            <list editable="bottom">
+            <tree editable="bottom">
               <field name="sequence" />
               <field name="active" />
               <field name="name" />
               <field name="result_status" />
               <field name="retry_seconds" />
-            </list>
+            </tree>
             <form>
               <sheet>
                 <group>
@@ -34,25 +34,25 @@
                 <notebook>
                   <page string="Conditions">
                     <field name="condition_ids" nolabel="1">
-                      <list editable="bottom">
+                      <tree editable="bottom">
                         <field name="sequence" />
                         <field name="source_kind" />
                         <field name="source_expression" />
                         <field name="operator" />
                         <field name="expected_value" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                   <page string="Assignments">
                     <field name="assignment_ids" nolabel="1">
-                      <list editable="bottom">
+                      <tree editable="bottom">
                         <field name="sequence" />
                         <field name="target_scope" />
                         <field name="target_expression" />
                         <field name="source_kind" />
                         <field name="source_expression" />
                         <field name="literal_value" />
-                      </list>
+                      </tree>
                     </field>
                   </page>
                 </notebook>
