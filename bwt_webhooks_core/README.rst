@@ -10,11 +10,14 @@ Webhooks Framework - Orchestration
    !! source digest: sha256:e336b5bb4359b0fdbab3bf204e7a2891cf29561bf6a3ff42dd0b50aebc36c7b6
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.. |badge1| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
+.. |badge1| image:: https://img.shields.io/badge/license-LGPL--3-blue.png
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
+.. |badge2| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
     :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/15.0/bwt_webhooks_core
     :alt: BitwiseHQ/odoo-webhooks
 
-|badge1|
+|badge1| |badge2|
 
 Production-grade webhook orchestration for Odoo, providing the shared
 engine used by inbound and outbound addons.

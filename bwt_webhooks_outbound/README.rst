@@ -10,11 +10,14 @@ Webhooks Framework - Outbound Delivery
    !! source digest: sha256:04d919c2a1ec4b4784e175ea53757123111a97be2848a6ae1b83c98b3b166796
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.. |badge1| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
+.. |badge1| image:: https://img.shields.io/badge/license-LGPL--3-blue.png
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
+.. |badge2| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
     :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/15.0/bwt_webhooks_outbound
     :alt: BitwiseHQ/odoo-webhooks
 
-|badge1|
+|badge1| |badge2|
 
 Reliable outbound webhook delivery for Odoo with templated requests,
 retries, and detailed diagnostics.
