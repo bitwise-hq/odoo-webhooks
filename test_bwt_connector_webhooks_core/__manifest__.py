@@ -12,7 +12,7 @@
     ],
     "author": "Bitwise Technologies LLC",
     "contributors": ["Youssef Egla"],
-    "license": "OPL-1",
+    "license": "LGPL-3",
     "installable": True,
     "auto_install": False,
 }
