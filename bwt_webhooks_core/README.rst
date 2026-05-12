@@ -11,7 +11,7 @@ Webhooks Framework - Orchestration
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 .. |badge1| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
-    :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/17.0/bwt_webhooks_core
+    :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/16.0/bwt_webhooks_core
     :alt: BitwiseHQ/odoo-webhooks
 
 |badge1|
@@ -27,7 +27,7 @@ engine used by inbound and outbound addons.
 - Security groups and access rules for webhook administration.
 - Stable primitives for connector-backed integrations.
 
-.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/17.0/bwt_webhooks_core/static/description/diagrams/webhooks-core-entities.svg
+.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/16.0/bwt_webhooks_core/static/description/diagrams/webhooks-core-entities.svg
    :alt: Core data model
    :align: center
 
@@ -60,7 +60,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/BitwiseHQ/odoo-webhooks/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/BitwiseHQ/odoo-webhooks/issues/new?body=module:%20bwt_webhooks_core%0Aversion:%2017.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/BitwiseHQ/odoo-webhooks/issues/new?body=module:%20bwt_webhooks_core%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -75,6 +75,6 @@ Authors
 Maintainers
 ~~~~~~~~~~~
 
-This module is part of the `BitwiseHQ/odoo-webhooks <https://github.com/BitwiseHQ/odoo-webhooks/tree/17.0/bwt_webhooks_core>`_ project on GitHub.
+This module is part of the `BitwiseHQ/odoo-webhooks <https://github.com/BitwiseHQ/odoo-webhooks/tree/16.0/bwt_webhooks_core>`_ project on GitHub.
 
 You are welcome to contribute.
