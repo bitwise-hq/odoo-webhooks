@@ -86,7 +86,7 @@ services:
   # ---------------------------------------------------------------------------
   odoo:
     profiles: [dev]
-    image: ghcr.io/oca/oca-ci/py3.10-odoo16.0:latest
+    image: ghcr.io/oca/oca-ci/py3.8-odoo15.0:latest
     pull_policy: missing
     restart: unless-stopped
     depends_on:
