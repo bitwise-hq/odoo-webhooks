@@ -10,11 +10,14 @@ Webhooks Framework - Inbound Gateway
    !! source digest: sha256:d0d8d079845919f03322b8b1e5dec729245765b64a30fe0a0852106b4c3e40f9
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.. |badge1| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
+.. |badge1| image:: https://img.shields.io/badge/license-LGPL--3-blue.png
+    :target: http://www.gnu.org/licenses/lgpl-3.0-standalone.html
+    :alt: License: LGPL-3
+.. |badge2| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
     :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/16.0/bwt_webhooks_inbound
     :alt: BitwiseHQ/odoo-webhooks
 
-|badge1|
+|badge1| |badge2|
 
 Secure inbound webhook endpoints for Odoo with signatures, replay
 protection, and rule-based processing.
