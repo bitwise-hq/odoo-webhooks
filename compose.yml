@@ -30,12 +30,11 @@ services:
   # ---------------------------------------------------------------------------
   test:
     profiles: [test]
-    image: ghcr.io/oca/oca-ci/py3.10-odoo17.0:latest
+    image: ghcr.io/oca/oca-ci/py3.10-odoo16.0:latest
     pull_policy: missing
     depends_on:
       postgres:
         condition: service_healthy
-    working_dir: /mnt/repo
     volumes:
       - type: bind
         source: .
@@ -86,7 +85,7 @@ services:
   # ---------------------------------------------------------------------------
   odoo:
     profiles: [dev]
-    image: ghcr.io/oca/oca-ci/py3.10-odoo17.0:latest
+    image: ghcr.io/oca/oca-ci/py3.10-odoo16.0:latest
     pull_policy: missing
     restart: unless-stopped
     depends_on:

@@ -1,6 +1,6 @@
 {
     "name": "Webhooks Connector - Core Orchestration",
-    "version": "17.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Tools",
     "summary": "Shared base for connector backends that own webhook endpoints.",
     "depends": [

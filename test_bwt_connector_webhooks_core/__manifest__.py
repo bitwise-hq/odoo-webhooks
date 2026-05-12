@@ -1,6 +1,6 @@
 {
     "name": "Tests: Connector Webhooks Core",
-    "version": "17.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Hidden",
     "summary": "Tests for the bwt_connector_webhooks_core addon.",
     "depends": [

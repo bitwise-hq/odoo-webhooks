@@ -4,11 +4,13 @@ on:
   pull_request:
     branches:
       - main
+      - "16.0*"
       - "17.0*"
       - "18.0*"
   push:
     branches:
       - main
+      - "16.0*"
       - "17.0*"
       - "18.0*"
 

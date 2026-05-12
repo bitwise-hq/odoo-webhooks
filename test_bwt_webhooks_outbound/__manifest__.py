@@ -1,6 +1,6 @@
 {
     "name": "Tests: Webhooks Outbound",
-    "version": "17.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Hidden",
     "summary": "Tests for the bwt_webhooks_outbound addon.",
     "depends": ["bwt_webhooks_outbound", "test_bwt_webhooks_core"],
