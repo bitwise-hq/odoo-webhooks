@@ -53,11 +53,11 @@
               <field name="company_id" />
             </group>
           </group>
-          <group string="Python Callback" invisible="execution_mode != 'python'">
+          <group string="Python Callback" attrs="{'invisible': [('execution_mode', '!=', 'python')]}">
             <field name="python_model_name" />
             <field name="python_method_name" />
           </group>
-          <notebook name="rules" invisible="execution_mode != 'model_driven'" />
+          <notebook name="rules" attrs="{'invisible': [('execution_mode', '!=', 'model_driven')]}" />
           <group string="Internal Notes">
             <field name="note" />
           </group>

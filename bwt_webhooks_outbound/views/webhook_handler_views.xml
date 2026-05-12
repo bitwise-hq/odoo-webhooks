@@ -6,7 +6,7 @@
     <field name="inherit_id" ref="bwt_webhooks_core.view_webhook_handler_form" />
     <field name="arch" type="xml">
       <notebook name="rules" position="inside">
-        <page string="Outbound Rules" invisible="direction != 'outbound'">
+        <page string="Outbound Rules" attrs="{'invisible': [('direction', '!=', 'outbound')]}">
           <field name="outbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
             <tree editable="bottom">
               <field name="sequence" />
@@ -25,7 +25,7 @@
                   </group>
                   <group>
                     <field name="result_status" />
-                    <field name="retry_seconds" invisible="result_status != 'retry'" />
+                    <field name="retry_seconds" attrs="{'invisible': [('result_status', '!=', 'retry')]}" />
                   </group>
                 </group>
                 <group string="Notes">

@@ -91,8 +91,9 @@ class TestOutboundAttemptUniquenessConstraint(WebhookTestCase):
         self.factory.outbound_attempt(delivery, attempt_number=1)
 
         with self.assertRaises(Exception) as cm:
-            self.factory.outbound_attempt(delivery, attempt_number=1)
-            delivery.flush_recordset()
+            with self.env.cr.savepoint():
+                self.factory.outbound_attempt(delivery, attempt_number=1)
+                delivery.flush_recordset()
         self.assertIsInstance(cm.exception.__cause__ or cm.exception, pg_errors.UniqueViolation)
 
 

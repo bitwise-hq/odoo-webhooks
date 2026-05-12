@@ -98,7 +98,7 @@ class TestCodeSuffixDerivation(_BackendOutboundTestCase):
                 "connector_backend_ref": f"{self.backend._name},{self.backend.id}",
             }
         )
-        with self.assertRaises(Exception), mute_logger("odoo.sql_db"):  # IntegrityError or ValidationError
+        with self.assertRaises(Exception), mute_logger("odoo.sql_db"), self.env.cr.savepoint():  # IntegrityError or ValidationError
             self.env["bwt.webhook.outbound.endpoint"].create(
                 {
                     "name": "Customer Create dup",

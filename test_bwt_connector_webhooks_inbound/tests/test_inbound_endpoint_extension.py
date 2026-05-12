@@ -37,7 +37,7 @@ class TestInboundEndpointReference(_BackendInboundTestCase):
         self.assertEqual(self.endpoint.connector_backend_ref, self.backend)
 
     def test_unique_constraint_prevents_two_endpoints_per_backend(self):
-        with mute_logger("odoo.sql_db"), self.assertRaises(Exception):
+        with mute_logger("odoo.sql_db"), self.assertRaises(Exception), self.env.cr.savepoint():
             self.env["bwt.webhook.inbound.endpoint"].create(
                 {
                     "name": "second",

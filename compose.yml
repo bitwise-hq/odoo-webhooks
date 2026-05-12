@@ -57,6 +57,7 @@ services:
       - -c
       - |
         set -e
+        cd /mnt/repo
         # Capture all test output into a repo-local log file.
         exec > >(tee -a "/mnt/repo/test.log") 2>&1
         # Reset odoo.cfg to avoid duplicate addons_path lines confusing manifestoo

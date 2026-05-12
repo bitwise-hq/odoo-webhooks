@@ -6,7 +6,7 @@
     <field name="inherit_id" ref="bwt_webhooks_core.view_webhook_handler_form" />
     <field name="arch" type="xml">
       <notebook name="rules" position="inside">
-        <page string="Inbound Rules" invisible="direction != 'inbound'">
+        <page string="Inbound Rules" attrs="{'invisible': [('direction', '!=', 'inbound')]}">
           <field name="inbound_rule_ids" nolabel="1" context="{'default_handler_id': id}">
             <tree editable="bottom">
               <field name="sequence" />
@@ -26,8 +26,8 @@
                     <field name="action_type" />
                   </group>
                   <group>
-                    <field name="target_model_name" invisible="action_type not in ['create_record', 'update_record', 'upsert_record']" />
-                    <field name="retry_seconds" invisible="action_type != 'retry'" />
+                    <field name="target_model_name" attrs="{'invisible': [('action_type', 'not in', ['create_record', 'update_record', 'upsert_record'])]}" />
+                    <field name="retry_seconds" attrs="{'invisible': [('action_type', '!=', 'retry')]}" />
                   </group>
                 </group>
                 <group string="Notes">
@@ -45,7 +45,7 @@
                       </tree>
                     </field>
                   </page>
-                  <page string="Lookup Keys" invisible="action_type not in ['update_record', 'upsert_record']">
+                  <page string="Lookup Keys" attrs="{'invisible': [('action_type', 'not in', ['update_record', 'upsert_record'])]}">
                     <field name="lookup_ids" nolabel="1">
                       <tree editable="bottom">
                         <field name="sequence" />
@@ -56,7 +56,7 @@
                       </tree>
                     </field>
                   </page>
-                  <page string="Assignments" invisible="action_type not in ['create_record', 'update_record', 'upsert_record']">
+                  <page string="Assignments" attrs="{'invisible': [('action_type', 'not in', ['create_record', 'update_record', 'upsert_record'])]}">
                     <field name="assignment_ids" nolabel="1">
                       <tree editable="bottom">
                         <field name="sequence" />

@@ -44,9 +44,9 @@
     <field name="arch" type="xml">
       <form>
         <header>
-          <button name="action_activate" type="object" string="Activate" class="oe_highlight" invisible="state != 'draft'" />
-          <button name="action_set_draft" type="object" string="Move To Draft" invisible="state not in ['active', 'archived']" />
-          <button name="action_archive" type="object" string="Archive" invisible="state == 'archived'" />
+          <button name="action_activate" type="object" string="Activate" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}" />
+          <button name="action_set_draft" type="object" string="Move To Draft" attrs="{'invisible': [('state', 'not in', ['active', 'archived'])]}" />
+          <button name="action_archive" type="object" string="Archive" attrs="{'invisible': [('state', '=', 'archived')]}" />
           <field name="state" widget="statusbar" statusbar_visible="draft,active" options="{'clickable': 0}" />
         </header>
         <sheet>
@@ -61,7 +61,7 @@
           <group string="Endpoint">
             <group>
               <field name="name" />
-              <field name="path" readonly="id" />
+              <field name="path" attrs="{'readonly': [('id', '!=', False)]}" />
               <field name="route_path" readonly="1" />
             </group>
             <group>
@@ -107,11 +107,11 @@
                   <field name="sequence" widget="handle" />
                   <field name="joiner" />
                   <field name="source_kind" />
-                  <field name="header_name" invisible="source_kind not in ['header', 'header_param']" />
-                  <field name="header_param_name" invisible="source_kind != 'header_param'" />
-                  <field name="payload_path" invisible="source_kind != 'payload_path'" />
-                  <field name="literal_value" invisible="source_kind != 'literal'" />
-                  <field name="computed_method" invisible="source_kind != 'computed'" />
+                  <field name="header_name" attrs="{'invisible': [('source_kind', 'not in', ['header', 'header_param'])]}" />
+                  <field name="header_param_name" attrs="{'invisible': [('source_kind', '!=', 'header_param')]}" />
+                  <field name="payload_path" attrs="{'invisible': [('source_kind', '!=', 'payload_path')]}" />
+                  <field name="literal_value" attrs="{'invisible': [('source_kind', '!=', 'literal')]}" />
+                  <field name="computed_method" attrs="{'invisible': [('source_kind', '!=', 'computed')]}" />
                   <field name="normalize_mode" />
                   <field name="hash_algorithm" />
                   <field name="required" />
@@ -130,11 +130,11 @@
                       </group>
                       <group>
                         <field name="source_kind" />
-                        <field name="header_name" invisible="source_kind not in ['header', 'header_param']" />
-                        <field name="header_param_name" invisible="source_kind != 'header_param'" />
-                        <field name="payload_path" invisible="source_kind != 'payload_path'" />
-                        <field name="literal_value" invisible="source_kind != 'literal'" widget="text" />
-                        <field name="computed_method" invisible="source_kind != 'computed'" />
+                        <field name="header_name" attrs="{'invisible': [('source_kind', 'not in', ['header', 'header_param'])]}" />
+                        <field name="header_param_name" attrs="{'invisible': [('source_kind', '!=', 'header_param')]}" />
+                        <field name="payload_path" attrs="{'invisible': [('source_kind', '!=', 'payload_path')]}" />
+                        <field name="literal_value" attrs="{'invisible': [('source_kind', '!=', 'literal')]}" widget="text" />
+                        <field name="computed_method" attrs="{'invisible': [('source_kind', '!=', 'computed')]}" />
                         <field name="normalize_mode" />
                         <field name="hash_algorithm" />
                         <field name="note" />
@@ -147,30 +147,30 @@
             <page string="Signature">
               <group string="Verification">
                 <field name="signature_verification_mode" />
-                <field name="signature_secret" password="True" invisible="signature_verification_mode != 'hmac'" />
-                <field name="signature_secondary_secret" password="True" invisible="signature_verification_mode != 'hmac'" />
-                <field name="signature_digest_algorithm" invisible="signature_verification_mode != 'hmac'" />
-                <field name="signature_encoding" invisible="signature_verification_mode != 'hmac'" />
-                <field name="signature_prefix" invisible="signature_verification_mode != 'hmac'" />
+                <field name="signature_secret" password="True" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
+                <field name="signature_secondary_secret" password="True" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
+                <field name="signature_digest_algorithm" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
+                <field name="signature_encoding" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
+                <field name="signature_prefix" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
               </group>
-              <group string="Freshness" invisible="signature_verification_mode != 'hmac'">
+              <group string="Freshness" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}">
                 <field name="signature_timestamp_format" />
                 <field name="signature_max_age_seconds" />
                 <field name="signature_max_future_skew_seconds" />
               </group>
-              <separator string="Message Assembly" invisible="signature_verification_mode != 'hmac'" />
-              <group invisible="signature_verification_mode != 'hmac'">
+              <separator string="Message Assembly" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}" />
+              <group attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}">
                 <field name="signature_message_joiner" />
               </group>
-              <field name="signature_part_ids" nolabel="1" invisible="signature_verification_mode != 'hmac'">
+              <field name="signature_part_ids" nolabel="1" attrs="{'invisible': [('signature_verification_mode', '!=', 'hmac')]}">
                 <tree editable="bottom">
                   <field name="sequence" widget="handle" />
                   <field name="source_kind" />
-                  <field name="header_name" invisible="source_kind not in ['header', 'header_param']" />
-                  <field name="header_param_name" invisible="source_kind != 'header_param'" />
-                  <field name="payload_path" invisible="source_kind != 'payload_path'" />
-                  <field name="literal_value" invisible="source_kind != 'literal'" />
-                  <field name="computed_method" invisible="source_kind != 'computed'" />
+                  <field name="header_name" attrs="{'invisible': [('source_kind', 'not in', ['header', 'header_param'])]}" />
+                  <field name="header_param_name" attrs="{'invisible': [('source_kind', '!=', 'header_param')]}" />
+                  <field name="payload_path" attrs="{'invisible': [('source_kind', '!=', 'payload_path')]}" />
+                  <field name="literal_value" attrs="{'invisible': [('source_kind', '!=', 'literal')]}" />
+                  <field name="computed_method" attrs="{'invisible': [('source_kind', '!=', 'computed')]}" />
                   <field name="required" />
                   <field name="active" />
                 </tree>
@@ -184,11 +184,11 @@
                         <field name="active" />
                       </group>
                       <group>
-                        <field name="header_name" invisible="source_kind not in ['header', 'header_param']" />
-                        <field name="header_param_name" invisible="source_kind != 'header_param'" />
-                        <field name="payload_path" invisible="source_kind != 'payload_path'" />
-                        <field name="literal_value" invisible="source_kind != 'literal'" />
-                        <field name="computed_method" invisible="source_kind != 'computed'" />
+                        <field name="header_name" attrs="{'invisible': [('source_kind', 'not in', ['header', 'header_param'])]}" />
+                        <field name="header_param_name" attrs="{'invisible': [('source_kind', '!=', 'header_param')]}" />
+                        <field name="payload_path" attrs="{'invisible': [('source_kind', '!=', 'payload_path')]}" />
+                        <field name="literal_value" attrs="{'invisible': [('source_kind', '!=', 'literal')]}" />
+                        <field name="computed_method" attrs="{'invisible': [('source_kind', '!=', 'computed')]}" />
                       </group>
                     </group>
                   </sheet>

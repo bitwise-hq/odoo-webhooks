@@ -97,8 +97,8 @@
     <field name="arch" type="xml">
       <form create="false" delete="false" edit="false">
         <header>
-          <button name="action_queue_processing" type="object" string="Queue Processing" class="oe_highlight" invisible="state not in ['received', 'error']" />
-          <button name="action_reset_to_received" type="object" string="Reset To Received" invisible="state not in ['error', 'dead_letter']" />
+          <button name="action_queue_processing" type="object" string="Queue Processing" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['received', 'error'])]}" />
+          <button name="action_reset_to_received" type="object" string="Reset To Received" attrs="{'invisible': [('state', 'not in', ['error', 'dead_letter'])]}" />
           <field name="state" widget="statusbar" statusbar_visible="received,processing,done" options="{'clickable': 0}" />
         </header>
         <sheet>
@@ -173,10 +173,10 @@
                 <field name="latest_queue_job_id" readonly="1" />
                 <field name="latest_queue_job_state" readonly="1" />
               </group>
-              <group string="Failure Details" invisible="not processing_error and state != 'rejected'">
-                <field name="processing_error" readonly="1" invisible="not processing_error" />
-                <field name="rejection_category" invisible="state != 'rejected'" />
-                <field name="rejection_reason" invisible="state != 'rejected'" />
+              <group string="Failure Details" attrs="{'invisible': [('processing_error', '=', False), ('state', '!=', 'rejected')]}">
+                <field name="processing_error" readonly="1" attrs="{'invisible': [('processing_error', '=', False)]}" />
+                <field name="rejection_category" attrs="{'invisible': [('state', '!=', 'rejected')]}" />
+                <field name="rejection_reason" attrs="{'invisible': [('state', '!=', 'rejected')]}" />
               </group>
             </page>
             <page string="Jobs">

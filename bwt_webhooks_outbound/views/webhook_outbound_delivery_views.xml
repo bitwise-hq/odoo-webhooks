@@ -93,10 +93,10 @@
     <field name="arch" type="xml">
       <form delete="false">
         <header>
-          <button name="action_queue_delivery" type="object" string="Queue Delivery" class="oe_highlight" invisible="state not in ['draft', 'error']" />
-          <button name="action_reset_to_draft" type="object" string="Reset To Draft" invisible="state not in ['error', 'dead_letter', 'canceled']" />
-          <button name="action_create_replay_delivery" type="object" string="Create Replay" invisible="state in ['draft', 'queued', 'processing']" />
-          <button name="action_cancel_delivery" type="object" string="Cancel" invisible="state not in ['draft', 'error']" />
+          <button name="action_queue_delivery" type="object" string="Queue Delivery" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft', 'error'])]}" />
+          <button name="action_reset_to_draft" type="object" string="Reset To Draft" attrs="{'invisible': [('state', 'not in', ['error', 'dead_letter', 'canceled'])]}" />
+          <button name="action_create_replay_delivery" type="object" string="Create Replay" attrs="{'invisible': [('state', 'in', ['draft', 'queued', 'processing'])]}" />
+          <button name="action_cancel_delivery" type="object" string="Cancel" attrs="{'invisible': [('state', 'not in', ['draft', 'error'])]}" />
           <field name="state" widget="statusbar" statusbar_visible="draft,queued,processing,done" options="{'clickable': 0}" />
         </header>
         <sheet>
@@ -157,8 +157,8 @@
                       </group>
                       <group>
                         <field name="source_kind" />
-                        <field name="source_expression" invisible="source_kind == 'literal'" />
-                        <field name="literal_value" invisible="source_kind != 'literal'" widget="text" />
+                        <field name="source_expression" attrs="{'invisible': [('source_kind', '=', 'literal')]}" />
+                        <field name="literal_value" attrs="{'invisible': [('source_kind', '!=', 'literal')]}" widget="text" />
                       </group>
                     </group>
                   </sheet>
