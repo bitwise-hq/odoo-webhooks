@@ -51,4 +51,4 @@ Contributors
 License
 -------
 
-Proprietary - `Odoo Proprietary License v1.0 (OPL-1) <https://www.odoo.com/documentation/user/legal/licenses.html>`_.
+LGPL-3 - `GNU Lesser General Public License v3.0 <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>`_.
