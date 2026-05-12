@@ -59,7 +59,7 @@ class TestBackendBaseDirectCodeValidation(_BackendBaseTestCase):
             "UPDATE %s SET code = %%s WHERE id = %%s" % self.backend_model._table,
             ("Bad_Code", backend.id),
         )
-        backend.invalidate_recordset(["code"])
+        backend.invalidate_cache(["code"])
         with self.assertRaisesRegex(ValidationError, "letters, digits"):
             backend._validate_webhook_backend_code()
 

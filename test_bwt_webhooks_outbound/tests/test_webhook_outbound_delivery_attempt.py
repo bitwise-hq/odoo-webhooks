@@ -70,7 +70,7 @@ class TestOutboundAttemptCreation(WebhookTestCase):
         self.delivery._create_attempt(self.request_dict)
         self.delivery._create_attempt(self.request_dict, state="done")
 
-        self.delivery.invalidate_recordset(["attempt_ids", "attempt_count"])
+        self.delivery.invalidate_cache(["attempt_ids", "attempt_count"])
 
         self.assertEqual(self.delivery.attempt_count, 2)
 

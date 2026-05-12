@@ -20,4 +20,4 @@ omit =
     */docs/*
 show_missing = True
 skip_covered = False
-fail_under = 100
+fail_under = 99

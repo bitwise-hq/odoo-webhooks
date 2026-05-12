@@ -999,7 +999,7 @@ class TestInboundEventQueueJobObservabilityWithJobs(WebhookTestCase):
             }
         )
 
-        event.invalidate_recordset()
+        event.invalidate_cache()
 
         self.assertEqual(event.queue_job_count, 2)
         self.assertEqual(event.queue_job_ids, job_a | job_b)
@@ -1166,7 +1166,7 @@ class TestInboundEventProcessingSeconds(WebhookTestCase):
             processed_at=processed,
         )
 
-        event.invalidate_recordset(["processing_seconds"])
+        event.invalidate_cache(["processing_seconds"])
         event._compute_processing_seconds()
 
         self.assertAlmostEqual(event.processing_seconds, 30.0)
@@ -1180,7 +1180,7 @@ class TestInboundEventProcessingSeconds(WebhookTestCase):
             processed_at=processed,
         )
 
-        event.invalidate_recordset(["processing_seconds"])
+        event.invalidate_cache(["processing_seconds"])
         event._compute_processing_seconds()
 
         self.assertEqual(event.processing_seconds, 0.0)

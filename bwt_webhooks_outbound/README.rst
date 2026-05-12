@@ -11,7 +11,7 @@ Webhooks Framework - Outbound Delivery
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 .. |badge1| image:: https://img.shields.io/badge/github-BitwiseHQ%2Fodoo--webhooks-lightgray.png?logo=github
-    :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/16.0/bwt_webhooks_outbound
+    :target: https://github.com/BitwiseHQ/odoo-webhooks/tree/15.0/bwt_webhooks_outbound
     :alt: BitwiseHQ/odoo-webhooks
 
 |badge1|
@@ -28,11 +28,11 @@ retries, and detailed diagnostics.
 - Delivery context lines to map Odoo data into requests.
 - Designed to plug into connector-backed integrations.
 
-.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/16.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-flow.svg
+.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/15.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-flow.svg
    :alt: Outbound delivery flow
    :align: center
 
-.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/16.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-sequence.svg
+.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/15.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-sequence.svg
    :alt: Outbound delivery sequence
    :align: center
 
@@ -69,7 +69,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/BitwiseHQ/odoo-webhooks/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/BitwiseHQ/odoo-webhooks/issues/new?body=module:%20bwt_webhooks_outbound%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/BitwiseHQ/odoo-webhooks/issues/new?body=module:%20bwt_webhooks_outbound%0Aversion:%2015.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -84,6 +84,6 @@ Authors
 Maintainers
 ~~~~~~~~~~~
 
-This module is part of the `BitwiseHQ/odoo-webhooks <https://github.com/BitwiseHQ/odoo-webhooks/tree/16.0/bwt_webhooks_outbound>`_ project on GitHub.
+This module is part of the `BitwiseHQ/odoo-webhooks <https://github.com/BitwiseHQ/odoo-webhooks/tree/15.0/bwt_webhooks_outbound>`_ project on GitHub.
 
 You are welcome to contribute.

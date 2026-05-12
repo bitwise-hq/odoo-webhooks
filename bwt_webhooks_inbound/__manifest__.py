@@ -1,6 +1,6 @@
 {
     "name": "Webhooks Framework - Inbound Gateway",
-    "version": "16.0.1.0.0",
+    "version": "15.0.1.0.0",
     "category": "Tools",
     "summary": "Secure inbound webhook endpoints with signature validation and rule-based processing.",
     "development_status": "Production",

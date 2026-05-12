@@ -105,7 +105,7 @@ class TestDeliveryConfigurationConstraint(WebhookTestCase):
 
     def test_endpoint_with_zero_timeout_propagates_validation_error(self):
         endpoint = self.factory.outbound_endpoint()
-        endpoint.invalidate_recordset()
+        endpoint.invalidate_cache()
 
         with self.assertRaisesRegex(ValidationError, "greater than zero seconds"):
             endpoint.write({"timeout_seconds": 0})
@@ -337,7 +337,7 @@ class TestDeliveryQueueJobObservability(WebhookTestCase):
             }
         )
 
-        delivery.invalidate_recordset()
+        delivery.invalidate_cache()
 
         self.assertEqual(delivery.queue_job_count, 2)
         self.assertEqual(delivery.queue_job_ids, job_a | job_b)
@@ -556,7 +556,7 @@ class TestDeliveryReplay(WebhookTestCase):
         self.delivery.action_create_replay_delivery()
         self.delivery.action_create_replay_delivery()
 
-        self.delivery.invalidate_recordset(["replay_delivery_ids", "replay_count"])
+        self.delivery.invalidate_cache(["replay_delivery_ids", "replay_count"])
 
         self.assertEqual(self.delivery.replay_count, 2)
 
@@ -577,7 +577,7 @@ class TestDeliveryAttemptCount(WebhookTestCase):
         self.factory.outbound_attempt(delivery, attempt_number=1)
         self.factory.outbound_attempt(delivery, attempt_number=2)
 
-        delivery.invalidate_recordset(["attempt_ids", "attempt_count"])
+        delivery.invalidate_cache(["attempt_ids", "attempt_count"])
 
         self.assertEqual(delivery.attempt_count, 2)
 
@@ -986,7 +986,7 @@ class TestDeliveryLatencySeconds(WebhookTestCase):
         # create_date is set by Odoo; simulate a 45-second window.
         delivery.write({"create_date": fields.Datetime.from_string("2026-01-01 12:00:00")})
 
-        delivery.invalidate_recordset(["end_to_end_seconds", "queue_to_done_seconds"])
+        delivery.invalidate_cache(["end_to_end_seconds", "queue_to_done_seconds"])
         delivery._compute_latency_seconds()
 
         self.assertGreater(delivery.end_to_end_seconds, 0.0)
@@ -1000,7 +1000,7 @@ class TestDeliveryLatencySeconds(WebhookTestCase):
             processed_at=processed,
         )
 
-        delivery.invalidate_recordset(["queue_to_done_seconds"])
+        delivery.invalidate_cache(["queue_to_done_seconds"])
         delivery._compute_latency_seconds()
 
         self.assertAlmostEqual(delivery.queue_to_done_seconds, 20.0)
@@ -1009,7 +1009,7 @@ class TestDeliveryLatencySeconds(WebhookTestCase):
         processed = fields.Datetime.from_string("2026-01-01 12:00:30")
         delivery = self.factory.outbound_delivery(self.endpoint, processed_at=processed)
 
-        delivery.invalidate_recordset(["queue_to_done_seconds"])
+        delivery.invalidate_cache(["queue_to_done_seconds"])
         delivery._compute_latency_seconds()
 
         self.assertEqual(delivery.queue_to_done_seconds, 0.0)
@@ -1023,7 +1023,7 @@ class TestDeliveryLatencySeconds(WebhookTestCase):
             processed_at=processed,
         )
 
-        delivery.invalidate_recordset(["queue_to_done_seconds"])
+        delivery.invalidate_cache(["queue_to_done_seconds"])
         delivery._compute_latency_seconds()
 
         self.assertEqual(delivery.queue_to_done_seconds, 0.0)
