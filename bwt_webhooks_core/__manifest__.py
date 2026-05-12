@@ -20,6 +20,7 @@
     "author": "Bitwise Technologies LLC",
     "contributors": ["Youssef Egla"],
     "license": "LGPL-3",
+    "website": "https://github.com/bitwise-hq/odoo-webhooks",
     "images": ["static/description/banner.png", "static/description/icon.png"],
     "installable": True,
 }
