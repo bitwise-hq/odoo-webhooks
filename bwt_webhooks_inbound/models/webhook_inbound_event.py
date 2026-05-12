@@ -63,7 +63,6 @@ class WebhookInboundEvent(models.Model):
         compute="_compute_processing_seconds",
         store=True,
         readonly=True,
-        aggregator="avg",
         help="Seconds between reception and processing completion.",
     )
     state = fields.Selection(

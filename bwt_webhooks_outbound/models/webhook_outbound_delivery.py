@@ -118,7 +118,6 @@ class WebhookOutboundDelivery(models.Model):
         compute="_compute_latency_seconds",
         store=True,
         readonly=True,
-        aggregator="avg",
         help="Seconds between queueing and completion.",
     )
     end_to_end_seconds = fields.Float(
@@ -126,7 +125,6 @@ class WebhookOutboundDelivery(models.Model):
         compute="_compute_latency_seconds",
         store=True,
         readonly=True,
-        aggregator="avg",
         help="Seconds between delivery creation and completion.",
     )
     http_method = fields.Selection(related="endpoint_id.http_method", string="HTTP Method", readonly=True)
