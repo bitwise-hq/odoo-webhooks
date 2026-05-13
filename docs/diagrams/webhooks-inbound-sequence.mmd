@@ -12,6 +12,13 @@ sequenceDiagram
   Endpoint->>Event: Create event record
   Event->>Handler: Evaluate rules
   Handler->>Queue: Enqueue action job
-  Queue->>Handler: Execute action
-  Handler->>Event: Update state + audit
+  alt Action succeeds
+    Queue->>Handler: Execute action
+    Handler->>Event: Update state: done
+  else Action fails — retry
+    Queue->>Queue: Reschedule (exponential backoff)
+    note over Queue: Retries up to queue_job max_retries
+  else Max retries exceeded
+    Queue->>Event: Mark dead-letter / failed
+  end
   Odoo-->>Sender: 2xx / 4xx response

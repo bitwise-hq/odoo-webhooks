@@ -10,7 +10,17 @@ sequenceDiagram
   Handler->>Endpoint: Resolve endpoint + context
   Handler->>Delivery: Create delivery record
   Handler->>Queue: Enqueue send job
-  Queue->>API: Send request
-  API-->>Queue: Response
-  Queue->>Delivery: Log attempt + status
-  Queue->>Handler: Notify response hook
+  alt Delivery succeeds (2xx)
+    Queue->>API: Send request
+    API-->>Queue: 2xx response
+    Queue->>Delivery: Mark done + log
+    Queue->>Handler: Notify response hook
+  else Retryable (5xx / timeout)
+    Queue->>API: Send request
+    API-->>Queue: 5xx / timeout
+    Queue->>Delivery: Log attempt
+    Queue->>Queue: Reschedule (exponential backoff)
+    note over Queue,API: Retries up to queue_job max_retries
+  else Permanent failure
+    Queue->>Delivery: Mark dead-letter
+  end

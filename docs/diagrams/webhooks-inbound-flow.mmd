@@ -10,5 +10,8 @@ flowchart TD
   H --> I{"Match Rules?"}
   I -- No --> J["Mark Done or Dead Letter"]
   I -- Yes --> K["Queue Job: Execute Action"]
-  K --> L["Create/Update/Upsert Records"]
-  L --> M["Update Event State + Audit"]
+  K --> L{"Action OK?"}
+  L -- Yes --> M["Update Event State: done"]
+  L -- Error --> N["Retry\nexponential backoff"]
+  N -- Max Retries --> O["Dead Letter\nevent marked failed"]
+  N -- Retry --> K

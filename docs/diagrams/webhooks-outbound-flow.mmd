@@ -6,6 +6,7 @@ flowchart TD
   E --> F["HTTP Attempt"]
   F --> G{"Response OK?"}
   G -- Yes --> H["Mark Delivery Done"]
-  G -- Retryable --> I["Schedule Retry"]
+  G -- Retryable --> I["Schedule Retry\nexponential backoff"]
   G -- Fail --> J["Dead Letter"]
+  I --> F
   F --> K["Log Attempt + Response"]
