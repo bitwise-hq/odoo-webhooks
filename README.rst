@@ -62,7 +62,7 @@ folder.
 * `Developer Guide <bwt_webhooks_outbound/readme/DEVELOPER_GUIDE.rst>`_ — outbound
   pipeline, delivery state machine, context lines, transport layer.
 
-**Connector Webhooks Core** (``bwt_connector_webhooks_core/``)
+**Connector Webhooks - Glue Core** (``bwt_connector_webhooks_core/``)
 
 * `Operator Guide <bwt_connector_webhooks_core/readme/OPERATOR_GUIDE.rst>`_ —
   what the connector layer is, linking endpoints to backends, troubleshooting.
