@@ -1,6 +1,6 @@
-==================================
-Bitwise Connector Webhooks Inbound
-==================================
+=================================
+Connector Webhooks - Glue Inbound
+=================================
 
 Inbound side mixin for connector backends.
 

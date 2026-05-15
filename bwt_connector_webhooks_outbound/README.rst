@@ -1,6 +1,6 @@
-===================================
-Bitwise Connector Webhooks Outbound
-===================================
+==================================
+Connector Webhooks - Glue Outbound
+==================================
 
 Outbound side mixin for connector backends.
 

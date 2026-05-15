@@ -1,69 +1,141 @@
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 40px 16px; }
+.bwt-app .bwt-wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero { background: #F5F4FF; text-align: center; }
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app .bwt-diagram { background: #E6E5F2; text-align: center; overflow: hidden; }
+.bwt-app .bwt-diagram img { margin: 0 auto; border-radius: 8px; box-shadow: 0 2px 12px rgba(91,79,232,0.10); }
+.bwt-app .bwt-cta { background: #5B4FE8; text-align: center; }
+.bwt-app .bwt-cta p { color: #fff; font-size: 16px; margin: 0; }
+.bwt-app .bwt-guide { border-top: 1px solid #E6E5F2; }
+.bwt-app .bwt-guide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #5B4FE8;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #E6E5F2;
+}
+.bwt-app h1, .bwt-app h2, .bwt-app h3, .bwt-app h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 26px; font-weight: 700; margin-top: 20px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 400; font-size: 18px; margin-top: 8px; }
+.bwt-app .bwt-section h2 { color: #5B4FE8; font-size: 22px; font-weight: 700; }
+.bwt-app .bwt-section h3 { color: #16142B; font-size: 17px; margin-top: 24px; }
+.bwt-app .bwt-section h4 { color: #6E6B88; font-size: 15px; margin-top: 20px; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+.bwt-app pre {
+  background: #16142B;
+  color: #F5F4FF;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: 100%;
+}
+.bwt-app pre code { background: transparent; color: inherit; padding: 0; }
+.bwt-app .bwt-caption { color: #6E6B88; font-size: 13px; font-style: italic; margin: 10px 0 0; }
+.bwt-app .bwt-inline-img { margin: 20px 0; text-align: center; }
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+  .bwt-app .bwt-section { padding: 28px 14px; }
+  .bwt-app .bwt-name { font-size: 22px; }
+  .bwt-app .bwt-tagline { font-size: 16px; }
+  .bwt-app .bwt-section h2 { font-size: 19px; }
+  .bwt-app .bwt-section h3 { font-size: 16px; }
+  .bwt-app pre { font-size: 12px; padding: 12px; }
+}
+</style>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0 32px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="cover.png" alt="Connector Webhooks - Core Integration Layer cover" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
-      <h2 class="oe_slogan" style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; margin-top:20px;">Connector Webhooks - Core Integration Layer</h2>
-      <h3 class="oe_slogan" style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-weight:400;">Shared base and mixins for connector backends that own webhook endpoints.</h3>
-    </div>
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Connector Webhooks - Glue Core</h1>
+    <p class="bwt-tagline">Shared base and mixins for connector backends that own webhook endpoints.</p>
   </div>
 </section>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Operator Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Connector Webhooks Core - Operator Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide explains the connector layer of the webhook framework and how an operator links connector backends to their webhook endpoints through the UI.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">What is the Connector Layer?</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The connector layer bridges the webhook framework with OCA connector backends (e.g. a Stripe or payment gateway backend). Each connector backend record in Odoo can own one or more webhook endpoints. The connector layer provides:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;">A computed <strong>Inbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_inbound</code> is installed).</li>
-        <li style="margin-bottom:6px;">A computed <strong>Outbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_outbound</code> is installed).</li>
-        <li style="margin-bottom:6px;">Scoped technical naming so endpoint codes are unique per backend instance and company.</li>
+<section class="bwt-section bwt-guide bwt-alt">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Operator Guide</h2>
+      <h2>Connector Webhooks - Glue Core - Operator Guide</h2>
+      <p>This guide explains the connector layer of the webhook framework and how an operator links connector backends to their webhook endpoints through the UI.</p>
+      <h3>What is the Connector Layer?</h3>
+      <p>The connector layer bridges the webhook framework with OCA connector backends (e.g. a Stripe or payment gateway backend). Each connector backend record in Odoo can own one or more webhook endpoints. The connector layer provides:</p>
+      <ul>
+        <li>A computed <strong>Inbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_inbound</code> is installed).</li>
+        <li>A computed <strong>Outbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_outbound</code> is installed).</li>
+        <li>Scoped technical naming so endpoint codes are unique per backend instance and company.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Endpoints are seeded as Odoo XML data records by the concrete connector addon (e.g. <code>bwt_stripe_core</code>). They are <strong>not</strong> auto-created when a backend record is first created.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Linking an Endpoint to a Backend</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">If an endpoint has not been automatically linked by the installer, link it manually:</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;">Go to <strong>Webhooks -> Inbound -> Endpoints</strong> (or Outbound -> Endpoints) and open the endpoint record you want to link.</li>
-        <li style="margin-bottom:8px;">In the <strong>Connector Backend</strong> field, select the backend model and the specific backend record.</li>
-        <li style="margin-bottom:8px;">Save the endpoint.</li>
+      <p>Endpoints are seeded as Odoo XML data records by the concrete connector addon (e.g. <code>bwt_stripe_core</code>). They are <strong>not</strong> auto-created when a backend record is first created.</p>
+      <h3>Linking an Endpoint to a Backend</h3>
+      <p>If an endpoint has not been automatically linked by the installer, link it manually:</p>
+      <ol>
+        <li>Go to <strong>Webhooks -> Inbound -> Endpoints</strong> (or Outbound -> Endpoints) and open the endpoint record you want to link.</li>
+        <li>In the <strong>Connector Backend</strong> field, select the backend model and the specific backend record.</li>
+        <li>Save the endpoint.</li>
       </ol>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The smart button on the backend form will now resolve to this endpoint.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Multiple Backends and Endpoint Scoping</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Each connector backend instance gets its own endpoint records scoped by a technical prefix derived from the backend model name and record ID (e.g. <code>stripe-1-inbound</code>). This ensures codes are unique across companies and backend instances.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Do not manually change the <strong>Code</strong> field on an endpoint that is linked to a backend; the scoping convention is enforced by the provisioning hooks in the concrete connector addon and resync operations depend on it.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Verifying the Link</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Open the backend form. The <strong>Inbound Endpoint</strong> and/or <strong>Outbound Endpoint</strong> smart buttons should show the linked endpoint name and navigate directly to the endpoint configuration on click.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">If a smart button shows 0 or is absent, the corresponding side addon (<code>bwt_connector_webhooks_inbound</code> or <code>bwt_connector_webhooks_outbound</code>) may not be installed, or no endpoint with a matching <code>connector_backend_ref</code> value exists yet.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Troubleshooting Checklist</h3>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Smart button shows 0 or is absent</strong>: install the side addon or ask the concrete connector addon to seed its endpoint XML data and run the installer.</li>
-        <li style="margin-bottom:6px;"><strong>Multiple endpoints linked to the same backend</strong>: for inbound, only one endpoint should be linked per backend instance. For outbound, multiple endpoints are valid (one per endpoint spec). Check the addon's <code>data/</code> folder for duplicate <code>connector_backend_ref</code> values.</li>
-        <li style="margin-bottom:6px;"><strong>Endpoint code conflicts on install</strong>: the concrete connector addon's XML data may have a conflicting code; inspect the <code>data/</code> folder for the endpoint record and ensure the code follows the <code><prefix>-<suffix></code> convention and is unique.</li>
-        <li style="margin-bottom:6px;"><strong>Backend not appearing in Connector Backend selection</strong>: ensure the concrete connector addon inherits both <code>connector.backend</code> and the appropriate webhook mixin, and that the addon is installed.</li>
+      <p>The smart button on the backend form will now resolve to this endpoint.</p>
+      <h4>Multiple Backends and Endpoint Scoping</h4>
+      <p>Each connector backend instance gets its own endpoint records scoped by a technical prefix derived from the backend model name and record ID (e.g. <code>stripe-1-inbound</code>). This ensures codes are unique across companies and backend instances.</p>
+      <p>Do not manually change the <strong>Code</strong> field on an endpoint that is linked to a backend; the scoping convention is enforced by the provisioning hooks in the concrete connector addon and resync operations depend on it.</p>
+      <h4>Verifying the Link</h4>
+      <p>Open the backend form. The <strong>Inbound Endpoint</strong> and/or <strong>Outbound Endpoint</strong> smart buttons should show the linked endpoint name and navigate directly to the endpoint configuration on click.</p>
+      <p>If a smart button shows 0 or is absent, the corresponding side addon (<code>bwt_connector_webhooks_inbound</code> or <code>bwt_connector_webhooks_outbound</code>) may not be installed, or no endpoint with a matching <code>connector_backend_ref</code> value exists yet.</p>
+      <h3>Troubleshooting Checklist</h3>
+      <ul>
+        <li><strong>Smart button shows 0 or is absent</strong>: install the side addon or ask the concrete connector addon to seed its endpoint XML data and run the installer.</li>
+        <li><strong>Multiple endpoints linked to the same backend</strong>: for inbound, only one endpoint should be linked per backend instance. For outbound, multiple endpoints are valid (one per endpoint spec). Check the addon's <code>data/</code> folder for duplicate <code>connector_backend_ref</code> values.</li>
+        <li><strong>Endpoint code conflicts on install</strong>: the concrete connector addon's XML data may have a conflicting code; inspect the <code>data/</code> folder for the endpoint record and ensure the code follows the <code><prefix>-<suffix></code> convention and is unique.</li>
+        <li><strong>Backend not appearing in Connector Backend selection</strong>: ensure the concrete connector addon inherits both <code>connector.backend</code> and the appropriate webhook mixin, and that the addon is installed.</li>
       </ul>
-    </div>
   </div>
 </section>
 
-<section class="oe_container" style="background:#ffffff; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Developer Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Connector Webhooks Core - Developer Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers building a new connector backend addon that integrates with the webhook framework via the connector layer mixins.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Architecture Overview</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The connector layer consists of three abstract models:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>bwt.connector.webhook.backend.base</code> - private shared base; not inherited directly. Provides code normalization, scoping primitives, and the integration contract marker.</li>
-        <li style="margin-bottom:6px;"><code>bwt.connector.webhook.inbound.mixin</code> - opt-in mixin for backends that receive inbound webhooks.</li>
-        <li style="margin-bottom:6px;"><code>bwt.connector.webhook.outbound.mixin</code> - opt-in mixin for backends that send outbound webhooks.</li>
+<section class="bwt-section bwt-guide">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Developer Guide</h2>
+      <h2>Connector Webhooks - Glue Core - Developer Guide</h2>
+      <p>This guide covers building a new connector backend addon that integrates with the webhook framework via the connector layer mixins.</p>
+      <h3>Architecture Overview</h3>
+      <p>The connector layer consists of three abstract models:</p>
+      <ul>
+        <li><code>bwt.connector.webhook.backend.base</code> - private shared base; not inherited directly. Provides code normalization, scoping primitives, and the integration contract marker.</li>
+        <li><code>bwt.connector.webhook.inbound.mixin</code> - opt-in mixin for backends that receive inbound webhooks.</li>
+        <li><code>bwt.connector.webhook.outbound.mixin</code> - opt-in mixin for backends that send outbound webhooks.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Concrete backends combine these with the OCA <code>connector.backend</code> model.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Registering a Backend</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Declare the backend model in your concrete connector addon</p>
+      <p>Concrete backends combine these with the OCA <code>connector.backend</code> model.</p>
+      <h3>Registering a Backend</h3>
+      <p>Declare the backend model in your concrete connector addon</p>
       <pre>class MyServiceBackend(models.Model):
     _name = &quot;my_service.backend&quot;
     _inherit = [
@@ -78,15 +150,15 @@
     company_id = fields.Many2one(&quot;res.company&quot;, required=True)
     active = fields.Boolean(default=True)
     api_key = fields.Char(string=&quot;API Key&quot;)</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The <code>_is_connector_webhook_backend = True</code> marker is set automatically by the base; your model is enrolled in the backend reference selection without further configuration.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Technical Prefix</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Override <code>_get_technical_prefix()</code> to return a stable, human-readable prefix</p>
+      <p>The <code>_is_connector_webhook_backend = True</code> marker is set automatically by the base; your model is enrolled in the backend reference selection without further configuration.</p>
+      <h4>Technical Prefix</h4>
+      <p>Override <code>_get_technical_prefix()</code> to return a stable, human-readable prefix</p>
       <pre>def _get_technical_prefix(self):
     self.ensure_one()
     return f&quot;my-service-{self.id}&quot;</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The default prefix is <code><model-token>-<id></code>. A custom prefix keeps codes stable across model renames and readable in the admin UI.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Inbound Integration</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Override <code>_handle_inbound_webhook_event</code> to process events routed to this backend</p>
+      <p>The default prefix is <code><model-token>-<id></code>. A custom prefix keeps codes stable across model renames and readable in the admin UI.</p>
+      <h3>Inbound Integration</h3>
+      <p>Override <code>_handle_inbound_webhook_event</code> to process events routed to this backend</p>
       <pre>def _handle_inbound_webhook_event(self, event):
     self.ensure_one()
     payload = event.get_payload()
@@ -95,38 +167,38 @@
         self._handle_payment(payload)
         return event.webhook_done()
     return event.webhook_dead_letter()</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Valid return values from <code>bwt_connector_webhooks_core.services.result_types</code>:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>event.webhook_done()</code> - processing complete.</li>
-        <li style="margin-bottom:6px;"><code>event.webhook_dead_letter()</code> - permanent failure; requires manual review.</li>
-        <li style="margin-bottom:6px;"><code>event.webhook_retry(seconds=60)</code> - re-enqueue after a delay.</li>
-        <li style="margin-bottom:6px;"><code>event.webhook_cancel()</code> - silently cancel without marking as error.</li>
+      <p>Valid return values from <code>bwt_connector_webhooks_core.services.result_types</code>:</p>
+      <ul>
+        <li><code>event.webhook_done()</code> - processing complete.</li>
+        <li><code>event.webhook_dead_letter()</code> - permanent failure; requires manual review.</li>
+        <li><code>event.webhook_retry(seconds=60)</code> - re-enqueue after a delay.</li>
+        <li><code>event.webhook_cancel()</code> - silently cancel without marking as error.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Returning <code>None</code> produces a framework-level dead-letter.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The handler record for this backend's inbound endpoint must use <strong>Python Callback</strong> mode pointing to <code>my_service.backend</code> and <code>_handle_inbound_webhook_event</code>. Seed it as an XML data record in your addon.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Outbound Integration</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Override the following hooks on your backend model.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Dynamic hostname (required when the URL changes between modes)</p>
+      <p>Returning <code>None</code> produces a framework-level dead-letter.</p>
+      <p>The handler record for this backend's inbound endpoint must use <strong>Python Callback</strong> mode pointing to <code>my_service.backend</code> and <code>_handle_inbound_webhook_event</code>. Seed it as an XML data record in your addon.</p>
+      <h3>Outbound Integration</h3>
+      <p>Override the following hooks on your backend model.</p>
+      <p>Dynamic hostname (required when the URL changes between modes)</p>
       <pre>def _get_outbound_api_base_url(self, delivery=None):
     self.ensure_one()
     return &quot;https://api.my-service.com&quot;</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Authentication headers (required for most APIs)</p>
+      <p>Authentication headers (required for most APIs)</p>
       <pre>def _get_outbound_extra_headers(self, delivery):
     self.ensure_one()
     return {&quot;Authorization&quot;: f&quot;Bearer {self.api_key}&quot;}</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Pre-send gate (optional - short-circuit before dispatch)</p>
+      <p>Pre-send gate (optional - short-circuit before dispatch)</p>
       <pre>def _check_outbound_dispatch_allowed(self, delivery):
     self.ensure_one()
     if not self.active:
         return delivery.webhook_cancel()
     return None</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Main dispatch handler (required when using Python Callback mode)</p>
+      <p>Main dispatch handler (required when using Python Callback mode)</p>
       <pre>def _handle_outbound_webhook_delivery(self, delivery):
     self.ensure_one()
     return delivery._build_outbound_delivery_result(outcome=&quot;send&quot;)</pre>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Endpoint Seeding</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Endpoint records are seeded as XML data in your concrete connector addon's <code>data/</code> folder. They are linked to backends via the <code>connector_backend_ref</code> field. Do not auto-provision endpoints from Python code; keep them as declarative XML records to stay upgrade-safe.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Example inbound endpoint record</p>
+      <h3>Endpoint Seeding</h3>
+      <p>Endpoint records are seeded as XML data in your concrete connector addon's <code>data/</code> folder. They are linked to backends via the <code>connector_backend_ref</code> field. Do not auto-provision endpoints from Python code; keep them as declarative XML records to stay upgrade-safe.</p>
+      <p>Example inbound endpoint record</p>
       <pre>&lt;record id=&quot;my_service_inbound_endpoint&quot; model=&quot;bwt.webhook.inbound.endpoint&quot;&gt;
     &lt;field name=&quot;name&quot;&gt;My Service Inbound&lt;/field&gt;
     &lt;field name=&quot;path&quot;&gt;/webhooks/my-service&lt;/field&gt;
@@ -135,18 +207,18 @@
     &lt;field name=&quot;signature_digest&quot;&gt;sha256&lt;/field&gt;
     &lt;field name=&quot;signature_encoding&quot;&gt;hex&lt;/field&gt;
 &lt;/record&gt;</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">After install, link the endpoint to the backend by setting <code>connector_backend_ref</code> or by following the UI steps in the Operator Guide.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Resolving the Linked Outbound Endpoint</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">When queueing an outbound delivery from your business logic</p>
+      <p>After install, link the endpoint to the backend by setting <code>connector_backend_ref</code> or by following the UI steps in the Operator Guide.</p>
+      <h3>Resolving the Linked Outbound Endpoint</h3>
+      <p>When queueing an outbound delivery from your business logic</p>
       <pre>backend = self.env[&quot;my_service.backend&quot;].browse(backend_id)
 endpoint = backend.get_outbound_endpoint()
 delivery = endpoint.queue_delivery(
     payload={&quot;event&quot;: &quot;order.paid&quot;, &quot;order_id&quot;: order.id},
     context_lines={&quot;idempotency_key&quot;: str(uuid.uuid4())},
 )</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Use <code>code_suffix</code> when a backend has multiple outbound endpoints</p>
+      <p>Use <code>code_suffix</code> when a backend has multiple outbound endpoints</p>
       <pre>endpoint = backend.get_outbound_endpoint(code_suffix=&quot;orders&quot;)</pre>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The <code>code_suffix</code> value must match the <code>code_suffix</code> column on the endpoint record, which is set by the concrete addon's XML data.</p>
-    </div>
+      <p>The <code>code_suffix</code> value must match the <code>code_suffix</code> column on the endpoint record, which is set by the concrete addon's XML data.</p>
   </div>
 </section>
+</div>

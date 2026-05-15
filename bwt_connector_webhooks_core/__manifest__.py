@@ -1,5 +1,5 @@
 {
-    "name": "Webhooks Connector - Core Orchestration",
+    "name": "Connector Webhooks - Glue Core",
     "version": "17.0.1.0.0",
     "category": "Tools",
     "summary": "Shared base for connector backends that own webhook endpoints.",
