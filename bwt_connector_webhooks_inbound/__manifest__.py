@@ -1,5 +1,5 @@
 {
-    "name": "Webhooks Connector - Inbound Gateway",
+    "name": "Connector Webhooks - Glue Inbound",
     "version": "16.0.1.0.0",
     "category": "Tools",
     "summary": "Inbound webhook integration for connector backends.",

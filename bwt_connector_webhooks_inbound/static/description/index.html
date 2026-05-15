@@ -1,68 +1,97 @@
-<section class="oe_container" style="background:#F5F4FF; padding:24px 0 16px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="banner.png" alt="Bitwise Connector Webhooks Inbound banner" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
-    </div>
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 40px 16px; }
+.bwt-app .bwt-wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero { background: #F5F4FF; text-align: center; }
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app h1, .bwt-app h2, .bwt-app h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 26px; font-weight: 700; margin-top: 20px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 400; font-size: 18px; margin-top: 8px; }
+.bwt-app .bwt-section h2 { color: #5B4FE8; font-size: 22px; font-weight: 700; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+  .bwt-app .bwt-section { padding: 28px 14px; }
+  .bwt-app .bwt-name { font-size: 22px; }
+  .bwt-app .bwt-tagline { font-size: 16px; }
+  .bwt-app .bwt-section h2 { font-size: 19px; }
+}
+</style>
+
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Connector Webhooks - Glue Inbound</h1>
+    <p class="bwt-tagline">Inbound webhook integration for connector backends.</p>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12 text-center">
-      <h2 class="oe_slogan" style="color: #4F46E5;">Bitwise Connector Webhooks Inbound</h2>
-      <h3 class="oe_slogan">Inbound webhook integration for connector backends.</h3>
-    </div>
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Overview</h2>
+    <p>
+      <strong>Connector Webhooks - Glue Inbound</strong> provides an opt-in mixin
+      (<code>bwt.connector.webhook.inbound.mixin</code>) that connector backends inherit to
+      gain fully automated inbound webhook provisioning. Endpoints and handlers are created,
+      updated, and linked to the backend record without manual configuration.
+    </p>
   </div>
 </section>
 
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Overview</h2>
-      <p>
-        <strong>Bitwise Connector Webhooks Inbound</strong> provides an opt-in mixin
-        (<code>bwt.connector.webhook.inbound.mixin</code>) that connector backends inherit to
-        gain fully automated inbound webhook provisioning. Endpoints and handlers are created,
-        updated, and linked to the backend record without manual configuration.
-      </p>
-    </div>
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Key Features</h2>
+    <ul>
+      <li>Adds <code>connector_backend_ref</code> on inbound endpoints and a computed <code>webhook_endpoint_id</code> on the backend</li>
+      <li>Inbound callback dispatcher (<code>_handle_inbound_webhook_event</code>) routed via the framework's <code>_invoke_inbound_dispatch</code> hook</li>
+      <li>JSON payload decoder with configurable depth and error handling</li>
+      <li>Form action to navigate directly to the linked inbound endpoint</li>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Key Features</h2>
-      <ul>
-        <li>Adds <code>connector_backend_ref</code> on inbound endpoints and a computed <code>webhook_endpoint_id</code> on the backend</li>
-        <li>Inbound callback dispatcher (<code>_handle_inbound_webhook_event</code>) routed via the framework's <code>_invoke_inbound_dispatch</code> hook</li>
-        <li>JSON payload decoder with configurable depth and error handling</li>
-        <li>Form action to navigate directly to the linked inbound endpoint</li>
-      </ul>
-    </div>
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Dependencies</h2>
+    <ul>
+      <li><code>bwt_connector_webhooks_core</code></li>
+      <li><code>bwt_webhooks_inbound</code></li>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Dependencies</h2>
-      <ul>
-        <li><code>bwt_connector_webhooks_core</code></li>
-        <li><code>bwt_webhooks_inbound</code></li>
-      </ul>
-    </div>
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Author</h2>
+    <p>
+      Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
+      Contributors: Youssef Egla.
+    </p>
   </div>
 </section>
-
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Author</h2>
-      <p>
-        Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
-        Contributors: Youssef Egla.
-      </p>
-    </div>
-  </div>
-</section>
+</div>

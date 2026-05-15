@@ -1,5 +1,5 @@
-Connector Webhooks Core — Operator Guide
-=========================================
+Connector Webhooks - Glue Core - Operator Guide
+===============================================
 
 This guide explains the connector layer of the webhook framework and how an
 operator links connector backends to their webhook endpoints through the UI.

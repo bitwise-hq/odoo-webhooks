@@ -39,9 +39,9 @@ BANNER_TEXT = {
     "bwt_webhooks_core": "Webhooks Framework - Orchestration",
     "bwt_webhooks_inbound": "Webhooks Framework - Inbound Gateway",
     "bwt_webhooks_outbound": "Webhooks Framework - Outbound Delivery",
-    "bwt_connector_webhooks_core": "Webhooks Connector - Core Orchestration",
-    "bwt_connector_webhooks_inbound": "Webhooks Connector - Inbound Gateway",
-    "bwt_connector_webhooks_outbound": "Webhooks Connector - Outbound Delivery",
+    "bwt_connector_webhooks_core": "Connector Webhooks - Glue Core",
+    "bwt_connector_webhooks_inbound": "Connector Webhooks - Glue Inbound",
+    "bwt_connector_webhooks_outbound": "Connector Webhooks - Glue Outbound",
 }
 
 

@@ -1,6 +1,6 @@
-===============================
-Bitwise Connector Webhooks Core
-===============================
+==============================
+Connector Webhooks - Glue Core
+==============================
 
 Shared base for connector backends that own webhook endpoints.
 
