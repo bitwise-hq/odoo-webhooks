@@ -1,200 +1,260 @@
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 40px 16px; }
+.bwt-app .bwt-wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero { background: #F5F4FF; text-align: center; }
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app .bwt-diagram { background: #E6E5F2; text-align: center; overflow: hidden; }
+.bwt-app .bwt-diagram img { margin: 0 auto; border-radius: 8px; box-shadow: 0 2px 12px rgba(91,79,232,0.10); }
+.bwt-app .bwt-cta { background: #5B4FE8; text-align: center; }
+.bwt-app .bwt-cta p { color: #fff; font-size: 16px; margin: 0; }
+.bwt-app .bwt-guide { border-top: 1px solid #E6E5F2; }
+.bwt-app .bwt-guide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #5B4FE8;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #E6E5F2;
+}
+.bwt-app h1, .bwt-app h2, .bwt-app h3, .bwt-app h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 26px; font-weight: 700; margin-top: 20px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 400; font-size: 18px; margin-top: 8px; }
+.bwt-app .bwt-section h2 { color: #5B4FE8; font-size: 22px; font-weight: 700; }
+.bwt-app .bwt-section h3 { color: #16142B; font-size: 17px; margin-top: 24px; }
+.bwt-app .bwt-section h4 { color: #6E6B88; font-size: 15px; margin-top: 20px; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+.bwt-app pre {
+  background: #16142B;
+  color: #F5F4FF;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: 100%;
+}
+.bwt-app pre code { background: transparent; color: inherit; padding: 0; }
+.bwt-app .bwt-caption { color: #6E6B88; font-size: 13px; font-style: italic; margin: 10px 0 0; }
+.bwt-app .bwt-inline-img { margin: 20px 0; text-align: center; }
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+  .bwt-app .bwt-section { padding: 28px 14px; }
+  .bwt-app .bwt-name { font-size: 22px; }
+  .bwt-app .bwt-tagline { font-size: 16px; }
+  .bwt-app .bwt-section h2 { font-size: 19px; }
+  .bwt-app .bwt-section h3 { font-size: 16px; }
+  .bwt-app pre { font-size: 12px; padding: 12px; }
+}
+</style>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0 32px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="cover.png" alt="Webhooks Framework - Outbound Delivery cover" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
-      <h2 class="oe_slogan" style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; margin-top:20px;">Webhooks Framework - Outbound Delivery</h2>
-      <h3 class="oe_slogan" style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-weight:400;">Reliable outbound delivery with templated requests, retries, and diagnostics.</h3>
-    </div>
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Webhooks Framework - Outbound Delivery</h1>
+    <p class="bwt-tagline">Reliable outbound delivery with templated requests, retries, and diagnostics.</p>
   </div>
 </section>
 
-<section class="oe_container" style="padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Key Features</h2>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Key Features</h2>
+    <ul>
         <li>Endpoint registry with method, body mode, and timeout controls.</li>
         <li>Tokenized paths plus header and payload rules for dynamic requests.</li>
         <li>Queue-backed delivery with retry and dead-letter handling.</li>
         <li>Per-attempt response logging for diagnostics and SLAs.</li>
         <li>Delivery context lines to map Odoo data into requests.</li>
         <li>Designed to plug into connector-backed integrations.</li>
-      </ul>
-    </div>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container oe_dark" style="background:#E6E5F2; padding:32px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <img src="diagrams/webhooks-outbound-flow.svg" alt="Outbound delivery flow" style="max-width:720px; width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(91,79,232,0.10);"/>
-    </div>
+<section class="bwt-section bwt-diagram">
+  <div class="bwt-wrap">
+    <img src="diagrams/webhooks-outbound-flow.svg" alt="Outbound delivery flow"/>
   </div>
 </section>
 
-<section class="oe_container oe_dark" style="background:#E6E5F2; padding:32px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <img src="diagrams/webhooks-outbound-sequence.svg" alt="Outbound delivery sequence" style="max-width:720px; width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(91,79,232,0.10);"/>
-    </div>
+<section class="bwt-section bwt-diagram">
+  <div class="bwt-wrap">
+    <img src="diagrams/webhooks-outbound-sequence.svg" alt="Outbound delivery sequence"/>
   </div>
 </section>
 
-<section class="oe_container" style="padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Configuration</h2>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Configuration</h2>
+    <ol>
         <li>Go to <code>Webhooks > Outbound Endpoints</code> and create an endpoint.</li>
         <li>Set the target host/path, method, body mode, and timeout.</li>
         <li>Configure header and payload rules plus context lines.</li>
         <li>Attach a handler and outbound rule set.</li>
-      </ol>
-    </div>
+    </ol>
   </div>
 </section>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Usage</h2>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Usage</h2>
+    <ol>
         <li>Trigger outbound rules from your business flow or connector backend.</li>
         <li>Monitor deliveries in <code>Webhooks > Outbound Deliveries</code>.</li>
         <li>Review attempts and retry or dead-letter as needed.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="bwt-section bwt-cta">
+  <div class="bwt-wrap">
+    <p>Looking for turnkey integrations? Pair this framework with premium connector addons (e.g., Stripe) to launch faster.</p>
+  </div>
+</section>
+
+<section class="bwt-section bwt-guide bwt-alt">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Operator Guide</h2>
+      <h2>Webhooks Outbound - Operator Guide</h2>
+      <p>This guide covers the outbound delivery engine: creating and configuring outbound endpoints, triggering deliveries, monitoring attempts, and handling failures.</p>
+      <h3>Prerequisites</h3>
+      <p>Install <code>bwt_webhooks_outbound</code> after <code>bwt_webhooks_core</code> and <code>queue_job</code> are in place. At least one handler with <strong>Direction = Outbound</strong> must exist before creating an endpoint that uses a handler.</p>
+      <h3>Creating an Outbound Endpoint</h3>
+      <p>Go to <strong>Webhooks -> Outbound -> Endpoints -> New</strong>.</p>
+      <p>Required fields:</p>
+      <ul>
+        <li><strong>Name</strong> - human-readable label.</li>
+        <li><strong>Code</strong> - stable, unique technical identifier used by connector addons and programmatic dispatch (lowercase slug; no spaces).</li>
+        <li><strong>HTTP Method</strong> - <code>POST</code> (default), <code>PUT</code>, <code>PATCH</code>, or <code>DELETE</code>.</li>
+        <li><strong>Request Body Mode</strong> - controls how the payload is encoded:</li>
+      </ul>
+      <ul>
+        <li><code>JSON</code> - <code>application/json</code>; default for REST APIs.</li>
+        <li><code>Form URL Encoded</code> - <code>application/x-www-form-urlencoded</code>.</li>
+        <li><code>Multipart</code> - <code>multipart/form-data</code>.</li>
+      </ul>
+      <ul>
+        <li><strong>Target Path</strong> - the URL path, optionally with <code>{token}</code> placeholders resolved from delivery context lines (e.g. <code>/v1/orders/{order_id}</code>).</li>
+        <li><strong>Company</strong> - defaults to the current company.</li>
+      </ul>
+      <h4>Target Hostname</h4>
+      <p>Set <strong>Target Hostname</strong> to the absolute base URL including the scheme (e.g. <code>https://api.example.com</code>). Leave it blank when a connector addon resolves the hostname dynamically via <code>_get_outbound_api_base_url</code>.</p>
+      <h4>Handler (optional)</h4>
+      <p>Attach an outbound handler to intercept deliveries before the HTTP request is sent. The handler can mutate the payload, retry, cancel, or dead-letter the delivery before the HTTP call is made.</p>
+      <h4>Header and Payload Rules</h4>
+      <p>Use the <strong>Headers</strong> and <strong>Payload</strong> tabs to configure rules that build the outgoing request:</p>
+      <ul>
+        <li><strong>Header rules</strong> - add or override request headers. Supports literal values and context-line token references.</li>
+        <li><strong>Payload rules</strong> - construct or override the request body using field paths and value mappings.</li>
+        <li><strong>Context lines</strong> - key/value pairs attached to a delivery at queue time; referenced in header and payload rules and path tokens via <code>{key}</code> syntax.</li>
+      </ul>
+      <h4>Endpoint States</h4>
+      <ul>
+        <li><strong>Draft</strong> - endpoint configured but deliveries are not dispatched.</li>
+        <li><strong>Active</strong> - endpoint is live; deliveries can be queued and dispatched.</li>
+        <li><strong>Archived</strong> - endpoint inactive; existing delivery records remain in audit history but no new deliveries can be queued.</li>
+      </ul>
+      <h3>Monitoring Deliveries</h3>
+      <p>Go to <strong>Webhooks -> Outbound -> Deliveries</strong> to see all deliveries.</p>
+      <p>Delivery lifecycle states:</p>
+      <ul>
+        <li><strong>Draft</strong> - created but not yet queued.</li>
+        <li><strong>Queued</strong> - waiting for the background worker.</li>
+        <li><strong>Processing</strong> - background job is running.</li>
+        <li><strong>Done</strong> - HTTP request sent and accepted by the target.</li>
+        <li><strong>Error</strong> - an exception occurred or the target returned a non-success response code.</li>
+        <li><strong>Dead Letter</strong> - permanently failed after exhausting retries or explicitly dead-lettered; requires manual review.</li>
+        <li><strong>Canceled</strong> - cancelled before dispatch.</li>
+      </ul>
+      <p>Click a delivery record to open its <strong>Attempts</strong> tab, which lists every HTTP request made with the response status code, headers, and body.</p>
+      <h3>Retries and Dead-Letter</h3>
+      <p>To retry a delivery in <strong>Error</strong> or <strong>Dead Letter</strong> state:</p>
+      <ol>
+        <li>Open the delivery record.</li>
+        <li>Click <strong>Reset to Draft</strong> to move it back to the <code>draft</code> state.</li>
+        <li>Click <strong>Queue</strong> (or trigger re-queueing from your business flow) to re-enqueue the delivery.</li>
       </ol>
-    </div>
+      <p>To permanently close a failed delivery without retrying, use <strong>Action -> Dead Letter</strong> from the delivery form.</p>
+      <h3>Troubleshooting Checklist</h3>
+      <ul>
+        <li><strong>401 / authentication failures</strong>: ensure the connector backend is active and the API key or secret field is populated (see the connector addon docs).</li>
+        <li><strong>Target not reachable</strong>: verify <strong>Target Hostname</strong> is correct and the Odoo server can reach the target host on the configured port.</li>
+        <li><strong>Deliveries stuck in Queued</strong>: confirm the <code>queue_job</code> worker is running and the job channel is not paused or at capacity.</li>
+        <li><strong>Payload shape wrong</strong>: open a delivery attempt and inspect the <strong>Request Body</strong> snapshot to compare the actual payload against the expected format.</li>
+        <li><strong>Path token not resolved</strong>: ensure the delivery's context lines contain a key matching the <code>{token}</code> placeholder in <strong>Target Path</strong>.</li>
+      </ul>
   </div>
 </section>
 
-<section class="oe_container" style="background:#5B4FE8; padding:36px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <p style="color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:16px; margin:0;">Looking for turnkey integrations? Pair this framework with premium connector addons (e.g., Stripe) to launch faster.</p>
-    </div>
-  </div>
-</section>
-
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Operator Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Outbound - Operator Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the outbound delivery engine: creating and configuring outbound endpoints, triggering deliveries, monitoring attempts, and handling failures.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Prerequisites</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Install <code>bwt_webhooks_outbound</code> after <code>bwt_webhooks_core</code> and <code>queue_job</code> are in place. At least one handler with <strong>Direction = Outbound</strong> must exist before creating an endpoint that uses a handler.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Creating an Outbound Endpoint</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Go to <strong>Webhooks -> Outbound -> Endpoints -> New</strong>.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Required fields:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Name</strong> - human-readable label.</li>
-        <li style="margin-bottom:6px;"><strong>Code</strong> - stable, unique technical identifier used by connector addons and programmatic dispatch (lowercase slug; no spaces).</li>
-        <li style="margin-bottom:6px;"><strong>HTTP Method</strong> - <code>POST</code> (default), <code>PUT</code>, <code>PATCH</code>, or <code>DELETE</code>.</li>
-        <li style="margin-bottom:6px;"><strong>Request Body Mode</strong> - controls how the payload is encoded:</li>
+<section class="bwt-section bwt-guide">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Developer Guide</h2>
+      <h2>Webhooks Outbound - Developer Guide</h2>
+      <p>This guide covers the outbound delivery pipeline, handler and rule contract, and extension points for developers building on or customising the outbound delivery addon.</p>
+      <h3>Outbound Processing Pipeline</h3>
+      <p>The diagram below shows the call chain executed for every delivery record.</p>
+      <div class="bwt-inline-img"><img src="diagrams/webhooks-outbound-pipeline.svg" alt="Outbound processing pipeline"/></div>
+      <p>Two value objects keep the data flow explicit:</p>
+      <ul>
+        <li><code>OutboundRequest</code> - immutable snapshot of the HTTP request to send (method, URL, headers, body mode, payload).</li>
+        <li><code>HandlerOutcome</code> - interpretation of the handler's return value: <code>send</code>, <code>retry</code>, <code>done</code>, <code>dead_letter</code>, or <code>cancel</code>.</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>JSON</code> - <code>application/json</code>; default for REST APIs.</li>
-        <li style="margin-bottom:6px;"><code>Form URL Encoded</code> - <code>application/x-www-form-urlencoded</code>.</li>
-        <li style="margin-bottom:6px;"><code>Multipart</code> - <code>multipart/form-data</code>.</li>
+      <h3>Delivery State Machine</h3>
+      <p>States and valid operator-driven transitions:</p>
+      <ul>
+        <li><code>draft</code> -> <code>queued</code> (via queue action or programmatic call)</li>
+        <li><code>queued</code> -> <code>processing</code> (worker picks up the job)</li>
+        <li><code>processing</code> -> <code>done</code> (HTTP success)</li>
+        <li><code>processing</code> -> <code>error</code> (exception or HTTP error response)</li>
+        <li><code>processing</code> -> <code>dead_letter</code> (handler dead-letters)</li>
+        <li><code>processing</code> -> <code>canceled</code> (handler cancels)</li>
+        <li><code>error</code> / <code>dead_letter</code> / <code>canceled</code> -> <code>draft</code> (operator reset)</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Target Path</strong> - the URL path, optionally with <code>{token}</code> placeholders resolved from delivery context lines (e.g. <code>/v1/orders/{order_id}</code>).</li>
-        <li style="margin-bottom:6px;"><strong>Company</strong> - defaults to the current company.</li>
+      <h3>Model-Driven Rule Processing</h3>
+      <p>Rules on <code>bwt.webhook.outbound.handler.rule</code> are evaluated before the HTTP request is dispatched. Supported actions:</p>
+      <ul>
+        <li><code>send</code> - allow the delivery to proceed (default when no rule matches).</li>
+        <li><code>done</code> - mark delivery done without sending.</li>
+        <li><code>dead_letter</code> - dead-letter the delivery without sending.</li>
+        <li><code>retry</code> - re-enqueue after <code>retry_seconds</code>.</li>
+        <li><code>mutate</code> - modify the <code>OutboundRequest</code> payload or headers via assignments before sending.</li>
       </ul>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Target Hostname</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Set <strong>Target Hostname</strong> to the absolute base URL including the scheme (e.g. <code>https://api.example.com</code>). Leave it blank when a connector addon resolves the hostname dynamically via <code>_get_outbound_api_base_url</code>.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Handler (optional)</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Attach an outbound handler to intercept deliveries before the HTTP request is sent. The handler can mutate the payload, retry, cancel, or dead-letter the delivery before the HTTP call is made.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Header and Payload Rules</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Use the <strong>Headers</strong> and <strong>Payload</strong> tabs to configure rules that build the outgoing request:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Header rules</strong> - add or override request headers. Supports literal values and context-line token references.</li>
-        <li style="margin-bottom:6px;"><strong>Payload rules</strong> - construct or override the request body using field paths and value mappings.</li>
-        <li style="margin-bottom:6px;"><strong>Context lines</strong> - key/value pairs attached to a delivery at queue time; referenced in header and payload rules and path tokens via <code>{key}</code> syntax.</li>
+      <p>Conditions use the same field-path and operator syntax as inbound rules, evaluated against the delivery's resolved context and endpoint configuration.</p>
+      <h3>Context Lines</h3>
+      <p>Context lines (<code>bwt.webhook.outbound.delivery.context_line</code>) are key/value pairs attached to a delivery at queue time. They serve three purposes:</p>
+      <ul>
+        <li>Resolve <code>{token}</code> placeholders in the endpoint <strong>Target Path</strong>.</li>
+        <li>Supply values referenced in header and payload rules.</li>
+        <li>Pass business identifiers to the backend's <code>_get_outbound_extra_headers</code> hook (see the Connector Integration guide).</li>
       </ul>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Endpoint States</h4>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Draft</strong> - endpoint configured but deliveries are not dispatched.</li>
-        <li style="margin-bottom:6px;"><strong>Active</strong> - endpoint is live; deliveries can be queued and dispatched.</li>
-        <li style="margin-bottom:6px;"><strong>Archived</strong> - endpoint inactive; existing delivery records remain in audit history but no new deliveries can be queued.</li>
-      </ul>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Monitoring Deliveries</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Go to <strong>Webhooks -> Outbound -> Deliveries</strong> to see all deliveries.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Delivery lifecycle states:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Draft</strong> - created but not yet queued.</li>
-        <li style="margin-bottom:6px;"><strong>Queued</strong> - waiting for the background worker.</li>
-        <li style="margin-bottom:6px;"><strong>Processing</strong> - background job is running.</li>
-        <li style="margin-bottom:6px;"><strong>Done</strong> - HTTP request sent and accepted by the target.</li>
-        <li style="margin-bottom:6px;"><strong>Error</strong> - an exception occurred or the target returned a non-success response code.</li>
-        <li style="margin-bottom:6px;"><strong>Dead Letter</strong> - permanently failed after exhausting retries or explicitly dead-lettered; requires manual review.</li>
-        <li style="margin-bottom:6px;"><strong>Canceled</strong> - cancelled before dispatch.</li>
-      </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Click a delivery record to open its <strong>Attempts</strong> tab, which lists every HTTP request made with the response status code, headers, and body.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Retries and Dead-Letter</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To retry a delivery in <strong>Error</strong> or <strong>Dead Letter</strong> state:</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;">Open the delivery record.</li>
-        <li style="margin-bottom:8px;">Click <strong>Reset to Draft</strong> to move it back to the <code>draft</code> state.</li>
-        <li style="margin-bottom:8px;">Click <strong>Queue</strong> (or trigger re-queueing from your business flow) to re-enqueue the delivery.</li>
-      </ol>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To permanently close a failed delivery without retrying, use <strong>Action -> Dead Letter</strong> from the delivery form.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Troubleshooting Checklist</h3>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>401 / authentication failures</strong>: ensure the connector backend is active and the API key or secret field is populated (see the connector addon docs).</li>
-        <li style="margin-bottom:6px;"><strong>Target not reachable</strong>: verify <strong>Target Hostname</strong> is correct and the Odoo server can reach the target host on the configured port.</li>
-        <li style="margin-bottom:6px;"><strong>Deliveries stuck in Queued</strong>: confirm the <code>queue_job</code> worker is running and the job channel is not paused or at capacity.</li>
-        <li style="margin-bottom:6px;"><strong>Payload shape wrong</strong>: open a delivery attempt and inspect the <strong>Request Body</strong> snapshot to compare the actual payload against the expected format.</li>
-        <li style="margin-bottom:6px;"><strong>Path token not resolved</strong>: ensure the delivery's context lines contain a key matching the <code>{token}</code> placeholder in <strong>Target Path</strong>.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section class="oe_container" style="background:#ffffff; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Developer Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Outbound - Developer Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the outbound delivery pipeline, handler and rule contract, and extension points for developers building on or customising the outbound delivery addon.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Outbound Processing Pipeline</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The diagram below shows the call chain executed for every delivery record.</p>
-      <div style="text-align:center; margin:24px 0;"><img src="diagrams/webhooks-outbound-pipeline.svg" alt="Outbound processing pipeline" style="max-width:100%; height:auto; border-radius:6px;"/></div>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Two value objects keep the data flow explicit:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>OutboundRequest</code> - immutable snapshot of the HTTP request to send (method, URL, headers, body mode, payload).</li>
-        <li style="margin-bottom:6px;"><code>HandlerOutcome</code> - interpretation of the handler's return value: <code>send</code>, <code>retry</code>, <code>done</code>, <code>dead_letter</code>, or <code>cancel</code>.</li>
-      </ul>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Delivery State Machine</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">States and valid operator-driven transitions:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>draft</code> -> <code>queued</code> (via queue action or programmatic call)</li>
-        <li style="margin-bottom:6px;"><code>queued</code> -> <code>processing</code> (worker picks up the job)</li>
-        <li style="margin-bottom:6px;"><code>processing</code> -> <code>done</code> (HTTP success)</li>
-        <li style="margin-bottom:6px;"><code>processing</code> -> <code>error</code> (exception or HTTP error response)</li>
-        <li style="margin-bottom:6px;"><code>processing</code> -> <code>dead_letter</code> (handler dead-letters)</li>
-        <li style="margin-bottom:6px;"><code>processing</code> -> <code>canceled</code> (handler cancels)</li>
-        <li style="margin-bottom:6px;"><code>error</code> / <code>dead_letter</code> / <code>canceled</code> -> <code>draft</code> (operator reset)</li>
-      </ul>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Model-Driven Rule Processing</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Rules on <code>bwt.webhook.outbound.handler.rule</code> are evaluated before the HTTP request is dispatched. Supported actions:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>send</code> - allow the delivery to proceed (default when no rule matches).</li>
-        <li style="margin-bottom:6px;"><code>done</code> - mark delivery done without sending.</li>
-        <li style="margin-bottom:6px;"><code>dead_letter</code> - dead-letter the delivery without sending.</li>
-        <li style="margin-bottom:6px;"><code>retry</code> - re-enqueue after <code>retry_seconds</code>.</li>
-        <li style="margin-bottom:6px;"><code>mutate</code> - modify the <code>OutboundRequest</code> payload or headers via assignments before sending.</li>
-      </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Conditions use the same field-path and operator syntax as inbound rules, evaluated against the delivery's resolved context and endpoint configuration.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Context Lines</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Context lines (<code>bwt.webhook.outbound.delivery.context_line</code>) are key/value pairs attached to a delivery at queue time. They serve three purposes:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;">Resolve <code>{token}</code> placeholders in the endpoint <strong>Target Path</strong>.</li>
-        <li style="margin-bottom:6px;">Supply values referenced in header and payload rules.</li>
-        <li style="margin-bottom:6px;">Pass business identifiers to the backend's <code>_get_outbound_extra_headers</code> hook (see the Connector Integration guide).</li>
-      </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Attach context lines when queueing a delivery programmatically</p>
+      <p>Attach context lines when queueing a delivery programmatically</p>
       <pre>endpoint = self.env[&quot;bwt.webhook.outbound.endpoint&quot;].search(
     [(&quot;code&quot;, &quot;=&quot;, &quot;my-endpoint&quot;)]
 )
@@ -202,22 +262,22 @@ delivery = endpoint.queue_delivery(
     payload={&quot;event&quot;: &quot;order.paid&quot;, &quot;order_id&quot;: order.id},
     context_lines={&quot;order_id&quot;: str(order.id)},
 )</pre>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Transport Layer</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The service module <code>services/transport.py</code> translates an <code>OutboundRequest</code> into <code>requests.request</code> kwargs:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>build_transport_kwargs(request)</code> - returns a dict ready for <code>requests.request(**kwargs)</code>.</li>
-        <li style="margin-bottom:6px;"><code>flatten_form_data(values)</code> - flattens nested dicts for <code>application/x-www-form-urlencoded</code> encoding using <code>key[child]</code> notation.</li>
-        <li style="margin-bottom:6px;"><code>normalize_request_files(files)</code> - coerces file mappings into the tuples that <code>requests</code> expects for <code>multipart/form-data</code>.</li>
+      <h3>Transport Layer</h3>
+      <p>The service module <code>services/transport.py</code> translates an <code>OutboundRequest</code> into <code>requests.request</code> kwargs:</p>
+      <ul>
+        <li><code>build_transport_kwargs(request)</code> - returns a dict ready for <code>requests.request(**kwargs)</code>.</li>
+        <li><code>flatten_form_data(values)</code> - flattens nested dicts for <code>application/x-www-form-urlencoded</code> encoding using <code>key[child]</code> notation.</li>
+        <li><code>normalize_request_files(files)</code> - coerces file mappings into the tuples that <code>requests</code> expects for <code>multipart/form-data</code>.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">These helpers can be imported and unit-tested without the ORM.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Extending Outbound Processing</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To add dynamic headers (e.g. per-delivery authentication or versioning):</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;">Use the connector backend hook <code>_get_outbound_extra_headers(delivery)</code> (see the Connector Integration guide) when the extra headers come from a connector backend.</li>
-        <li style="margin-bottom:8px;">For non-connector use cases, extend <code>bwt.webhook.outbound.delivery</code> and override <code>_collect_extra_headers</code> to contribute additional headers.</li>
+      <p>These helpers can be imported and unit-tested without the ORM.</p>
+      <h3>Extending Outbound Processing</h3>
+      <p>To add dynamic headers (e.g. per-delivery authentication or versioning):</p>
+      <ol>
+        <li>Use the connector backend hook <code>_get_outbound_extra_headers(delivery)</code> (see the Connector Integration guide) when the extra headers come from a connector backend.</li>
+        <li>For non-connector use cases, extend <code>bwt.webhook.outbound.delivery</code> and override <code>_collect_extra_headers</code> to contribute additional headers.</li>
       </ol>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Headers returned by backend hooks are merged on top of endpoint header rules, so backend-level authentication always takes precedence.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To add a custom pre-dispatch check, extend <code>bwt.webhook.outbound.delivery</code> and override <code>_pre_dispatch_check</code>, returning a result dict to short-circuit or <code>None</code> to allow dispatch.</p>
-    </div>
+      <p>Headers returned by backend hooks are merged on top of endpoint header rules, so backend-level authentication always takes precedence.</p>
+      <p>To add a custom pre-dispatch check, extend <code>bwt.webhook.outbound.delivery</code> and override <code>_pre_dispatch_check</code>, returning a result dict to short-circuit or <code>None</code> to allow dispatch.</p>
   </div>
 </section>
+</div>

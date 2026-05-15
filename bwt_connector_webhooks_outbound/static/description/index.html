@@ -1,71 +1,100 @@
-<section class="oe_container" style="background:#F5F4FF; padding:24px 0 16px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="banner.png" alt="Bitwise Connector Webhooks Outbound banner" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
-    </div>
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 40px 16px; }
+.bwt-app .bwt-wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero { background: #F5F4FF; text-align: center; }
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app h1, .bwt-app h2, .bwt-app h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 26px; font-weight: 700; margin-top: 20px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 400; font-size: 18px; margin-top: 8px; }
+.bwt-app .bwt-section h2 { color: #5B4FE8; font-size: 22px; font-weight: 700; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+  .bwt-app .bwt-section { padding: 28px 14px; }
+  .bwt-app .bwt-name { font-size: 22px; }
+  .bwt-app .bwt-tagline { font-size: 16px; }
+  .bwt-app .bwt-section h2 { font-size: 19px; }
+}
+</style>
+
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Connector Webhooks - Glue Outbound</h1>
+    <p class="bwt-tagline">Outbound webhook integration for connector backends.</p>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12 text-center">
-      <h2 class="oe_slogan" style="color: #4F46E5;">Bitwise Connector Webhooks Outbound</h2>
-      <h3 class="oe_slogan">Outbound webhook integration for connector backends.</h3>
-    </div>
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Overview</h2>
+    <p>
+      <strong>Connector Webhooks - Glue Outbound</strong> provides an opt-in mixin
+      (<code>bwt.connector.webhook.outbound.mixin</code>) that connector backends inherit to
+      gain fully automated outbound webhook provisioning and delivery. Endpoints are
+      templated, provisioned, and linked automatically; deliveries are built and queued via
+      <em>queue_job</em>.
+    </p>
   </div>
 </section>
 
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Overview</h2>
-      <p>
-        <strong>Bitwise Connector Webhooks Outbound</strong> provides an opt-in mixin
-        (<code>bwt.connector.webhook.outbound.mixin</code>) that connector backends inherit to
-        gain fully automated outbound webhook provisioning and delivery. Endpoints are
-        templated, provisioned, and linked automatically; deliveries are built and queued via
-        <em>queue_job</em>.
-      </p>
-    </div>
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Key Features</h2>
+    <ul>
+      <li>Adds <code>connector_backend_ref</code> on outbound endpoints and a computed <code>outbound_endpoint_id</code> on the backend</li>
+      <li>Outbound dispatch hook (<code>_handle_outbound_webhook_delivery(delivery, request)</code>) routed via the framework's <code>_invoke_handler</code></li>
+      <li>Outbound response hook (<code>_handle_outbound_webhook_response(delivery, response, state, outcome, *, binding, operation)</code>) with the binding and operation pre-resolved by the overlay</li>
+      <li>Per-backend hooks <code>_get_outbound_api_base_url(delivery)</code> and <code>_get_outbound_extra_headers(delivery)</code> consumed by the framework when rendering the URL and merging request headers</li>
+      <li>Delivery factory (<code>queue_outbound_delivery</code>) and <code>get_outbound_endpoint</code> resolver</li>
+      <li>Form/list action to navigate to the linked outbound endpoint(s)</li>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Key Features</h2>
-      <ul>
-        <li>Adds <code>connector_backend_ref</code> on outbound endpoints and a computed <code>outbound_endpoint_id</code> on the backend</li>
-        <li>Outbound dispatch hook (<code>_handle_outbound_webhook_delivery(delivery, request)</code>) routed via the framework's <code>_invoke_handler</code></li>
-        <li>Outbound response hook (<code>_handle_outbound_webhook_response(delivery, response, state, outcome, *, binding, operation)</code>) with the binding and operation pre-resolved by the overlay</li>
-        <li>Per-backend hooks <code>_get_outbound_api_base_url(delivery)</code> and <code>_get_outbound_extra_headers(delivery)</code> consumed by the framework when rendering the URL and merging request headers</li>
-        <li>Delivery factory (<code>queue_outbound_delivery</code>) and <code>get_outbound_endpoint</code> resolver</li>
-        <li>Form/list action to navigate to the linked outbound endpoint(s)</li>
-      </ul>
-    </div>
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Dependencies</h2>
+    <ul>
+      <li><code>bwt_connector_webhooks_core</code></li>
+      <li><code>bwt_webhooks_outbound</code></li>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Dependencies</h2>
-      <ul>
-        <li><code>bwt_connector_webhooks_core</code></li>
-        <li><code>bwt_webhooks_outbound</code></li>
-      </ul>
-    </div>
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Author</h2>
+    <p>
+      Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
+      Contributors: Youssef Egla.
+    </p>
   </div>
 </section>
-
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Author</h2>
-      <p>
-        Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
-        Contributors: Youssef Egla.
-      </p>
-    </div>
-  </div>
-</section>
+</div>

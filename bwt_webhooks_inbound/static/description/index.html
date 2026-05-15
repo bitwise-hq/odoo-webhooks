@@ -1,232 +1,292 @@
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 40px 16px; }
+.bwt-app .bwt-wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero { background: #F5F4FF; text-align: center; }
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app .bwt-diagram { background: #E6E5F2; text-align: center; overflow: hidden; }
+.bwt-app .bwt-diagram img { margin: 0 auto; border-radius: 8px; box-shadow: 0 2px 12px rgba(91,79,232,0.10); }
+.bwt-app .bwt-cta { background: #5B4FE8; text-align: center; }
+.bwt-app .bwt-cta p { color: #fff; font-size: 16px; margin: 0; }
+.bwt-app .bwt-guide { border-top: 1px solid #E6E5F2; }
+.bwt-app .bwt-guide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #5B4FE8;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #E6E5F2;
+}
+.bwt-app h1, .bwt-app h2, .bwt-app h3, .bwt-app h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 26px; font-weight: 700; margin-top: 20px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 400; font-size: 18px; margin-top: 8px; }
+.bwt-app .bwt-section h2 { color: #5B4FE8; font-size: 22px; font-weight: 700; }
+.bwt-app .bwt-section h3 { color: #16142B; font-size: 17px; margin-top: 24px; }
+.bwt-app .bwt-section h4 { color: #6E6B88; font-size: 15px; margin-top: 20px; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+.bwt-app pre {
+  background: #16142B;
+  color: #F5F4FF;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: 100%;
+}
+.bwt-app pre code { background: transparent; color: inherit; padding: 0; }
+.bwt-app .bwt-caption { color: #6E6B88; font-size: 13px; font-style: italic; margin: 10px 0 0; }
+.bwt-app .bwt-inline-img { margin: 20px 0; text-align: center; }
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+  .bwt-app .bwt-section { padding: 28px 14px; }
+  .bwt-app .bwt-name { font-size: 22px; }
+  .bwt-app .bwt-tagline { font-size: 16px; }
+  .bwt-app .bwt-section h2 { font-size: 19px; }
+  .bwt-app .bwt-section h3 { font-size: 16px; }
+  .bwt-app pre { font-size: 12px; padding: 12px; }
+}
+</style>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0 32px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="cover.png" alt="Webhooks Framework - Inbound Gateway cover" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
-      <h2 class="oe_slogan" style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; margin-top:20px;">Webhooks Framework - Inbound Gateway</h2>
-      <h3 class="oe_slogan" style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-weight:400;">Secure inbound endpoints with signatures, replay protection, and rule-based processing.</h3>
-    </div>
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Webhooks Framework - Inbound Gateway</h1>
+    <p class="bwt-tagline">Secure inbound endpoints with signatures, replay protection, and rule-based processing.</p>
   </div>
 </section>
 
-<section class="oe_container" style="padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Key Features</h2>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Key Features</h2>
+    <ul>
         <li>Public endpoints with HMAC signature verification (SHA1/256/512, hex/base64).</li>
         <li>Timestamp and idempotency controls to block replayed events.</li>
         <li>Declarative rules to create, update, or upsert Odoo records.</li>
         <li>Semantic bindings to normalize payload fields for consistent rules.</li>
         <li>Full event audit trail with state, retries, and dead-letter flows.</li>
         <li>Operator-friendly views for endpoints, rules, and events.</li>
-      </ul>
-    </div>
+    </ul>
   </div>
 </section>
 
-<section class="oe_container oe_dark" style="background:#E6E5F2; padding:32px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <img src="diagrams/webhooks-inbound-flow.svg" alt="Inbound request flow" style="max-width:720px; width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(91,79,232,0.10);"/>
-    </div>
+<section class="bwt-section bwt-diagram">
+  <div class="bwt-wrap">
+    <img src="diagrams/webhooks-inbound-flow.svg" alt="Inbound request flow"/>
   </div>
 </section>
 
-<section class="oe_container oe_dark" style="background:#E6E5F2; padding:32px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <img src="diagrams/webhooks-inbound-sequence.svg" alt="Inbound processing sequence" style="max-width:720px; width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(91,79,232,0.10);"/>
-    </div>
+<section class="bwt-section bwt-diagram">
+  <div class="bwt-wrap">
+    <img src="diagrams/webhooks-inbound-sequence.svg" alt="Inbound processing sequence"/>
   </div>
 </section>
 
-<section class="oe_container" style="padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Configuration</h2>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section">
+  <div class="bwt-wrap">
+    <h2>Configuration</h2>
+    <ol>
         <li>Go to <code>Webhooks > Inbound Endpoints</code> and create an endpoint.</li>
         <li>Set the path, signature mode, and shared secret(s).</li>
         <li>Define identity and timestamp policies to control replays.</li>
         <li>Attach a handler and configure rule conditions and actions.</li>
-      </ol>
-    </div>
+    </ol>
   </div>
 </section>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif;">Usage</h2>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7;">
+<section class="bwt-section bwt-alt">
+  <div class="bwt-wrap">
+    <h2>Usage</h2>
+    <ol>
         <li>Send requests to the endpoint path.</li>
         <li>Review events in <code>Webhooks > Inbound Events</code>.</li>
         <li>Reprocess or dead-letter events as needed.</li>
-      </ol>
-    </div>
+    </ol>
   </div>
 </section>
 
-<section class="oe_container" style="background:#5B4FE8; padding:36px 0; text-align:center;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <p style="color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:16px; margin:0;">Looking for turnkey integrations? Pair this framework with premium connector addons (e.g., Stripe) to launch faster.</p>
-    </div>
+<section class="bwt-section bwt-cta">
+  <div class="bwt-wrap">
+    <p>Looking for turnkey integrations? Pair this framework with premium connector addons (e.g., Stripe) to launch faster.</p>
   </div>
 </section>
 
-<section class="oe_container" style="background:#F5F4FF; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Operator Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Inbound - Operator Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the inbound gateway: creating and configuring inbound endpoints, monitoring events, and handling failures.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Prerequisites</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Install <code>bwt_webhooks_inbound</code> after <code>bwt_webhooks_core</code> and <code>queue_job</code> are in place. At least one handler with <strong>Direction = Inbound</strong> must exist before creating an endpoint.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Creating an Inbound Endpoint</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Go to <strong>Webhooks -> Inbound -> Endpoints -> New</strong>.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Required fields:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Name</strong> - human-readable label.</li>
-        <li style="margin-bottom:6px;"><strong>Path</strong> - URL path suffix appended to the webhook base URL (e.g. <code>/webhooks/my-service</code>). Must be unique across all endpoints.</li>
-        <li style="margin-bottom:6px;"><strong>Handler</strong> - select a handler with <strong>Direction = Inbound</strong>.</li>
-        <li style="margin-bottom:6px;"><strong>Company</strong> - defaults to the current company.</li>
+<section class="bwt-section bwt-guide bwt-alt">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Operator Guide</h2>
+      <h2>Webhooks Inbound - Operator Guide</h2>
+      <p>This guide covers the inbound gateway: creating and configuring inbound endpoints, monitoring events, and handling failures.</p>
+      <h3>Prerequisites</h3>
+      <p>Install <code>bwt_webhooks_inbound</code> after <code>bwt_webhooks_core</code> and <code>queue_job</code> are in place. At least one handler with <strong>Direction = Inbound</strong> must exist before creating an endpoint.</p>
+      <h3>Creating an Inbound Endpoint</h3>
+      <p>Go to <strong>Webhooks -> Inbound -> Endpoints -> New</strong>.</p>
+      <p>Required fields:</p>
+      <ul>
+        <li><strong>Name</strong> - human-readable label.</li>
+        <li><strong>Path</strong> - URL path suffix appended to the webhook base URL (e.g. <code>/webhooks/my-service</code>). Must be unique across all endpoints.</li>
+        <li><strong>Handler</strong> - select a handler with <strong>Direction = Inbound</strong>.</li>
+        <li><strong>Company</strong> - defaults to the current company.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Save the record. The endpoint is immediately active and ready to receive requests at the configured path.</p>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Signature Verification</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Under the <strong>Signature</strong> tab:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Signature Mode</strong> - choose <code>None</code> (no verification) or <code>Shared Secret HMAC</code> (recommended for production).</li>
-        <li style="margin-bottom:6px;">When HMAC is selected, configure:</li>
+      <p>Save the record. The endpoint is immediately active and ready to receive requests at the configured path.</p>
+      <h4>Signature Verification</h4>
+      <p>Under the <strong>Signature</strong> tab:</p>
+      <ul>
+        <li><strong>Signature Mode</strong> - choose <code>None</code> (no verification) or <code>Shared Secret HMAC</code> (recommended for production).</li>
+        <li>When HMAC is selected, configure:</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Digest</strong> - <code>SHA256</code> is recommended; <code>SHA1</code> and <code>SHA512</code> are also supported.</li>
-        <li style="margin-bottom:6px;"><strong>Encoding</strong> - <code>Hex</code> or <code>Base64</code>, depending on the upstream provider.</li>
-        <li style="margin-bottom:6px;"><strong>Primary Secret</strong> - the shared secret from the upstream provider.</li>
-        <li style="margin-bottom:6px;"><strong>Secondary Secret</strong> - optional rotation secret; valid during key rotation.</li>
-        <li style="margin-bottom:6px;"><strong>Signature Parts</strong> - define which header values and payload fragments are concatenated to build the signed message. Order matters and must match the upstream provider specification.</li>
-        <li style="margin-bottom:6px;"><strong>Signature Header</strong> - the request header that carries the signature value (e.g. <code>X-Signature-256</code>).</li>
-        <li style="margin-bottom:6px;"><strong>Signature Prefix</strong> - optional prefix the provider prepends to the value (e.g. <code>sha256=</code>); it is stripped before comparison.</li>
+      <ul>
+        <li><strong>Digest</strong> - <code>SHA256</code> is recommended; <code>SHA1</code> and <code>SHA512</code> are also supported.</li>
+        <li><strong>Encoding</strong> - <code>Hex</code> or <code>Base64</code>, depending on the upstream provider.</li>
+        <li><strong>Primary Secret</strong> - the shared secret from the upstream provider.</li>
+        <li><strong>Secondary Secret</strong> - optional rotation secret; valid during key rotation.</li>
+        <li><strong>Signature Parts</strong> - define which header values and payload fragments are concatenated to build the signed message. Order matters and must match the upstream provider specification.</li>
+        <li><strong>Signature Header</strong> - the request header that carries the signature value (e.g. <code>X-Signature-256</code>).</li>
+        <li><strong>Signature Prefix</strong> - optional prefix the provider prepends to the value (e.g. <code>sha256=</code>); it is stripped before comparison.</li>
       </ul>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Identity and Replay Policies</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Under the <strong>Identity</strong> tab:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Delivery Identity Policy</strong> - controls deduplication on receipt (the "same request" check):</li>
+      <h4>Identity and Replay Policies</h4>
+      <p>Under the <strong>Identity</strong> tab:</p>
+      <ul>
+        <li><strong>Delivery Identity Policy</strong> - controls deduplication on receipt (the "same request" check):</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>Delivery Identity</code> - a header-carried delivery ID.</li>
-        <li style="margin-bottom:6px;"><code>Explicit Idempotency Key</code> - a header-carried idempotency key.</li>
-        <li style="margin-bottom:6px;"><code>Raw Body SHA256</code> - hash of the raw request body.</li>
+      <ul>
+        <li><code>Delivery Identity</code> - a header-carried delivery ID.</li>
+        <li><code>Explicit Idempotency Key</code> - a header-carried idempotency key.</li>
+        <li><code>Raw Body SHA256</code> - hash of the raw request body.</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Replay Identity Policy</strong> - controls business-event-level deduplication (the "same business event" check):</li>
+      <ul>
+        <li><strong>Replay Identity Policy</strong> - controls business-event-level deduplication (the "same business event" check):</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>None</code> - no replay protection.</li>
-        <li style="margin-bottom:6px;"><code>Business Event Identity</code> - a field-path extracted event ID.</li>
-        <li style="margin-bottom:6px;"><code>Explicit Idempotency Key</code> - a header-carried idempotency key.</li>
+      <ul>
+        <li><code>None</code> - no replay protection.</li>
+        <li><code>Business Event Identity</code> - a field-path extracted event ID.</li>
+        <li><code>Explicit Idempotency Key</code> - a header-carried idempotency key.</li>
       </ul>
-      <h4 style="color:#6E6B88; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin:28px 0 10px;">Timestamp Validation</h4>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Enable timestamp validation under the <strong>Identity</strong> tab to reject stale or future-dated requests:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Timestamp Header</strong> - the request header that carries the timestamp value.</li>
-        <li style="margin-bottom:6px;"><strong>Timestamp Format</strong> - <code>Unix Seconds</code>, <code>Unix Milliseconds</code>, or <code>ISO 8601</code>.</li>
-        <li style="margin-bottom:6px;"><strong>Max Age (seconds)</strong> - requests older than this value are rejected.</li>
-        <li style="margin-bottom:6px;"><strong>Max Future Skew (seconds)</strong> - requests dated this far ahead are rejected.</li>
+      <h4>Timestamp Validation</h4>
+      <p>Enable timestamp validation under the <strong>Identity</strong> tab to reject stale or future-dated requests:</p>
+      <ul>
+        <li><strong>Timestamp Header</strong> - the request header that carries the timestamp value.</li>
+        <li><strong>Timestamp Format</strong> - <code>Unix Seconds</code>, <code>Unix Milliseconds</code>, or <code>ISO 8601</code>.</li>
+        <li><strong>Max Age (seconds)</strong> - requests older than this value are rejected.</li>
+        <li><strong>Max Future Skew (seconds)</strong> - requests dated this far ahead are rejected.</li>
       </ul>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Monitoring Events</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Go to <strong>Webhooks -> Inbound -> Events</strong> to see all received events.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Event lifecycle states:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Received</strong> - event stored; not yet processed.</li>
-        <li style="margin-bottom:6px;"><strong>Processing</strong> - background job is running.</li>
-        <li style="margin-bottom:6px;"><strong>Done</strong> - processing completed successfully.</li>
-        <li style="margin-bottom:6px;"><strong>Error</strong> - processing raised an exception; the raw traceback is stored on the event record for inspection.</li>
-        <li style="margin-bottom:6px;"><strong>Dead Letter</strong> - handler returned a dead-letter result; manual review required.</li>
-        <li style="margin-bottom:6px;"><strong>Rejected</strong> - signature or freshness validation failed; the event will not be retried automatically.</li>
+      <h3>Monitoring Events</h3>
+      <p>Go to <strong>Webhooks -> Inbound -> Events</strong> to see all received events.</p>
+      <p>Event lifecycle states:</p>
+      <ul>
+        <li><strong>Received</strong> - event stored; not yet processed.</li>
+        <li><strong>Processing</strong> - background job is running.</li>
+        <li><strong>Done</strong> - processing completed successfully.</li>
+        <li><strong>Error</strong> - processing raised an exception; the raw traceback is stored on the event record for inspection.</li>
+        <li><strong>Dead Letter</strong> - handler returned a dead-letter result; manual review required.</li>
+        <li><strong>Rejected</strong> - signature or freshness validation failed; the event will not be retried automatically.</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Use the <strong>State</strong> filter and saved views to quickly isolate failures.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Reprocessing and Dead-Letter</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To reprocess an event in <strong>Error</strong> or <strong>Dead Letter</strong> state:</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;">Open the event record.</li>
-        <li style="margin-bottom:8px;">Click <strong>Reset to Received</strong> to move it back to the <code>received</code> state.</li>
-        <li style="margin-bottom:8px;">Click <strong>Process</strong> to re-enqueue, or wait for the background runner.</li>
+      <p>Use the <strong>State</strong> filter and saved views to quickly isolate failures.</p>
+      <h3>Reprocessing and Dead-Letter</h3>
+      <p>To reprocess an event in <strong>Error</strong> or <strong>Dead Letter</strong> state:</p>
+      <ol>
+        <li>Open the event record.</li>
+        <li>Click <strong>Reset to Received</strong> to move it back to the <code>received</code> state.</li>
+        <li>Click <strong>Process</strong> to re-enqueue, or wait for the background runner.</li>
       </ol>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Rejected events cannot be reset. Fix the endpoint configuration first (e.g. correct the signature secret), then resend the request from the upstream provider to create a fresh event.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Troubleshooting Checklist</h3>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><strong>Signature mismatch / 401</strong>: confirm the shared secret on the endpoint matches the upstream provider exactly, including encoding (hex vs base64) and prefix stripping.</li>
-        <li style="margin-bottom:6px;"><strong>Events arriving as Rejected with freshness error</strong>: the server clock may differ from the upstream provider; increase <strong>Max Age</strong> or sync NTP.</li>
-        <li style="margin-bottom:6px;"><strong>Events stuck in Received</strong>: check that the <code>queue_job</code> worker is running and the job channel is not paused.</li>
-        <li style="margin-bottom:6px;"><strong>Duplicate events not deduplicated</strong>: confirm the <strong>Delivery Identity Policy</strong> is set and the upstream provider sends a consistent identity header.</li>
-        <li style="margin-bottom:6px;"><strong>Events processed but no records created</strong>: open the event form and inspect the <strong>Matched Rule</strong> and <strong>Execution Log</strong> to see which rule fired and why the assignment did not produce the expected record.</li>
+      <p>Rejected events cannot be reset. Fix the endpoint configuration first (e.g. correct the signature secret), then resend the request from the upstream provider to create a fresh event.</p>
+      <h3>Troubleshooting Checklist</h3>
+      <ul>
+        <li><strong>Signature mismatch / 401</strong>: confirm the shared secret on the endpoint matches the upstream provider exactly, including encoding (hex vs base64) and prefix stripping.</li>
+        <li><strong>Events arriving as Rejected with freshness error</strong>: the server clock may differ from the upstream provider; increase <strong>Max Age</strong> or sync NTP.</li>
+        <li><strong>Events stuck in Received</strong>: check that the <code>queue_job</code> worker is running and the job channel is not paused.</li>
+        <li><strong>Duplicate events not deduplicated</strong>: confirm the <strong>Delivery Identity Policy</strong> is set and the upstream provider sends a consistent identity header.</li>
+        <li><strong>Events processed but no records created</strong>: open the event form and inspect the <strong>Matched Rule</strong> and <strong>Execution Log</strong> to see which rule fired and why the assignment did not produce the expected record.</li>
       </ul>
-    </div>
   </div>
 </section>
 
-<section class="oe_container" style="background:#ffffff; padding:40px 0;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-bottom:24px; padding-bottom:12px; border-bottom:2px solid #E6E5F2;">Developer Guide</h2>
-      <h2 style="color:#5B4FE8; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; margin:28px 0 10px;">Webhooks Inbound - Developer Guide</h2>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">This guide covers the inbound processing pipeline, model-driven rule contract, and extension points for developers building on or customising the inbound gateway addon.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Inbound Processing Lifecycle</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">When a request arrives at an inbound endpoint the pipeline is:</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;"><strong>HTTP reception</strong> - the controller writes a <code>bwt.webhook.inbound.event</code> record in state <code>received</code> and enqueues a background job.</li>
-        <li style="margin-bottom:8px;"><strong>Signature verification</strong> (if enabled) - HMAC of the configured message parts is compared against the request signature header using constant-time comparison. Failure moves the event to state <code>rejected</code>.</li>
-        <li style="margin-bottom:8px;"><strong>Freshness check</strong> (if enabled) - the timestamp header is parsed and validated against the configured age and skew bounds. Failure -> <code>rejected</code>.</li>
-        <li style="margin-bottom:8px;"><strong>Delivery identity</strong> - a delivery identity key is resolved and checked for duplicates. A duplicate request updates the existing event record; the new request body is not processed again.</li>
-        <li style="margin-bottom:8px;"><strong>Handler dispatch</strong> - the event's handler is called (model-driven rules or Python callback). The return value determines the final state.</li>
+<section class="bwt-section bwt-guide">
+  <div class="bwt-wrap">
+    <h2 class="bwt-guide-title">Developer Guide</h2>
+      <h2>Webhooks Inbound - Developer Guide</h2>
+      <p>This guide covers the inbound processing pipeline, model-driven rule contract, and extension points for developers building on or customising the inbound gateway addon.</p>
+      <h3>Inbound Processing Lifecycle</h3>
+      <p>When a request arrives at an inbound endpoint the pipeline is:</p>
+      <ol>
+        <li><strong>HTTP reception</strong> - the controller writes a <code>bwt.webhook.inbound.event</code> record in state <code>received</code> and enqueues a background job.</li>
+        <li><strong>Signature verification</strong> (if enabled) - HMAC of the configured message parts is compared against the request signature header using constant-time comparison. Failure moves the event to state <code>rejected</code>.</li>
+        <li><strong>Freshness check</strong> (if enabled) - the timestamp header is parsed and validated against the configured age and skew bounds. Failure -> <code>rejected</code>.</li>
+        <li><strong>Delivery identity</strong> - a delivery identity key is resolved and checked for duplicates. A duplicate request updates the existing event record; the new request body is not processed again.</li>
+        <li><strong>Handler dispatch</strong> - the event's handler is called (model-driven rules or Python callback). The return value determines the final state.</li>
       </ol>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Event State Machine</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Valid state transitions:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>received</code> -> <code>processing</code> -> <code>done</code></li>
-        <li style="margin-bottom:6px;"><code>received</code> -> <code>processing</code> -> <code>error</code></li>
-        <li style="margin-bottom:6px;"><code>received</code> -> <code>processing</code> -> <code>dead_letter</code></li>
-        <li style="margin-bottom:6px;"><code>received</code> -> <code>rejected</code> (signature or freshness failure; not retryable)</li>
+      <h3>Event State Machine</h3>
+      <p>Valid state transitions:</p>
+      <ul>
+        <li><code>received</code> -> <code>processing</code> -> <code>done</code></li>
+        <li><code>received</code> -> <code>processing</code> -> <code>error</code></li>
+        <li><code>received</code> -> <code>processing</code> -> <code>dead_letter</code></li>
+        <li><code>received</code> -> <code>rejected</code> (signature or freshness failure; not retryable)</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Operators can reset <code>error</code> and <code>dead_letter</code> events back to <code>received</code> for reprocessing. <code>rejected</code> events are closed and require a new inbound request.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Model-Driven Rule Processing</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Rules are rows on <code>bwt.webhook.inbound.handler.rule</code>, evaluated in ascending <code>sequence</code> order. Each rule exposes:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>condition_ids</code> (<code>bwt.webhook.inbound.handler.rule.condition</code>) - each condition specifies a field path into the event payload, an operator (<code>=</code>, <code>!=</code>, <code>in</code>, <code>not in</code>, <code>contains</code>, ...), and a literal value.</li>
-        <li style="margin-bottom:6px;"><code>action_type</code> - one of:</li>
+      <p>Operators can reset <code>error</code> and <code>dead_letter</code> events back to <code>received</code> for reprocessing. <code>rejected</code> events are closed and require a new inbound request.</p>
+      <h3>Model-Driven Rule Processing</h3>
+      <p>Rules are rows on <code>bwt.webhook.inbound.handler.rule</code>, evaluated in ascending <code>sequence</code> order. Each rule exposes:</p>
+      <ul>
+        <li><code>condition_ids</code> (<code>bwt.webhook.inbound.handler.rule.condition</code>) - each condition specifies a field path into the event payload, an operator (<code>=</code>, <code>!=</code>, <code>in</code>, <code>not in</code>, <code>contains</code>, ...), and a literal value.</li>
+        <li><code>action_type</code> - one of:</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>done</code> - mark the event done; stop rule evaluation.</li>
-        <li style="margin-bottom:6px;"><code>dead_letter</code> - move to dead-letter; stop evaluation.</li>
-        <li style="margin-bottom:6px;"><code>retry</code> - re-enqueue after <code>retry_seconds</code>; stop evaluation.</li>
-        <li style="margin-bottom:6px;"><code>create_record</code> - create a new record on <code>target_model_name</code>.</li>
-        <li style="margin-bottom:6px;"><code>update_record</code> - update an existing record located via <code>lookup_ids</code>.</li>
-        <li style="margin-bottom:6px;"><code>upsert_record</code> - create or update; locate via <code>lookup_ids</code>.</li>
+      <ul>
+        <li><code>done</code> - mark the event done; stop rule evaluation.</li>
+        <li><code>dead_letter</code> - move to dead-letter; stop evaluation.</li>
+        <li><code>retry</code> - re-enqueue after <code>retry_seconds</code>; stop evaluation.</li>
+        <li><code>create_record</code> - create a new record on <code>target_model_name</code>.</li>
+        <li><code>update_record</code> - update an existing record located via <code>lookup_ids</code>.</li>
+        <li><code>upsert_record</code> - create or update; locate via <code>lookup_ids</code>.</li>
       </ul>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>assignment_ids</code> (<code>bwt.webhook.inbound.handler.rule.assignment</code>) - each assignment maps a target field name to a value source: <code>resolved_value</code> (extracted from the event payload path), <code>semantic_field</code> (a named semantic binding), <code>event_field</code> (a field on the event record itself), or <code>literal</code> (a hardcoded string or number).</li>
+      <ul>
+        <li><code>assignment_ids</code> (<code>bwt.webhook.inbound.handler.rule.assignment</code>) - each assignment maps a target field name to a value source: <code>resolved_value</code> (extracted from the event payload path), <code>semantic_field</code> (a named semantic binding), <code>event_field</code> (a field on the event record itself), or <code>literal</code> (a hardcoded string or number).</li>
       </ul>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Value Extraction</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">The framework extracts values from event payloads using dot-separated paths (e.g. <code>data.object.id</code>). Path resolution is handled by <code>services/value_extraction.py</code>:</p>
-      <ul style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:6px;"><code>walk_payload_path(payload, path)</code> - navigate nested dicts and lists.</li>
-        <li style="margin-bottom:6px;"><code>extract_header(headers, name)</code> - case-insensitive header lookup.</li>
-        <li style="margin-bottom:6px;"><code>extract_header_parameters(value)</code> - parse <code>key=value</code> pairs from header parameter strings (e.g. <code>Content-Type: application/json; charset=utf-8</code>).</li>
+      <h3>Value Extraction</h3>
+      <p>The framework extracts values from event payloads using dot-separated paths (e.g. <code>data.object.id</code>). Path resolution is handled by <code>services/value_extraction.py</code>:</p>
+      <ul>
+        <li><code>walk_payload_path(payload, path)</code> - navigate nested dicts and lists.</li>
+        <li><code>extract_header(headers, name)</code> - case-insensitive header lookup.</li>
+        <li><code>extract_header_parameters(value)</code> - parse <code>key=value</code> pairs from header parameter strings (e.g. <code>Content-Type: application/json; charset=utf-8</code>).</li>
       </ul>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">These helpers are available for use in custom Python callbacks.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Semantic Bindings</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">Semantic bindings (<code>bwt.webhook.inbound.endpoint.semantic.binding</code>) allow endpoints to map named semantic names (e.g. <code>company_id</code>, <code>partner_id</code>) to resolved values extracted from the request. Assignments can then reference these by semantic name, keeping rule configuration decoupled from specific payload paths.</p>
-      <h3 style="color:#16142B; font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin:28px 0 10px;">Extending Inbound Processing</h3>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To add a computed field available as an assignment source:</p>
-      <ol style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; padding-left:24px; margin:0 0 16px;">
-        <li style="margin-bottom:8px;">Extend <code>bwt.webhook.inbound.event</code> with a new stored computed field.</li>
-        <li style="margin-bottom:8px;">Add a source kind entry pointing to the new field.</li>
-        <li style="margin-bottom:8px;">Reference the field name in model-driven rule assignments via the <code>event_field</code> source kind.</li>
+      <p>These helpers are available for use in custom Python callbacks.</p>
+      <h3>Semantic Bindings</h3>
+      <p>Semantic bindings (<code>bwt.webhook.inbound.endpoint.semantic.binding</code>) allow endpoints to map named semantic names (e.g. <code>company_id</code>, <code>partner_id</code>) to resolved values extracted from the request. Assignments can then reference these by semantic name, keeping rule configuration decoupled from specific payload paths.</p>
+      <h3>Extending Inbound Processing</h3>
+      <p>To add a computed field available as an assignment source:</p>
+      <ol>
+        <li>Extend <code>bwt.webhook.inbound.event</code> with a new stored computed field.</li>
+        <li>Add a source kind entry pointing to the new field.</li>
+        <li>Reference the field name in model-driven rule assignments via the <code>event_field</code> source kind.</li>
       </ol>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">To add a new action type, extend <code>bwt.webhook.inbound.handler.rule</code> and override <code>_execute_model_driven_handler</code> on the event model to dispatch the new type.</p>
-      <p style="color:#16142B; font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.7; margin:0 0 12px;">No core file edits are required; all extension points use standard Odoo model inheritance.</p>
-    </div>
+      <p>To add a new action type, extend <code>bwt.webhook.inbound.handler.rule</code> and override <code>_execute_model_driven_handler</code> on the event model to dispatch the new type.</p>
+      <p>No core file edits are required; all extension points use standard Odoo model inheritance.</p>
   </div>
 </section>
+</div>

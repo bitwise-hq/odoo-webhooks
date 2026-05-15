@@ -1,5 +1,5 @@
-Connector Webhooks Core — Developer Guide
-==========================================
+Connector Webhooks - Glue Core - Developer Guide
+================================================
 
 This guide covers building a new connector backend addon that integrates with
 the webhook framework via the connector layer mixins.
