@@ -58,6 +58,8 @@ repos:
         name: render addon description html
         entry: python scripts/render_app_descriptions.py
         language: python
+        additional_dependencies:
+          - Pillow
         pass_filenames: false
         always_run: true
   - repo: https://github.com/pre-commit/pre-commit-hooks
