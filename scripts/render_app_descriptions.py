@@ -96,10 +96,7 @@ def _find_bitwise_hq_root(repo_root: Path) -> Path:
         if (resolved / shared_module_relpath).exists():
             return resolved
 
-    raise FileNotFoundError(
-        "Unable to find bitwise-hq/scripts/odoo_addon_description_renderer.py. "
-        "Set BITWISE_HQ_ROOT to the local bitwise-hq repository root."
-    )
+    raise FileNotFoundError("Unable to find bitwise-hq/scripts/odoo_addon_description_renderer.py. Set BITWISE_HQ_ROOT to the local bitwise-hq repository root.")
 
 
 def _load_shared_renderer(repo_root: Path):
