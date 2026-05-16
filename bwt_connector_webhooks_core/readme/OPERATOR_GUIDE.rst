@@ -22,6 +22,11 @@ Endpoints are seeded as Odoo XML data records by the concrete connector addon
 (e.g. ``bwt_stripe_core``). They are **not** auto-created when a backend record
 is first created.
 
+For side-addon specific behavior and setup details, see:
+
+* `Glue Inbound README <../../bwt_connector_webhooks_inbound/README.rst>`_
+* `Glue Outbound README <../../bwt_connector_webhooks_outbound/README.rst>`_
+
 Linking an Endpoint to a Backend
 ----------------------------------
 
