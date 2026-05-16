@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant Sender as External Sender
+  participant HTTP as Odoo HTTP Controller
+  participant Endpoint as Inbound Endpoint
+  participant Backend as Connector Backend
+  participant Event as Inbound Event
+  participant Queue as Queue Worker
+
+  Sender->>HTTP: POST webhook payload
+  HTTP->>Endpoint: Resolve endpoint and verify signature
+  Endpoint->>Event: Create event with endpoint reference
+  Event->>Backend: Route to _handle_inbound_webhook_event
+
+  alt Backend returns done
+    Backend->>Event: Mark done
+  else Backend returns retry
+    Backend->>Queue: Schedule retry with delay
+  else Backend returns dead_letter
+    Backend->>Event: Mark dead_letter
+  end

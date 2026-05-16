@@ -1,5 +1,5 @@
-Connector Webhooks Core — Developer Guide
-==========================================
+Connector Webhooks - Glue Core - Developer Guide
+================================================
 
 This guide covers building a new connector backend addon that integrates with
 the webhook framework via the connector layer mixins.
@@ -18,6 +18,11 @@ The connector layer consists of three abstract models:
   send outbound webhooks.
 
 Concrete backends combine these with the OCA ``connector.backend`` model.
+
+For side-specific contracts and examples, also review:
+
+* `Glue Inbound README <../../bwt_connector_webhooks_inbound/README.rst>`_
+* `Glue Outbound README <../../bwt_connector_webhooks_outbound/README.rst>`_
 
 Registering a Backend
 ----------------------
@@ -82,6 +87,9 @@ Returning ``None`` produces a framework-level dead-letter.
 The handler record for this backend's inbound endpoint must use **Python
 Callback** mode pointing to ``my_service.backend`` and
 ``_handle_inbound_webhook_event``. Seed it as an XML data record in your addon.
+
+For operational linking and troubleshooting steps, see the
+`Glue Inbound README <../../bwt_connector_webhooks_inbound/README.rst>`_.
 
 Outbound Integration
 ---------------------
@@ -154,3 +162,6 @@ Use ``code_suffix`` when a backend has multiple outbound endpoints::
 
 The ``code_suffix`` value must match the ``code_suffix`` column on the endpoint
 record, which is set by the concrete addon's XML data.
+
+For outbound routing patterns and troubleshooting, see the
+`Glue Outbound README <../../bwt_connector_webhooks_outbound/README.rst>`_.

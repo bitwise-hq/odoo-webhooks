@@ -1,0 +1,9 @@
+flowchart LR
+  A["Concrete backend model<br/>(inherits connector.backend + Glue mixin)"] --> B["Backend record"]
+  C["XML seeded endpoint records"] --> D["Endpoint records"]
+  B --> E["Set connector_backend_ref"]
+  D --> E
+  E --> F["Inbound smart button resolves webhook_endpoint_id"]
+  E --> G["Outbound smart button resolves outbound_endpoint_id"]
+  F --> H["Inbound events dispatched to _handle_inbound_webhook_event"]
+  G --> I["Outbound deliveries dispatched to _handle_outbound_webhook_delivery"]

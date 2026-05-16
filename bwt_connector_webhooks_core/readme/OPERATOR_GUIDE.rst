@@ -1,5 +1,5 @@
-Connector Webhooks Core — Operator Guide
-=========================================
+Connector Webhooks - Glue Core - Operator Guide
+===============================================
 
 This guide explains the connector layer of the webhook framework and how an
 operator links connector backends to their webhook endpoints through the UI.
@@ -21,6 +21,11 @@ Odoo can own one or more webhook endpoints. The connector layer provides:
 Endpoints are seeded as Odoo XML data records by the concrete connector addon
 (e.g. ``bwt_stripe_core``). They are **not** auto-created when a backend record
 is first created.
+
+For side-addon specific behavior and setup details, see:
+
+* `Glue Inbound README <../../bwt_connector_webhooks_inbound/README.rst>`_
+* `Glue Outbound README <../../bwt_connector_webhooks_outbound/README.rst>`_
 
 Linking an Endpoint to a Backend
 ----------------------------------

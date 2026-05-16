@@ -1,8 +1,8 @@
 {
-    "name": "Webhooks Connector - Outbound Delivery",
+    "name": "Connector Webhooks - Glue Outbound",
     "version": "19.0.1.1.0",
     "category": "Tools",
-    "summary": "Outbound webhook integration for connector backends.",
+    "summary": "Opt-in mixin for connector backends to send outbound webhooks.",
     "depends": [
         "bwt_connector_webhooks_core",
         "bwt_webhooks_outbound",
@@ -12,9 +12,8 @@
     ],
     "author": "Bitwise Technologies LLC",
     "contributors": ["Youssef Egla"],
-    "license": "OPL-1",
-    "price": 0.0,
-    "currency": "USD",
+    "license": "LGPL-3",
+    "website": "https://github.com/bitwise-hq/odoo-webhooks",
     "images": ["static/description/banner.png", "static/description/icon.png"],
     "installable": True,
     "auto_install": True,

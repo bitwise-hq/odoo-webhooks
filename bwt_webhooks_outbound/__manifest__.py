@@ -21,9 +21,8 @@
     ],
     "author": "Bitwise Technologies LLC",
     "contributors": ["Youssef Egla"],
-    "license": "OPL-1",
-    "price": 0.0,
-    "currency": "USD",
+    "license": "LGPL-3",
+    "website": "https://github.com/bitwise-hq/odoo-webhooks",
     "images": ["static/description/banner.png", "static/description/icon.png"],
     "installable": True,
 }

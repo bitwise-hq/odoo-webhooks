@@ -1,71 +1,464 @@
-<section class="oe_container" style="background:#F5F4FF; padding:24px 0 16px;">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12" style="text-align:center;">
-      <img src="banner.png" alt="Bitwise Connector Webhooks Outbound banner" style="max-width:960px; width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(22,20,43,0.16);"/>
+<div class="bwt-app">
+<style>
+.bwt-app {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #16142B;
+    line-height: 1.65;
+  font-size: 15px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f7ff 100%);
+  overflow-x: hidden;
+}
+.bwt-app *, .bwt-app *::before, .bwt-app *::after { box-sizing: border-box; }
+.bwt-app img { max-width: 100%; height: auto; display: block; }
+.bwt-app a { color: #5B4FE8; }
+.bwt-app .bwt-section { padding: 44px 18px; }
+.bwt-app .bwt-wrap { max-width: 1024px; margin: 0 auto; width: 100%; }
+.bwt-app .bwt-hero {
+    background:
+        radial-gradient(120% 85% at 50% -20%, rgba(91,79,232,0.20) 0%, rgba(91,79,232,0.04) 55%, rgba(91,79,232,0) 100%),
+        linear-gradient(180deg, #f8f7ff 0%, #f1efff 100%);
+    text-align: center;
+    border-bottom: 1px solid #dddaf4;
+}
+.bwt-app .bwt-alt { background: #F5F4FF; }
+.bwt-app .bwt-intro { padding-top: 24px; padding-bottom: 30px; }
+.bwt-app .bwt-lead {
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+    color: #2f2c52;
+    font-size: 18px;
+    line-height: 1.72;
+}
+.bwt-app .bwt-highlights { padding-top: 18px; }
+.bwt-app .bwt-highlights ul {
+    list-style: none;
+    padding: 0;
+    margin: 18px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+.bwt-app .bwt-highlights li {
+    margin: 0;
+    padding: 18px 18px 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    border: 1px solid #dddaf4;
+    border-top: 4px solid #5B4FE8;
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(22,20,43,0.07);
+    color: #2f2c52;
+}
+.bwt-app .bwt-proof li {
+    background:
+        radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%),
+        linear-gradient(180deg, #ffffff 0%, #fbfaff 100%);
+}
+.bwt-app .bwt-audience li {
+    background: linear-gradient(180deg, #ffffff 0%, #f9f8ff 100%);
+}
+.bwt-app .bwt-diagram { background: transparent; padding-top: 18px; }
+.bwt-app .bwt-diagram .bwt-wrap {
+    background: #ebe8ff;
+    border: 1px solid #d9d4fb;
+    border-radius: 16px;
+    padding: 26px 22px;
+}
+.bwt-app .bwt-diagram h2 { text-align: left; }
+.bwt-app .bwt-diagram-stack { display: grid; gap: 18px; }
+.bwt-app .bwt-figure {
+    margin: 0;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #d9d4fb;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(22,20,43,0.08);
+}
+.bwt-app .bwt-figure.bwt-figure-lead {
+    border: 2px solid #5B4FE8;
+    box-shadow: 0 12px 28px rgba(91,79,232,0.20);
+}
+.bwt-app .bwt-figure img { width: 100%; border-radius: 10px; background: #fff; }
+.bwt-app .bwt-diagram h2 { margin-bottom: 24px; }
+.bwt-app .bwt-cta { background: #5B4FE8; text-align: center; }
+.bwt-app .bwt-cta p { color: #fff; font-size: 16px; margin: 0; }
+.bwt-app .bwt-steps { padding-top: 24px; }
+.bwt-app .bwt-steps ol {
+    margin: 16px 0 0;
+    padding-left: 0;
+    list-style: none;
+    counter-reset: bwtStep;
+    display: grid;
+    gap: 10px;
+}
+.bwt-app .bwt-steps li {
+    margin: 0;
+    position: relative;
+    padding: 12px 14px 12px 46px;
+    background: #fff;
+    border: 1px solid #dddaf4;
+    border-radius: 12px;
+}
+.bwt-app .bwt-steps li::before {
+    counter-increment: bwtStep;
+    content: counter(bwtStep);
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: #5B4FE8;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bwt-app .bwt-guide { border-top: 1px solid #dcd8f6; }
+.bwt-app .bwt-guide .bwt-wrap {
+    background: #fff;
+    border: 1px solid #e2def8;
+    border-radius: 14px;
+    padding: 26px 22px;
+}
+.bwt-app .bwt-guide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #5B4FE8;
+        font-size: 28px;
+    font-weight: 700;
+        margin: 0 0 26px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #d7d1fb;
+    letter-spacing: -0.02em;
+}
+.bwt-app h1, .bwt-app h2, .bwt-app h3, .bwt-app h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+.bwt-app .bwt-name { color: #5B4FE8; font-size: 34px; letter-spacing: -0.02em; font-weight: 700; margin-top: 8px; }
+.bwt-app .bwt-tagline { color: #16142B; font-weight: 500; font-size: 19px; line-height: 1.5; margin: 14px auto 0; max-width: 780px; }
+.bwt-app .bwt-section h2 {
+    color: #5B4FE8;
+    font-size: clamp(26px, 2.2vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d9d4fb;
+}
+.bwt-app .bwt-section h3 {
+    color: #1f1b3f;
+    font-size: clamp(19px, 1.5vw, 23px);
+    font-weight: 700;
+    margin-top: 34px;
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 4px solid #7b70f0;
+}
+.bwt-app .bwt-section h4 {
+    color: #453f74;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 26px;
+    margin-bottom: 12px;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #d9d4fb;
+    background: #f1efff;
+}
+.bwt-app .bwt-guide h3:first-of-type,
+.bwt-app .bwt-guide h4:first-of-type { margin-top: 10px; }
+.bwt-app p { margin: 0 0 12px; }
+.bwt-app ul, .bwt-app ol { padding-left: 24px; margin: 0 0 16px; }
+.bwt-app li { margin-bottom: 6px; }
+.bwt-app code {
+  background: #E6E5F2;
+  color: #16142B;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  word-break: break-word;
+}
+.bwt-app pre {
+  background: #16142B;
+  color: #F5F4FF;
+  padding: 16px;
+    border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: 100%;
+}
+.bwt-app pre code { background: transparent; color: inherit; padding: 0; }
+.bwt-app .bwt-caption { color: #4f4b72; font-size: 13px; font-style: normal; text-align: left; margin: 10px 0 2px; }
+.bwt-app .bwt-inline-img { margin: 20px 0; text-align: center; }
+.bwt-app .bwt-section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    color: #453f74;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.bwt-app .bwt-section-kicker::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: #a69ff6;
+}
+.bwt-app .bwt-proof { padding-top: 18px; }
+.bwt-app .bwt-proof .bwt-wrap,
+.bwt-app .bwt-technical .bwt-wrap,
+.bwt-app .bwt-implementation .bwt-wrap {
+    max-width: 1080px;
+}
+.bwt-app .bwt-audience ul {
+    list-style: none;
+    padding: 0;
+    margin: 18px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.bwt-app .bwt-audience li {
+    margin: 0;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #dddaf4;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(22,20,43,0.06);
+}
+.bwt-app .bwt-story {
+    padding-top: 18px;
+    padding-bottom: 32px;
+}
+.bwt-app .bwt-story-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    gap: 24px;
+    align-items: start;
+}
+.bwt-app .bwt-story-copy {
+    padding: 28px 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    border: 1px solid #dddaf4;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(22,20,43,0.08);
+}
+.bwt-app .bwt-story-copy p:last-child { margin-bottom: 0; }
+.bwt-app .bwt-story-copy .bwt-story-lead {
+    color: #2f2c52;
+    font-size: 18px;
+    line-height: 1.72;
+}
+.bwt-app .bwt-story-figure {
+    margin: 0;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #d9d4fb;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(22,20,43,0.10);
+}
+.bwt-app .bwt-story-figure img {
+    width: 100%;
+    border-radius: 12px;
+    background: #fff;
+}
+.bwt-app .bwt-technical {
+    background: linear-gradient(180deg, #faf9ff 0%, #f3f1ff 100%);
+    border-top: 1px solid #dddaf4;
+    border-bottom: 1px solid #dddaf4;
+}
+.bwt-app .bwt-technical-intro {
+    max-width: 760px;
+    color: #38355c;
+    margin: 0 0 22px;
+}
+.bwt-app .bwt-technical-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+.bwt-app .bwt-technical-grid > .bwt-figure:only-child {
+    width: 100%;
+    max-width: 760px;
+    justify-self: center;
+}
+.bwt-app .bwt-implementation {
+    padding-top: 28px;
+}
+.bwt-app .bwt-implementation-lead {
+    max-width: 760px;
+    margin: 0;
+    text-align: left;
+}
+.bwt-app .bwt-implementation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+    align-items: start;
+}
+.bwt-app .bwt-implementation-grid > .bwt-step-panel:only-child {
+    width: 100%;
+    max-width: 760px;
+    justify-self: center;
+}
+.bwt-app .bwt-step-panel {
+    padding: 20px 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    border: 1px solid #dddaf4;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(22,20,43,0.06);
+}
+.bwt-app .bwt-step-panel h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+.bwt-app .bwt-step-panel ol {
+    margin-bottom: 0;
+}
+@media (max-width: 600px) {
+  .bwt-app { font-size: 14px; }
+    .bwt-app .bwt-section { padding: 28px 14px; }
+    .bwt-app .bwt-wrap { max-width: 100%; }
+    .bwt-app .bwt-name { font-size: 25px; }
+    .bwt-app .bwt-tagline { font-size: 16px; }
+    .bwt-app .bwt-lead { font-size: 16px; }
+        .bwt-app .bwt-guide-title { font-size: 24px; margin-bottom: 20px; }
+        .bwt-app .bwt-section h2 { font-size: 24px; }
+    .bwt-app .bwt-section h3 { font-size: 18px; }
+        .bwt-app .bwt-section h4 { font-size: 11px; padding: 4px 9px; }
+    .bwt-app .bwt-diagram .bwt-wrap { padding: 16px 14px; }
+    .bwt-app .bwt-figure { padding: 10px; }
+        .bwt-app .bwt-story-shell { grid-template-columns: 1fr; }
+        .bwt-app .bwt-story-copy { padding: 18px 16px; }
+        .bwt-app .bwt-story-copy .bwt-story-lead { font-size: 16px; }
+        .bwt-app .bwt-story-figure { padding: 12px; }
+        .bwt-app .bwt-implementation-grid { grid-template-columns: 1fr; }
+    .bwt-app .bwt-guide .bwt-wrap { padding: 18px 14px; }
+  .bwt-app pre { font-size: 12px; padding: 12px; }
+}
+</style>
+
+<section class="bwt-section bwt-hero">
+  <div class="bwt-wrap">
+    <h1 class="bwt-name">Connector Webhooks - Glue Outbound</h1>
+    <p class="bwt-tagline">Let connector backends own outbound delivery without rebuilding the same glue layer.</p>
+  </div>
+</section>
+
+<section class="bwt-section bwt-intro">
+  <div class="bwt-wrap">
+    <p class="bwt-lead">Connector-ready outbound glue for backend-owned delivery flows.</p>
+  </div>
+</section>
+
+<section class="bwt-section bwt-highlights bwt-proof">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">Outcomes</p>
+    <h2>Why Teams Choose It</h2>
+    <ul>
+        <li>Keeps outbound routing tied to the backend that owns the integration.</li>
+        <li>Lets delivery decisions stay close to connector-specific logic.</li>
+        <li>Supports repeatable outbound operations without rebuilding the same glue layer.</li>
+        <li>Gives teams a cleaner path from framework setup to live connector dispatch.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="bwt-section bwt-highlights bwt-audience bwt-alt">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">Audience</p>
+    <h2>Who It&#x27;s For</h2>
+    <ul>
+        <li>Connector teams whose backend records need to own outbound endpoint routing.</li>
+        <li>Integration teams that want framework-managed recovery while keeping connector behavior on the backend.</li>
+        <li>Odoo partners packaging outbound delivery behavior as reusable connector addons.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="bwt-section bwt-highlights bwt-capabilities">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">Capabilities</p>
+    <h2>Capability Pillars</h2>
+    <ul>
+        <li>A clear outbound ownership model for backend-led integrations.</li>
+        <li>Direct endpoint resolution tied to the connector backend.</li>
+        <li>Shared delivery orchestration with room for connector-specific decisions.</li>
+        <li>Flexible transport support for real-world outbound connector needs.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="bwt-section bwt-story">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">How it works</p>
+    <h2>How It Works</h2>
+    <div class="bwt-story-shell">
+      <div class="bwt-story-copy">
+      <p class="bwt-story-lead">The outbound glue addon keeps routing and delivery ownership on the backend while the shared framework handles queueing, retries, and delivery state changes around it.</p>
+      </div>
+      <figure class="bwt-story-figure">
+        <img src="diagrams/webhooks-connector-outbound-routing.svg" alt="Outbound endpoint routing by connector backend"/>
+        <p class="bwt-caption">Outbound endpoint routing by connector backend</p>
+      </figure>
     </div>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12 text-center">
-      <h2 class="oe_slogan" style="color: #4F46E5;">Bitwise Connector Webhooks Outbound</h2>
-      <h3 class="oe_slogan">Outbound webhook integration for connector backends.</h3>
+<section class="bwt-section bwt-technical">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">Technical proof</p>
+    <h2>Technical Validation</h2>
+    <p class="bwt-technical-intro">The technical section below surfaces routing and dispatch flow so evaluators can inspect how backend ownership, endpoint resolution, and framework-managed delivery fit together.</p>
+    <div class="bwt-technical-grid">
+      <figure class="bwt-figure">
+        <img src="diagrams/webhooks-connector-outbound-sequence.svg" alt="Connector outbound dispatch sequence"/>
+        <p class="bwt-caption">Connector outbound dispatch sequence</p>
+      </figure>
     </div>
   </div>
 </section>
 
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Overview</h2>
-      <p>
-        <strong>Bitwise Connector Webhooks Outbound</strong> provides an opt-in mixin
-        (<code>bwt.connector.webhook.outbound.mixin</code>) that connector backends inherit to
-        gain fully automated outbound webhook provisioning and delivery. Endpoints are
-        templated, provisioned, and linked automatically; deliveries are built and queued via
-        <em>queue_job</em>.
-      </p>
+<section class="bwt-section bwt-implementation">
+  <div class="bwt-wrap">
+    <p class="bwt-section-kicker">Rollout</p>
+    <h2>Rollout Path</h2>
+    <p class="bwt-lead bwt-implementation-lead">A typical rollout keeps outbound ownership on the backend while the framework manages delivery and recovery around it.</p>
+    <div class="bwt-implementation-grid">
+      <div class="bwt-step-panel">
+        <h3>Rollout Steps</h3>
+        <ol>
+          <li>Prepare the backend so it can own outbound delivery.</li>
+          <li>Seed or install the outbound endpoints that belong to that backend.</li>
+          <li>Let business flows resolve the right endpoint and queue delivery work.</li>
+          <li>Let the framework manage dispatch and response handling around the connector.</li>
+          <li>Use delivery states to retry, review, or close work cleanly.</li>
+        </ol>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Key Features</h2>
-      <ul>
-        <li>Adds <code>connector_backend_ref</code> on outbound endpoints and a computed <code>outbound_endpoint_id</code> on the backend</li>
-        <li>Outbound dispatch hook (<code>_handle_outbound_webhook_delivery(delivery, request)</code>) routed via the framework's <code>_invoke_handler</code></li>
-        <li>Outbound response hook (<code>_handle_outbound_webhook_response(delivery, response, state, outcome, *, binding, operation)</code>) with the binding and operation pre-resolved by the overlay</li>
-        <li>Per-backend hooks <code>_get_outbound_api_base_url(delivery)</code> and <code>_get_outbound_extra_headers(delivery)</code> consumed by the framework when rendering the URL and merging request headers</li>
-        <li>Delivery factory (<code>queue_outbound_delivery</code>) and <code>get_outbound_endpoint</code> resolver</li>
-        <li>Form/list action to navigate to the linked outbound endpoint(s)</li>
-      </ul>
-    </div>
+<section class="bwt-section bwt-cta">
+  <div class="bwt-wrap">
+    <p>Looking for a faster path to live outbound connectors? Pair this glue layer with premium connector modules such as Stripe when you want a more turnkey rollout.</p>
   </div>
 </section>
-
-<section class="oe_container oe_dark">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Dependencies</h2>
-      <ul>
-        <li><code>bwt_connector_webhooks_core</code></li>
-        <li><code>bwt_webhooks_outbound</code></li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section class="oe_container">
-  <div class="oe_row oe_spaced">
-    <div class="oe_span12">
-      <h2>Author</h2>
-      <p>
-        Developed by <strong>Bitwise Technologies LLC</strong>.<br/>
-        Contributors: Youssef Egla.
-      </p>
-    </div>
-  </div>
-</section>
+</div>

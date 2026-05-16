@@ -35,11 +35,23 @@ The addon stack depends on:
 When installing or testing this repository, make sure the required addons are
 available on the Odoo addons path.
 
+Connector Glue install order
+----------------------------
+
+For connector-backed webhook integrations, install in this order:
+
+1. ``bwt_connector_webhooks_core``
+2. ``bwt_connector_webhooks_inbound`` (if inbound is needed)
+3. ``bwt_connector_webhooks_outbound`` (if outbound is needed)
+
+Concrete connector addons then seed endpoint records and link them to backend
+records through ``connector_backend_ref``.
+
 Documentation
 -------------
 
-Each addon ships its own operator and developer guides under its ``readme/``
-folder.
+Each addon ships documentation; framework addons include operator and developer
+guides under ``readme/`` and Glue side addons include detailed README guides.
 
 **Webhooks Core** (``bwt_webhooks_core/``)
 
@@ -62,13 +74,23 @@ folder.
 * `Developer Guide <bwt_webhooks_outbound/readme/DEVELOPER_GUIDE.rst>`_ — outbound
   pipeline, delivery state machine, context lines, transport layer.
 
-**Connector Webhooks Core** (``bwt_connector_webhooks_core/``)
+**Connector Webhooks - Glue Core** (``bwt_connector_webhooks_core/``)
 
 * `Operator Guide <bwt_connector_webhooks_core/readme/OPERATOR_GUIDE.rst>`_ —
   what the connector layer is, linking endpoints to backends, troubleshooting.
 * `Developer Guide <bwt_connector_webhooks_core/readme/DEVELOPER_GUIDE.rst>`_ —
   registering a backend, inbound and outbound mixins, required overrides,
   endpoint seeding.
+
+**Connector Webhooks - Glue Inbound** (``bwt_connector_webhooks_inbound/``)
+
+* `README <bwt_connector_webhooks_inbound/README.rst>`_ — inbound mixin
+  contract, dependencies, backend linking flow, troubleshooting.
+
+**Connector Webhooks - Glue Outbound** (``bwt_connector_webhooks_outbound/``)
+
+* `README <bwt_connector_webhooks_outbound/README.rst>`_ — outbound mixin
+  contract, multi-endpoint routing, dependencies, troubleshooting.
 
 Development notes
 -----------------
@@ -89,4 +111,4 @@ Contributors
 License
 -------
 
-Proprietary - `Odoo Proprietary License v1.0 (OPL-1) <https://www.odoo.com/documentation/user/legal/licenses.html>`_.
+LGPL-3 - `GNU Lesser General Public License v3.0 <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>`_.
