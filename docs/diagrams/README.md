@@ -27,5 +27,4 @@ npx @mermaid-js/mermaid-cli -i docs/diagrams/webhooks-inbound-flow.mmd -o bwt_we
 
 Run `render.ps1` to export all diagrams.
 
-The script writes both `.svg` and `.png` outputs into each addon's
-`static/description/diagrams/` folder.
+The script writes both `.svg` and `.png` outputs into each addon's `static/description/diagrams/` folder.
