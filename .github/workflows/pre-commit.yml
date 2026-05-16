@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: bitwise-hq/bitwise-hq
-          ref: main
+          ref: 20567ef7c80a8e692063336b7e27da665db94938
           path: bitwise-hq
           fetch-depth: 1
           sparse-checkout: |
