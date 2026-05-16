@@ -1,0 +1,17 @@
+flowchart TD
+  A["Delivery in queued state"] --> B["_send_outbound_delivery_job()"]
+  B --> C["_prepare_outbound_request()"]
+  C --> D["_check_outbound_dispatch_allowed()"]
+  D --> E["_invoke_handler(delivery, request)"]
+  E --> F{"HandlerOutcome.status"}
+  F -- cancel --> G["_apply_outcome(canceled)"]
+  F -- done --> H["_apply_outcome(done)"]
+  F -- retry --> I["_schedule_retry()"]
+  F -- dead_letter --> J["_apply_outcome(dead_letter)"]
+  F -- send --> K["_dispatch_http_request()"]
+  K --> L["_log_delivery_attempt()"]
+  L --> M["_handle_outbound_response()"]
+  M --> N{"Transport result"}
+  N -- 2xx --> O["_apply_outcome(done)"]
+  N -- retryable --> P["_schedule_retry()"]
+  N -- fatal --> Q["_apply_outcome(dead_letter)"]

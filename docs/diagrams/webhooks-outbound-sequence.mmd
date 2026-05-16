@@ -1,26 +1,24 @@
 sequenceDiagram
-  participant Odoo as Odoo Process
-  participant Handler
+  participant App as Business Flow
+  participant Backend as Connector Backend
   participant Endpoint
   participant Delivery
   participant Queue
   participant API as External API
 
-  Odoo->>Handler: Trigger outbound hook
-  Handler->>Endpoint: Resolve endpoint + context
-  Handler->>Delivery: Create delivery record
-  Handler->>Queue: Enqueue send job
-  alt Delivery succeeds (2xx)
-    Queue->>API: Send request
-    API-->>Queue: 2xx response
-    Queue->>Delivery: Mark done + log
-    Queue->>Handler: Notify response hook
-  else Retryable (5xx / timeout)
-    Queue->>API: Send request
-    API-->>Queue: 5xx / timeout
-    Queue->>Delivery: Log attempt
-    Queue->>Queue: Reschedule (exponential backoff)
-    note over Queue,API: Retries up to queue_job max_retries
-  else Permanent failure
-    Queue->>Delivery: Mark dead-letter
+  App->>Backend: queue_outbound_delivery(...)
+  Backend->>Endpoint: get_outbound_endpoint(code_suffix)
+  Endpoint->>Delivery: Create queued delivery + context
+  Delivery->>Queue: Enqueue send job
+  Queue->>Backend: _handle_outbound_webhook_delivery(delivery, request)
+  alt Handler returns cancel/done/retry/dead_letter
+    Queue->>Delivery: Apply outcome state
+  else Handler allows send or mutate
+    Queue->>API: Send HTTP request
+    API-->>Queue: Response or error
+    Queue->>Delivery: Log attempt and update state
+    Queue->>Backend: _handle_outbound_webhook_response(...)
+    alt Retryable failure
+      Queue->>Queue: Reschedule (exponential backoff)
+    end
   end

@@ -1,24 +1,41 @@
 sequenceDiagram
   participant Sender
-  participant Odoo as Odoo HTTP
+  participant HTTP as Odoo HTTP Controller
   participant Endpoint as Inbound Endpoint
   participant Event as Inbound Event
   participant Handler as Webhook Handler
   participant Queue as Queue Job
 
-  Sender->>Odoo: POST /webhook/path
-  Odoo->>Endpoint: Resolve endpoint + config
-  Endpoint->>Endpoint: Verify signature + timestamp
-  Endpoint->>Event: Create event record
-  Event->>Handler: Evaluate rules
-  Handler->>Queue: Enqueue action job
-  alt Action succeeds
-    Queue->>Handler: Execute action
-    Handler->>Event: Update state: done
-  else Action fails — retry
-    Queue->>Queue: Reschedule (exponential backoff)
-    note over Queue: Retries up to queue_job max_retries
-  else Max retries exceeded
-    Queue->>Event: Mark dead-letter / failed
+  Sender->>HTTP: POST /webhook/path
+  HTTP->>Endpoint: Resolve endpoint by path
+  alt Endpoint missing
+    HTTP-->>Sender: 404 / 403
+  else Endpoint found
+    HTTP->>Endpoint: Verify signature + timestamp
+    alt Validation fails
+      HTTP-->>Sender: 401 / 422
+    else Validation passes
+      HTTP->>Event: Resolve identity keys
+      alt Duplicate or replay
+        Event->>Event: Link replay chain
+        HTTP-->>Sender: 202 Accepted
+      else New event
+        Event->>Event: Create draft event
+        Event->>Handler: Evaluate rules
+        alt Rule action required
+          Handler->>Queue: Enqueue execution job
+          Queue->>Handler: Execute action
+          alt Action succeeds
+            Handler->>Event: Mark done
+          else Retry requested
+            Handler->>Queue: Reschedule (exponential backoff)
+          else Max retries or fatal
+            Handler->>Event: Mark dead_letter
+          end
+        else No action matched
+          Handler->>Event: Mark done or dead_letter
+        end
+        HTTP-->>Sender: 202 Accepted
+      end
+    end
   end
-  Odoo-->>Sender: 2xx / 4xx response

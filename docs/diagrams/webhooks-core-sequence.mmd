@@ -1,0 +1,24 @@
+sequenceDiagram
+  participant Admin as Platform Admin
+  participant Handler as Webhook Handler
+  participant Inbound as Inbound Endpoint
+  participant Outbound as Outbound Endpoint
+  participant Event as Inbound Event
+  participant Delivery as Outbound Delivery
+  participant Queue as Queue Worker
+
+  Admin->>Handler: Configure handler direction and mode
+  Admin->>Inbound: Link inbound endpoint to handler
+  Admin->>Outbound: Link outbound endpoint to handler
+
+  alt Inbound orchestration
+    Inbound->>Event: Create event from validated request
+    Event->>Handler: Invoke rule engine or callback
+    Handler->>Queue: Enqueue business action
+    Queue->>Event: Mark done or dead_letter
+  else Outbound orchestration
+    Handler->>Delivery: Create delivery from business event
+    Delivery->>Queue: Enqueue transport job
+    Queue->>Handler: Invoke outbound pre-send hook
+    Queue->>Delivery: Mark done, retry, or dead_letter
+  end

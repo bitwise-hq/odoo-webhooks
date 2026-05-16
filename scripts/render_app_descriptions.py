@@ -10,6 +10,8 @@ DESCRIPTION_ADDONS = (
     "bwt_webhooks_inbound",
     "bwt_webhooks_outbound",
     "bwt_connector_webhooks_core",
+    "bwt_connector_webhooks_inbound",
+    "bwt_connector_webhooks_outbound",
 )
 
 BANNER_ADDONS = (
@@ -31,12 +33,40 @@ ADDON_NAMES = {
 }
 
 ADDON_TAGLINES = {
-    "bwt_webhooks_core": "Production-grade webhook orchestration for Odoo.",
-    "bwt_webhooks_inbound": "Secure inbound endpoints with signatures, replay protection, and rule-based processing.",
-    "bwt_webhooks_outbound": "Reliable outbound delivery with templated requests, retries, and diagnostics.",
-    "bwt_connector_webhooks_core": "Shared base and mixins for connector backends that own webhook endpoints.",
-    "bwt_connector_webhooks_inbound": "Mixin for connector backends to receive and process inbound webhooks.",
-    "bwt_connector_webhooks_outbound": "Mixin for connector backends to send outbound webhooks reliably.",
+    "bwt_webhooks_core": "Build dependable webhook operations in Odoo before you scale into broader integration flows.",
+    "bwt_webhooks_inbound": "Bring external events into Odoo with more trust, control, and day-to-day visibility.",
+    "bwt_webhooks_outbound": "Send Odoo events outward with steadier delivery, clearer recovery, and better visibility.",
+    "bwt_connector_webhooks_core": "Give connector backends a cleaner foundation for owning webhook flows.",
+    "bwt_connector_webhooks_inbound": "Let connector backends own inbound intake without scattering rollout logic.",
+    "bwt_connector_webhooks_outbound": "Let connector backends own outbound delivery without rebuilding the same glue layer.",
+}
+
+ADDON_DIAGRAMS = {
+    "bwt_webhooks_core": (
+        ("diagrams/webhooks-core-sequence.svg", "Core orchestration sequence"),
+        ("diagrams/webhooks-core-entities.svg", "Core data model"),
+    ),
+    "bwt_webhooks_inbound": (
+        ("diagrams/webhooks-inbound-flow.svg", "Inbound request flow"),
+        ("diagrams/webhooks-inbound-sequence.svg", "Inbound processing sequence"),
+    ),
+    "bwt_webhooks_outbound": (
+        ("diagrams/webhooks-outbound-flow.svg", "Outbound delivery flow"),
+        ("diagrams/webhooks-outbound-pipeline.svg", "Outbound processing pipeline"),
+        ("diagrams/webhooks-outbound-sequence.svg", "Outbound delivery sequence"),
+    ),
+    "bwt_connector_webhooks_core": (
+        ("diagrams/webhooks-connector-backend-linking.svg", "Connector backend linking flow"),
+        ("diagrams/webhooks-connector-core-sequence.svg", "Connector backend orchestration sequence"),
+    ),
+    "bwt_connector_webhooks_inbound": (
+        ("diagrams/webhooks-connector-backend-linking.svg", "Inbound backend-to-endpoint linking"),
+        ("diagrams/webhooks-connector-inbound-sequence.svg", "Connector inbound dispatch sequence"),
+    ),
+    "bwt_connector_webhooks_outbound": (
+        ("diagrams/webhooks-connector-outbound-routing.svg", "Outbound endpoint routing by connector backend"),
+        ("diagrams/webhooks-connector-outbound-sequence.svg", "Connector outbound dispatch sequence"),
+    ),
 }
 
 
@@ -97,6 +127,9 @@ def main() -> int:
         banner_addons=BANNER_ADDONS,
         addon_names=ADDON_NAMES,
         addon_taglines=ADDON_TAGLINES,
+        addon_diagrams=ADDON_DIAGRAMS,
+        diagram_section_title="How It Works",
+        include_diagram_captions=True,
         fonts_dir=local_fonts_dir if local_fonts_dir.exists() else BITWISE_HQ_ROOT / "assets" / "fonts",
     )
     render_repository(REPO_ROOT, config)

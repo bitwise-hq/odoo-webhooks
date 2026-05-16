@@ -1,0 +1,18 @@
+flowchart TD
+  A["Backend record"] --> B["_get_outbound_endpoint_template_specs()"]
+  B --> C["Spec: primary"]
+  B --> D["Spec: orders"]
+  B --> E["Spec: refunds"]
+  C --> F["Endpoint code: backend-prefix-primary"]
+  D --> G["Endpoint code: backend-prefix-orders"]
+  E --> H["Endpoint code: backend-prefix-refunds"]
+
+  I["Business operation"] --> J["get_outbound_endpoint(code_suffix)"]
+  J --> K{"code_suffix"}
+  K -- none or primary --> F
+  K -- orders --> G
+  K -- refunds --> H
+  F --> L["queue_outbound_delivery(...)"]
+  G --> L
+  H --> L
+  L --> M["Delivery routed with backend-scoped endpoint"]

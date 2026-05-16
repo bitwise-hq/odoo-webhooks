@@ -1,12 +1,16 @@
 flowchart TD
-  A["Business Event"] --> B["Select Outbound Handler"]
-  B --> C["Resolve Endpoint + Context"]
-  C --> D["Build Request: Path + Headers + Payload"]
-  D --> E["Queue Job: Send Delivery"]
-  E --> F["HTTP Attempt"]
-  F --> G{"Response OK?"}
-  G -- Yes --> H["Mark Delivery Done"]
-  G -- Retryable --> I["Schedule Retry\nexponential backoff"]
-  G -- Fail --> J["Dead Letter"]
-  I --> F
-  F --> K["Log Attempt + Response"]
+  A["Business trigger or backend call"] --> B["Resolve outbound endpoint"]
+  B --> C["Build OutboundRequest (path, headers, payload)"]
+  C --> D["Invoke backend pre-dispatch hooks"]
+  D --> E{"Handler outcome"}
+  E -- cancel --> F["Mark canceled"]
+  E -- done --> G["Mark done (no HTTP call)"]
+  E -- retry --> H["Reschedule with backoff"]
+  E -- dead_letter --> I["Mark dead_letter"]
+  E -- send or mutate --> J["Queue transport job"]
+  J --> K["HTTP attempt"]
+  K --> L{"Response class"}
+  L -- 2xx --> M["Mark done"]
+  L -- retryable (5xx/timeout) --> N["Log attempt and reschedule"]
+  L -- non-retryable (4xx/fatal) --> O["Mark dead_letter"]
+  N --> J

@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant Addon as Concrete Connector Addon
+  participant Backend as Backend Record
+  participant Endpoint as Endpoint Record
+  participant Framework as Webhooks Framework
+  participant Glue as Glue Mixins
+
+  Addon->>Backend: Inherit connector.backend plus Glue mixins
+  Addon->>Endpoint: Seed endpoint XML records
+  Backend->>Endpoint: Set connector_backend_ref
+  Framework->>Glue: Resolve backend from endpoint reference
+
+  alt Inbound dispatch
+    Framework->>Glue: _handle_inbound_webhook_event(event)
+    Glue-->>Framework: done, retry, dead_letter, or cancel
+  else Outbound dispatch
+    Framework->>Glue: _handle_outbound_webhook_delivery(...)
+    Glue-->>Framework: send, mutate, or terminal outcome
+  end
