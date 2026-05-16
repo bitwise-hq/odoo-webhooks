@@ -32,7 +32,7 @@ jobs:
             scripts/odoo_addon_description_renderer.py
           sparse-checkout-cone-mode: false
           persist-credentials: false
-          token: ${{ secrets.BITWISE_ORG_GH_PAT || secrets.GIT_PUSH_TOKEN }}
+          token: ${{ secrets.BITWISE_ORG_GH_PAT }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
