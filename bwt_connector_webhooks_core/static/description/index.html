@@ -1,4 +1,4 @@
-<div class="bwt-app">
+<div class="bwt-app" style="font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #16142B; line-height: 1.65; font-size: 15px; background: linear-gradient(180deg, #ffffff 0%, #f8f7ff 100%); overflow-x: hidden">
 <style>
 .bwt-app {
   font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -82,40 +82,6 @@
 .bwt-app .bwt-diagram h2 { margin-bottom: 24px; }
 .bwt-app .bwt-cta { background: #5B4FE8; text-align: center; }
 .bwt-app .bwt-cta p { color: #fff; font-size: 16px; margin: 0; }
-.bwt-app .bwt-steps { padding-top: 24px; }
-.bwt-app .bwt-steps ol {
-    margin: 16px 0 0;
-    padding-left: 0;
-    list-style: none;
-    counter-reset: bwtStep;
-    display: grid;
-    gap: 10px;
-}
-.bwt-app .bwt-steps li {
-    margin: 0;
-    position: relative;
-    padding: 12px 14px 12px 46px;
-    background: #fff;
-    border: 1px solid #dddaf4;
-    border-radius: 12px;
-}
-.bwt-app .bwt-steps li::before {
-    counter-increment: bwtStep;
-    content: counter(bwtStep);
-    position: absolute;
-    left: 14px;
-    top: 10px;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: #5B4FE8;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 .bwt-app .bwt-guide { border-top: 1px solid #dcd8f6; }
 .bwt-app .bwt-guide .bwt-wrap {
     background: #fff;
@@ -213,10 +179,13 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
-.bwt-app .bwt-section-kicker::before {
-    content: "";
+.bwt-app .bwt-section-kicker-line {
+    display: block;
     width: 26px;
     height: 1px;
+    font-size: 0;
+    line-height: 0;
+    overflow: hidden;
     background: #a69ff6;
 }
 .bwt-app .bwt-proof { padding-top: 18px; }
@@ -329,6 +298,42 @@
     margin-top: 0;
     margin-bottom: 14px;
 }
+.bwt-app .bwt-step-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: grid;
+    gap: 10px;
+}
+.bwt-app .bwt-step-list li {
+    margin: 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.bwt-app .bwt-step-badge {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: #5B4FE8;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.bwt-app .bwt-step-copy {
+    display: block;
+    flex: 1 1 auto;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #dddaf4;
+    border-radius: 12px;
+}
 .bwt-app .bwt-step-panel ol {
     margin-bottom: 0;
 }
@@ -355,257 +360,287 @@
 }
 </style>
 
-<section class="bwt-section bwt-hero">
-  <div class="bwt-wrap">
-    <h1 class="bwt-name">Connector Webhooks - Glue Core</h1>
-    <p class="bwt-tagline">Give connector backends a cleaner foundation for owning webhook flows.</p>
+<section class="bwt-section bwt-hero" style="box-sizing: border-box; padding: 44px 18px; background: radial-gradient(120% 85% at 50% -20%, rgba(91,79,232,0.20) 0%, rgba(91,79,232,0.04) 55%, rgba(91,79,232,0) 100%), linear-gradient(180deg, #f8f7ff 0%, #f1efff 100%); text-align: center; border-bottom: 1px solid #dddaf4">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <h1 class="bwt-name" style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #5B4FE8; font-size: 34px; letter-spacing: -0.02em; font-weight: 700; margin-top: 8px">Connector Webhooks - Glue Core</h1>
+    <p class="bwt-tagline" style="box-sizing: border-box; color: #16142B; font-weight: 500; font-size: 19px; line-height: 1.5; margin: 14px auto 0; max-width: 780px">Give connector backends a cleaner foundation for owning webhook flows.</p>
   </div>
 </section>
 
-<section class="bwt-section bwt-intro">
-  <div class="bwt-wrap">
-    <p class="bwt-lead">Shared glue infrastructure for connector backends that need webhook ownership, cleaner rollout patterns, and a stronger operational base.</p>
+<section class="bwt-section bwt-intro" style="box-sizing: border-box; padding: 44px 18px; padding-top: 24px; padding-bottom: 30px">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <p class="bwt-lead" style="box-sizing: border-box; max-width: 860px; margin: 0 auto; text-align: center; color: #2f2c52; font-size: 18px; line-height: 1.72">Shared glue infrastructure for connector backends that need webhook ownership, cleaner rollout patterns, and a stronger operational base.</p>
   </div>
 </section>
 
-<section class="bwt-section bwt-highlights bwt-proof">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">Outcomes</p>
-    <h2>Why Teams Choose It</h2>
-    <ul>
-        <li>Gives connector teams one shared ownership model across webhook flows.</li>
-        <li>Keeps rollout and refresh work more predictable over time.</li>
-        <li>Helps endpoint naming and routing stay consistent as connector scope grows.</li>
-        <li>Supports inbound-only, outbound-only, or combined connector rollouts.</li>
+<section class="bwt-section bwt-highlights bwt-proof" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px">
+  <div class="bwt-wrap" style="box-sizing: border-box; margin: 0 auto; width: 100%; max-width: 1080px">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">Outcomes</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Why Teams Choose It</h2>
+    <ul style="box-sizing: border-box; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-left: 24px">
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Gives connector teams one shared ownership model across webhook flows.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Keeps rollout and refresh work more predictable over time.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Helps endpoint naming and routing stay consistent as connector scope grows.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Supports inbound-only, outbound-only, or combined connector rollouts.</li>
     </ul>
   </div>
 </section>
 
-<section class="bwt-section bwt-highlights bwt-audience bwt-alt">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">Audience</p>
-    <h2>Who It&#x27;s For</h2>
-    <ul>
-        <li>Teams productising connector backends that need webhook ownership to live on backend records.</li>
-        <li>Integration teams that want one shared glue layer before expanding into inbound and outbound behavior.</li>
-        <li>Odoo partners standardising connector-backed rollout patterns across multiple addons.</li>
+<section class="bwt-section bwt-highlights bwt-audience bwt-alt" style="box-sizing: border-box; padding: 44px 18px; background: #F5F4FF; padding-top: 18px">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">Audience</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Who It's For</h2>
+    <ul style="box-sizing: border-box; padding-left: 24px; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px">
+        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Teams productising connector backends that need webhook ownership to live on backend records.</li>
+        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Integration teams that want one shared glue layer before expanding into inbound and outbound behavior.</li>
+        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Odoo partners standardising connector-backed rollout patterns across multiple addons.</li>
     </ul>
   </div>
 </section>
 
-<section class="bwt-section bwt-highlights bwt-capabilities">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">Capabilities</p>
-    <h2>Capability Pillars</h2>
-    <ul>
-        <li>One shared foundation for backend-owned webhook rollout.</li>
-        <li>Clear backend linkage that keeps ownership and routing aligned.</li>
-        <li>Stable naming and provisioning patterns that reduce drift over time.</li>
-        <li>Directional expansion paths so teams only add the behavior they need.</li>
+<section class="bwt-section bwt-highlights bwt-capabilities" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">Capabilities</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Capability Pillars</h2>
+    <ul style="box-sizing: border-box; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-left: 24px">
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">One shared foundation for backend-owned webhook rollout.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Clear backend linkage that keeps ownership and routing aligned.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Stable naming and provisioning patterns that reduce drift over time.</li>
+        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Directional expansion paths so teams only add the behavior they need.</li>
     </ul>
   </div>
 </section>
 
-<section class="bwt-section bwt-story">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">How it works</p>
-    <h2>How It Works</h2>
-    <div class="bwt-story-shell">
-      <div class="bwt-story-copy">
-      <p class="bwt-story-lead">Glue Core establishes the shared ownership model first, then the directional glue addons layer inbound and outbound behavior on top so connector teams can grow without rebuilding the same foundation for each flow.</p>
+<section class="bwt-section bwt-story" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px; padding-bottom: 32px">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">How it works</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">How It Works</h2>
+    <div class="bwt-story-shell" style="box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); gap: 24px; align-items: start">
+      <div class="bwt-story-copy" style="box-sizing: border-box; padding: 28px 24px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-radius: 16px; box-shadow: 0 10px 28px rgba(22,20,43,0.08)">
+      <p class="bwt-story-lead" style="box-sizing: border-box; margin: 0 0 12px; margin-bottom: 0; color: #2f2c52; font-size: 18px; line-height: 1.72">Glue Core establishes the shared ownership model first, then the directional glue addons layer inbound and outbound behavior on top so connector teams can grow without rebuilding the same foundation for each flow.</p>
       </div>
-      <figure class="bwt-story-figure">
-        <img src="diagrams/webhooks-connector-backend-linking.svg" alt="Connector backend linking flow"/>
-        <p class="bwt-caption">Connector backend linking flow</p>
+      <figure class="bwt-story-figure" style="box-sizing: border-box; margin: 0; padding: 18px; background: #fff; border: 1px solid #d9d4fb; border-radius: 16px; box-shadow: 0 12px 30px rgba(22,20,43,0.10)">
+        <img src="diagrams/webhooks-connector-backend-linking.svg" alt="Connector backend linking flow" style="box-sizing: border-box; max-width: 100%; height: auto; display: block; width: 100%; border-radius: 12px; background: #fff" />
+        <p class="bwt-caption" style="box-sizing: border-box; color: #4f4b72; font-size: 13px; font-style: normal; text-align: left; margin: 10px 0 2px">Connector backend linking flow</p>
       </figure>
     </div>
   </div>
 </section>
 
-<section class="bwt-section bwt-technical">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">Technical proof</p>
-    <h2>Technical Validation</h2>
-    <p class="bwt-technical-intro">The technical section below surfaces backend linking flow and orchestration details so evaluators can inspect how backend records, endpoint references, and directional glue pieces fit together.</p>
-    <div class="bwt-technical-grid">
-      <figure class="bwt-figure">
-        <img src="diagrams/webhooks-connector-core-sequence.svg" alt="Connector backend orchestration sequence"/>
-        <p class="bwt-caption">Connector backend orchestration sequence</p>
+<section class="bwt-section bwt-technical" style="box-sizing: border-box; padding: 44px 18px; background: linear-gradient(180deg, #faf9ff 0%, #f3f1ff 100%); border-top: 1px solid #dddaf4; border-bottom: 1px solid #dddaf4">
+  <div class="bwt-wrap" style="box-sizing: border-box; margin: 0 auto; width: 100%; max-width: 1080px">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">Technical proof</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Technical Validation</h2>
+    <p class="bwt-technical-intro" style="box-sizing: border-box; max-width: 760px; color: #38355c; margin: 0 0 22px">The technical section below surfaces backend linking flow and orchestration details so evaluators can inspect how backend records, endpoint references, and directional glue pieces fit together.</p>
+    <div class="bwt-technical-grid" style="box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start">
+      <figure class="bwt-figure" style="box-sizing: border-box; margin: 0; padding: 14px; background: #fff; border: 1px solid #d9d4fb; border-radius: 14px; box-shadow: 0 8px 24px rgba(22,20,43,0.08); width: 100%; max-width: 760px; justify-self: center">
+        <img src="diagrams/webhooks-connector-core-sequence.svg" alt="Connector backend orchestration sequence" style="box-sizing: border-box; max-width: 100%; height: auto; display: block; width: 100%; border-radius: 10px; background: #fff" />
+        <p class="bwt-caption" style="box-sizing: border-box; color: #4f4b72; font-size: 13px; font-style: normal; text-align: left; margin: 10px 0 2px">Connector backend orchestration sequence</p>
       </figure>
     </div>
   </div>
 </section>
 
-<section class="bwt-section bwt-implementation">
-  <div class="bwt-wrap">
-    <p class="bwt-section-kicker">Rollout</p>
-    <h2>Rollout Path</h2>
-    <p class="bwt-lead bwt-implementation-lead">Start with Glue Core when the backend record should be the place where webhook ownership and rollout decisions live.</p>
-    <div class="bwt-implementation-grid">
-      <div class="bwt-step-panel">
-        <h3>Rollout Steps</h3>
-        <ol>
-          <li>Install <code>bwt_connector_webhooks_core</code> to give backend records a shared ownership layer.</li>
-          <li>Add inbound glue where the backend needs to receive provider traffic.</li>
-          <li>Add outbound glue where the backend needs to send deliveries.</li>
-          <li>Link each endpoint to the backend record it belongs to.</li>
+<section class="bwt-section bwt-implementation" style="box-sizing: border-box; padding: 44px 18px; padding-top: 28px">
+  <div class="bwt-wrap" style="box-sizing: border-box; margin: 0 auto; width: 100%; max-width: 1080px">
+    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
+      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
+      <span style="box-sizing: border-box">Rollout</span>
+    </p>
+    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Rollout Path</h2>
+    <p class="bwt-lead bwt-implementation-lead" style="box-sizing: border-box; color: #2f2c52; font-size: 18px; line-height: 1.72; max-width: 760px; margin: 0; text-align: left">Start with Glue Core when the backend record should be the place where webhook ownership and rollout decisions live.</p>
+    <div class="bwt-implementation-grid" style="box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 18px; align-items: start">
+      <div class="bwt-step-panel" style="box-sizing: border-box; width: 100%; max-width: 760px; justify-self: center; padding: 20px 18px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-radius: 16px; box-shadow: 0 8px 24px rgba(22,20,43,0.06)">
+        <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; padding-left: 12px; border-left: 4px solid #7b70f0; margin-top: 0; margin-bottom: 14px">Rollout Steps</h3>
+        <ol class="bwt-step-list" style="box-sizing: border-box; padding-left: 24px; list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; margin-bottom: 0">
+          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
+            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">1</span>
+            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Install <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_core</code> to give backend records a shared ownership layer.</span>
+          </li>
+          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
+            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">2</span>
+            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Add inbound glue where the backend needs to receive provider traffic.</span>
+          </li>
+          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
+            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">3</span>
+            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Add outbound glue where the backend needs to send deliveries.</span>
+          </li>
+          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
+            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">4</span>
+            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Link each endpoint to the backend record it belongs to.</span>
+          </li>
         </ol>
       </div>
     </div>
   </div>
 </section>
 
-<section class="bwt-section bwt-cta">
-  <div class="bwt-wrap">
-    <p>Looking for a faster path from glue layer to live integration? Pair this foundation with premium connector modules such as Stripe when you want a more turnkey rollout.</p>
+<section class="bwt-section bwt-cta" style="box-sizing: border-box; padding: 44px 18px; background: #5B4FE8; text-align: center">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
+    <p style="box-sizing: border-box; color: #fff; font-size: 16px; margin: 0">Looking for a faster path from glue layer to live integration? Pair this foundation with premium connector modules such as Stripe when you want a more turnkey rollout.</p>
   </div>
 </section>
 
-<section class="bwt-section bwt-guide bwt-alt">
-  <div class="bwt-wrap">
-    <h2 class="bwt-guide-title">Operator Guide</h2>
-      <p>This guide explains the connector layer of the webhook framework and how an operator links connector backends to their webhook endpoints through the UI.</p>
-      <h3>What is the Connector Layer?</h3>
-      <p>The connector layer bridges the webhook framework with OCA connector backends (e.g. a Stripe or payment gateway backend). Each connector backend record in Odoo can own one or more webhook endpoints. The connector layer provides:</p>
-      <ul>
-        <li>A computed <strong>Inbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_inbound</code> is installed).</li>
-        <li>A computed <strong>Outbound Endpoint</strong> smart button on backend forms (when <code>bwt_connector_webhooks_outbound</code> is installed).</li>
-        <li>Scoped technical naming so endpoint codes are unique per backend instance and company.</li>
+<section class="bwt-section bwt-guide bwt-alt" style="box-sizing: border-box; padding: 44px 18px; background: #F5F4FF; border-top: 1px solid #dcd8f6">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%; background: #fff; border: 1px solid #e2def8; border-radius: 14px; padding: 26px 22px">
+    <h2 class="bwt-guide-title" style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Operator Guide</h2>
+      <p style="box-sizing: border-box; margin: 0 0 12px">This guide explains the connector layer of the webhook framework and how an operator links connector backends to their webhook endpoints through the UI.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0; margin-top: 10px">What is the Connector Layer?</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The connector layer bridges the webhook framework with OCA connector backends (e.g. a Stripe or payment gateway backend). Each connector backend record in Odoo can own one or more webhook endpoints. The connector layer provides:</p>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px">A computed <strong style="box-sizing: border-box">Inbound Endpoint</strong> smart button on backend forms (when <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_inbound</code> is installed).</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px">A computed <strong style="box-sizing: border-box">Outbound Endpoint</strong> smart button on backend forms (when <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_outbound</code> is installed).</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px">Scoped technical naming so endpoint codes are unique per backend instance and company.</li>
       </ul>
-      <p>Endpoints are seeded as Odoo XML data records by the concrete connector addon (e.g. <code>bwt_stripe_core</code>). They are <strong>not</strong> auto-created when a backend record is first created.</p>
-      <p>For side-addon specific behavior and setup details, see:</p>
-      <ul>
-        <li><a href="../../bwt_connector_webhooks_inbound/README.rst">Glue Inbound README </a></li>
-        <li><a href="../../bwt_connector_webhooks_outbound/README.rst">Glue Outbound README </a></li>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Endpoints are seeded as Odoo XML data records by the concrete connector addon (e.g. <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_stripe_core</code>). They are <strong style="box-sizing: border-box">not</strong> auto-created when a backend record is first created.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">For side-addon specific behavior and setup details, see:</p>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px"><a href="../../bwt_connector_webhooks_inbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Inbound README </a></li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><a href="../../bwt_connector_webhooks_outbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Outbound README </a></li>
       </ul>
-      <h3>Linking an Endpoint to a Backend</h3>
-      <p>If an endpoint has not been automatically linked by the installer, link it manually:</p>
-      <ol>
-        <li>Go to <strong>Webhooks -> Inbound -> Endpoints</strong> (or Outbound -> Endpoints) and open the endpoint record you want to link.</li>
-        <li>In the <strong>Connector Backend</strong> field, select the backend model and the specific backend record.</li>
-        <li>Save the endpoint.</li>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Linking an Endpoint to a Backend</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">If an endpoint has not been automatically linked by the installer, link it manually:</p>
+      <ol style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px">Go to <strong style="box-sizing: border-box">Webhooks -&gt; Inbound -&gt; Endpoints</strong> (or Outbound -&gt; Endpoints) and open the endpoint record you want to link.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px">In the <strong style="box-sizing: border-box">Connector Backend</strong> field, select the backend model and the specific backend record.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px">Save the endpoint.</li>
       </ol>
-      <p>The smart button on the backend form will now resolve to this endpoint.</p>
-      <h4>Multiple Backends and Endpoint Scoping</h4>
-      <p>Each connector backend instance gets its own endpoint records scoped by a technical prefix derived from the backend model name and record ID (e.g. <code>stripe-1-inbound</code>). This ensures codes are unique across companies and backend instances.</p>
-      <p>Do not manually change the <strong>Code</strong> field on an endpoint that is linked to a backend; the scoping convention is enforced by the provisioning hooks in the concrete connector addon and resync operations depend on it.</p>
-      <h4>Verifying the Link</h4>
-      <p>Open the backend form. The <strong>Inbound Endpoint</strong> and/or <strong>Outbound Endpoint</strong> smart buttons should show the linked endpoint name and navigate directly to the endpoint configuration on click.</p>
-      <p>If a smart button shows 0 or is absent, the corresponding side addon (<code>bwt_connector_webhooks_inbound</code> or <code>bwt_connector_webhooks_outbound</code>) may not be installed, or no endpoint with a matching <code>connector_backend_ref</code> value exists yet.</p>
-      <h3>Troubleshooting Checklist</h3>
-      <ul>
-        <li><strong>Smart button shows 0 or is absent</strong>: install the side addon or ask the concrete connector addon to seed its endpoint XML data and run the installer.</li>
-        <li><strong>Multiple endpoints linked to the same backend</strong>: for inbound, only one endpoint should be linked per backend instance. For outbound, multiple endpoints are valid (one per endpoint spec). Check the addon's <code>data/</code> folder for duplicate <code>connector_backend_ref</code> values.</li>
-        <li><strong>Endpoint code conflicts on install</strong>: the concrete connector addon's XML data may have a conflicting code; inspect the <code>data/</code> folder for the endpoint record and ensure the code follows the <code><prefix>-<suffix></code> convention and is unique.</li>
-        <li><strong>Backend not appearing in Connector Backend selection</strong>: ensure the concrete connector addon inherits both <code>connector.backend</code> and the appropriate webhook mixin, and that the addon is installed.</li>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The smart button on the backend form will now resolve to this endpoint.</p>
+      <h4 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #453f74; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; display: inline-block; padding: 5px 10px; border-radius: 999px; border: 1px solid #d9d4fb; background: #f1efff; margin-top: 10px">Multiple Backends and Endpoint Scoping</h4>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Each connector backend instance gets its own endpoint records scoped by a technical prefix derived from the backend model name and record ID (e.g. <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">stripe-1-inbound</code>). This ensures codes are unique across companies and backend instances.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Do not manually change the <strong style="box-sizing: border-box">Code</strong> field on an endpoint that is linked to a backend; the scoping convention is enforced by the provisioning hooks in the concrete connector addon and resync operations depend on it.</p>
+      <h4 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #453f74; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 26px; margin-bottom: 12px; display: inline-block; padding: 5px 10px; border-radius: 999px; border: 1px solid #d9d4fb; background: #f1efff">Verifying the Link</h4>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Open the backend form. The <strong style="box-sizing: border-box">Inbound Endpoint</strong> and/or <strong style="box-sizing: border-box">Outbound Endpoint</strong> smart buttons should show the linked endpoint name and navigate directly to the endpoint configuration on click.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">If a smart button shows 0 or is absent, the corresponding side addon (<code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_inbound</code> or <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_outbound</code>) may not be installed, or no endpoint with a matching <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector_backend_ref</code> value exists yet.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Troubleshooting Checklist</h3>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px"><strong style="box-sizing: border-box">Smart button shows 0 or is absent</strong>: install the side addon or ask the concrete connector addon to seed its endpoint XML data and run the installer.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><strong style="box-sizing: border-box">Multiple endpoints linked to the same backend</strong>: for inbound, only one endpoint should be linked per backend instance. For outbound, multiple endpoints are valid (one per endpoint spec). Check the addon's <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">data/</code> folder for duplicate <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector_backend_ref</code> values.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><strong style="box-sizing: border-box">Endpoint code conflicts on install</strong>: the concrete connector addon's XML data may have a conflicting code; inspect the <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">data/</code> folder for the endpoint record and ensure the code follows the <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">&lt;prefix&gt;-&lt;suffix&gt;</code> convention and is unique.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><strong style="box-sizing: border-box">Backend not appearing in Connector Backend selection</strong>: ensure the concrete connector addon inherits both <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector.backend</code> and the appropriate webhook mixin, and that the addon is installed.</li>
       </ul>
   </div>
 </section>
 
-<section class="bwt-section bwt-guide">
-  <div class="bwt-wrap">
-    <h2 class="bwt-guide-title">Developer Guide</h2>
-      <p>This guide covers building a new connector backend addon that integrates with the webhook framework via the connector layer mixins.</p>
-      <h3>Architecture Overview</h3>
-      <p>The connector layer consists of three abstract models:</p>
-      <ul>
-        <li><code>bwt.connector.webhook.backend.base</code> - private shared base; not inherited directly. Provides code normalization, scoping primitives, and the integration contract marker.</li>
-        <li><code>bwt.connector.webhook.inbound.mixin</code> - opt-in mixin for backends that receive inbound webhooks.</li>
-        <li><code>bwt.connector.webhook.outbound.mixin</code> - opt-in mixin for backends that send outbound webhooks.</li>
+<section class="bwt-section bwt-guide" style="box-sizing: border-box; padding: 44px 18px; border-top: 1px solid #dcd8f6">
+  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%; background: #fff; border: 1px solid #e2def8; border-radius: 14px; padding: 26px 22px">
+    <h2 class="bwt-guide-title" style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Developer Guide</h2>
+      <p style="box-sizing: border-box; margin: 0 0 12px">This guide covers building a new connector backend addon that integrates with the webhook framework via the connector layer mixins.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0; margin-top: 10px">Architecture Overview</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The connector layer consists of three abstract models:</p>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt.connector.webhook.backend.base</code> - private shared base; not inherited directly. Provides code normalization, scoping primitives, and the integration contract marker.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt.connector.webhook.inbound.mixin</code> - opt-in mixin for backends that receive inbound webhooks.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt.connector.webhook.outbound.mixin</code> - opt-in mixin for backends that send outbound webhooks.</li>
       </ul>
-      <p>Concrete backends combine these with the OCA <code>connector.backend</code> model.</p>
-      <p>For side-specific contracts and examples, also review:</p>
-      <ul>
-        <li><a href="../../bwt_connector_webhooks_inbound/README.rst">Glue Inbound README </a></li>
-        <li><a href="../../bwt_connector_webhooks_outbound/README.rst">Glue Outbound README </a></li>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Concrete backends combine these with the OCA <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector.backend</code> model.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">For side-specific contracts and examples, also review:</p>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px"><a href="../../bwt_connector_webhooks_inbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Inbound README </a></li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><a href="../../bwt_connector_webhooks_outbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Outbound README </a></li>
       </ul>
-      <h3>Registering a Backend</h3>
-      <p>Declare the backend model in your concrete connector addon</p>
-      <pre>class MyServiceBackend(models.Model):
-    _name = &quot;my_service.backend&quot;
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Registering a Backend</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Declare the backend model in your concrete connector addon</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">class MyServiceBackend(models.Model):
+    _name = "my_service.backend"
     _inherit = [
-        &quot;connector.backend&quot;,
-        &quot;bwt.connector.webhook.inbound.mixin&quot;,
-        &quot;bwt.connector.webhook.outbound.mixin&quot;,
+        "connector.backend",
+        "bwt.connector.webhook.inbound.mixin",
+        "bwt.connector.webhook.outbound.mixin",
     ]
-    _description = &quot;My Service Backend&quot;
+    _description = "My Service Backend"
 
     name = fields.Char(required=True)
     code = fields.Char(required=True)
-    company_id = fields.Many2one(&quot;res.company&quot;, required=True)
+    company_id = fields.Many2one("res.company", required=True)
     active = fields.Boolean(default=True)
-    api_key = fields.Char(string=&quot;API Key&quot;)</pre>
-      <p>The <code>_is_connector_webhook_backend = True</code> marker is set automatically by the base; your model is enrolled in the backend reference selection without further configuration.</p>
-      <h4>Technical Prefix</h4>
-      <p>Override <code>_get_technical_prefix()</code> to return a stable, human-readable prefix</p>
-      <pre>def _get_technical_prefix(self):
+    api_key = fields.Char(string="API Key")</pre>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">_is_connector_webhook_backend = True</code> marker is set automatically by the base; your model is enrolled in the backend reference selection without further configuration.</p>
+      <h4 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #453f74; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; display: inline-block; padding: 5px 10px; border-radius: 999px; border: 1px solid #d9d4fb; background: #f1efff; margin-top: 10px">Technical Prefix</h4>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Override <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">_get_technical_prefix()</code> to return a stable, human-readable prefix</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _get_technical_prefix(self):
     self.ensure_one()
-    return f&quot;my-service-{self.id}&quot;</pre>
-      <p>The default prefix is <code><model-token>-<id></code>. A custom prefix keeps codes stable across model renames and readable in the admin UI.</p>
-      <h3>Inbound Integration</h3>
-      <p>Override <code>_handle_inbound_webhook_event</code> to process events routed to this backend</p>
-      <pre>def _handle_inbound_webhook_event(self, event):
+    return f"my-service-{self.id}"</pre>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The default prefix is <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">&lt;model-token&gt;-&lt;id&gt;</code>. A custom prefix keeps codes stable across model renames and readable in the admin UI.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Inbound Integration</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Override <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">_handle_inbound_webhook_event</code> to process events routed to this backend</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _handle_inbound_webhook_event(self, event):
     self.ensure_one()
     payload = event.get_payload()
-    event_type = payload.get(&quot;type&quot;, &quot;&quot;)
-    if event_type == &quot;payment.completed&quot;:
+    event_type = payload.get("type", "")
+    if event_type == "payment.completed":
         self._handle_payment(payload)
         return event.webhook_done()
     return event.webhook_dead_letter()</pre>
-      <p>Valid return values from <code>bwt_connector_webhooks_core.services.result_types</code>:</p>
-      <ul>
-        <li><code>event.webhook_done()</code> - processing complete.</li>
-        <li><code>event.webhook_dead_letter()</code> - permanent failure; requires manual review.</li>
-        <li><code>event.webhook_retry(seconds=60)</code> - re-enqueue after a delay.</li>
-        <li><code>event.webhook_cancel()</code> - silently cancel without marking as error.</li>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Valid return values from <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_core.services.result_types</code>:</p>
+      <ul style="box-sizing: border-box; padding-left: 24px; margin: 0 0 16px">
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">event.webhook_done()</code> - processing complete.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">event.webhook_dead_letter()</code> - permanent failure; requires manual review.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">event.webhook_retry(seconds=60)</code> - re-enqueue after a delay.</li>
+        <li style="box-sizing: border-box; margin-bottom: 6px"><code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">event.webhook_cancel()</code> - silently cancel without marking as error.</li>
       </ul>
-      <p>Returning <code>None</code> produces a framework-level dead-letter.</p>
-      <p>The handler record for this backend's inbound endpoint must use <strong>Python Callback</strong> mode pointing to <code>my_service.backend</code> and <code>_handle_inbound_webhook_event</code>. Seed it as an XML data record in your addon.</p>
-      <p>For operational linking and troubleshooting steps, see the <a href="../../bwt_connector_webhooks_inbound/README.rst">Glue Inbound README </a>.</p>
-      <h3>Outbound Integration</h3>
-      <p>Override the following hooks on your backend model.</p>
-      <p>Dynamic hostname (required when the URL changes between modes)</p>
-      <pre>def _get_outbound_api_base_url(self, delivery=None):
+      <p style="box-sizing: border-box; margin: 0 0 12px">Returning <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">None</code> produces a framework-level dead-letter.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The handler record for this backend's inbound endpoint must use <strong style="box-sizing: border-box">Python Callback</strong> mode pointing to <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">my_service.backend</code> and <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">_handle_inbound_webhook_event</code>. Seed it as an XML data record in your addon.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">For operational linking and troubleshooting steps, see the <a href="../../bwt_connector_webhooks_inbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Inbound README </a>.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Outbound Integration</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Override the following hooks on your backend model.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Dynamic hostname (required when the URL changes between modes)</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _get_outbound_api_base_url(self, delivery=None):
     self.ensure_one()
-    return &quot;https://api.my-service.com&quot;</pre>
-      <p>Authentication headers (required for most APIs)</p>
-      <pre>def _get_outbound_extra_headers(self, delivery):
+    return "https://api.my-service.com"</pre>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Authentication headers (required for most APIs)</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _get_outbound_extra_headers(self, delivery):
     self.ensure_one()
-    return {&quot;Authorization&quot;: f&quot;Bearer {self.api_key}&quot;}</pre>
-      <p>Pre-send gate (optional - short-circuit before dispatch)</p>
-      <pre>def _check_outbound_dispatch_allowed(self, delivery):
+    return {"Authorization": f"Bearer {self.api_key}"}</pre>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Pre-send gate (optional - short-circuit before dispatch)</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _check_outbound_dispatch_allowed(self, delivery):
     self.ensure_one()
     if not self.active:
         return delivery.webhook_cancel()
     return None</pre>
-      <p>Main dispatch handler (required when using Python Callback mode)</p>
-      <pre>def _handle_outbound_webhook_delivery(self, delivery):
+      <p style="box-sizing: border-box; margin: 0 0 12px">Main dispatch handler (required when using Python Callback mode)</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">def _handle_outbound_webhook_delivery(self, delivery):
     self.ensure_one()
-    return delivery._build_outbound_delivery_result(outcome=&quot;send&quot;)</pre>
-      <h3>Endpoint Seeding</h3>
-      <p>Endpoint records are seeded as XML data in your concrete connector addon's <code>data/</code> folder. They are linked to backends via the <code>connector_backend_ref</code> field. Do not auto-provision endpoints from Python code; keep them as declarative XML records to stay upgrade-safe.</p>
-      <p>Example inbound endpoint record</p>
-      <pre>&lt;record id=&quot;my_service_inbound_endpoint&quot; model=&quot;bwt.webhook.inbound.endpoint&quot;&gt;
-    &lt;field name=&quot;name&quot;&gt;My Service Inbound&lt;/field&gt;
-    &lt;field name=&quot;path&quot;&gt;/webhooks/my-service&lt;/field&gt;
-    &lt;field name=&quot;handler_id&quot; ref=&quot;my_service_inbound_handler&quot;/&gt;
-    &lt;field name=&quot;signature_mode&quot;&gt;hmac&lt;/field&gt;
-    &lt;field name=&quot;signature_digest&quot;&gt;sha256&lt;/field&gt;
-    &lt;field name=&quot;signature_encoding&quot;&gt;hex&lt;/field&gt;
+    return delivery._build_outbound_delivery_result(outcome="send")</pre>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Endpoint Seeding</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Endpoint records are seeded as XML data in your concrete connector addon's <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">data/</code> folder. They are linked to backends via the <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector_backend_ref</code> field. Do not auto-provision endpoints from Python code; keep them as declarative XML records to stay upgrade-safe.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Example inbound endpoint record</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">&lt;record id="my_service_inbound_endpoint" model="bwt.webhook.inbound.endpoint"&gt;
+    &lt;field name="name"&gt;My Service Inbound&lt;/field&gt;
+    &lt;field name="path"&gt;/webhooks/my-service&lt;/field&gt;
+    &lt;field name="handler_id" ref="my_service_inbound_handler"/&gt;
+    &lt;field name="signature_mode"&gt;hmac&lt;/field&gt;
+    &lt;field name="signature_digest"&gt;sha256&lt;/field&gt;
+    &lt;field name="signature_encoding"&gt;hex&lt;/field&gt;
 &lt;/record&gt;</pre>
-      <p>After install, link the endpoint to the backend by setting <code>connector_backend_ref</code> or by following the UI steps in the Operator Guide.</p>
-      <h3>Resolving the Linked Outbound Endpoint</h3>
-      <p>When queueing an outbound delivery from your business logic</p>
-      <pre>backend = self.env[&quot;my_service.backend&quot;].browse(backend_id)
+      <p style="box-sizing: border-box; margin: 0 0 12px">After install, link the endpoint to the backend by setting <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">connector_backend_ref</code> or by following the UI steps in the Operator Guide.</p>
+      <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; margin-top: 34px; margin-bottom: 12px; padding-left: 12px; border-left: 4px solid #7b70f0">Resolving the Linked Outbound Endpoint</h3>
+      <p style="box-sizing: border-box; margin: 0 0 12px">When queueing an outbound delivery from your business logic</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">backend = self.env["my_service.backend"].browse(backend_id)
 endpoint = backend.get_outbound_endpoint()
 delivery = endpoint.queue_delivery(
-    payload={&quot;event&quot;: &quot;order.paid&quot;, &quot;order_id&quot;: order.id},
-    context_lines={&quot;idempotency_key&quot;: str(uuid.uuid4())},
+    payload={"event": "order.paid", "order_id": order.id},
+    context_lines={"idempotency_key": str(uuid.uuid4())},
 )</pre>
-      <p>Use <code>code_suffix</code> when a backend has multiple outbound endpoints</p>
-      <pre>endpoint = backend.get_outbound_endpoint(code_suffix=&quot;orders&quot;)</pre>
-      <p>The <code>code_suffix</code> value must match the <code>code_suffix</code> column on the endpoint record, which is set by the concrete addon's XML data.</p>
-      <p>For outbound routing patterns and troubleshooting, see the <a href="../../bwt_connector_webhooks_outbound/README.rst">Glue Outbound README </a>.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">Use <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">code_suffix</code> when a backend has multiple outbound endpoints</p>
+      <pre style="box-sizing: border-box; background: #16142B; color: #F5F4FF; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 13px; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; line-height: 1.5; margin: 0 0 16px; max-width: 100%">endpoint = backend.get_outbound_endpoint(code_suffix="orders")</pre>
+      <p style="box-sizing: border-box; margin: 0 0 12px">The <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">code_suffix</code> value must match the <code style="box-sizing: border-box; background: #E6E5F2; color: #16142B; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">code_suffix</code> column on the endpoint record, which is set by the concrete addon's XML data.</p>
+      <p style="box-sizing: border-box; margin: 0 0 12px">For outbound routing patterns and troubleshooting, see the <a href="../../bwt_connector_webhooks_outbound/README.rst" style="box-sizing: border-box; color: #5B4FE8">Glue Outbound README </a>.</p>
   </div>
 </section>
 </div>
