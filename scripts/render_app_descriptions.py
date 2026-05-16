@@ -93,8 +93,11 @@ def _find_bitwise_hq_root(repo_root: Path) -> Path:
         if resolved in seen:
             continue
         seen.add(resolved)
-        if (resolved / shared_module_relpath).exists():
-            return resolved
+        try:
+            if (resolved / shared_module_relpath).exists():
+                return resolved
+        except OSError:
+            continue
 
     raise FileNotFoundError("Unable to find bitwise-hq/scripts/odoo_addon_description_renderer.py. Set BITWISE_HQ_ROOT to the local bitwise-hq repository root.")
 
