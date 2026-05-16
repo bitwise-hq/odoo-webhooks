@@ -1,14 +1,20 @@
 flowchart TD
-  A["Inbound HTTP Request"] --> B{"Endpoint Found?"}
-  B -- No --> Z["Reject (not configured)"]
-  B -- Yes --> C["Validate Signature + Timestamp"]
-  C -- Fail --> D["Reject Request"]
-  C -- Pass --> E["Check Replay / Idempotency"]
-  E -- Duplicate --> F["Mark Replay"]
-  E -- New --> G["Create Inbound Event"]
-  G --> H["Resolve Semantic Fields"]
-  H --> I{"Match Rules?"}
-  I -- No --> J["Mark Done or Dead Letter"]
-  I -- Yes --> K["Queue Job: Execute Action"]
-  K --> L["Create/Update/Upsert Records"]
-  L --> M["Update Event State + Audit"]
+  A["Inbound HTTP request"] --> B{"Endpoint configured?"}
+  B -- No --> R1["Reject request (404/403)"]
+  B -- Yes --> C["Validate signature"]
+  C -- Fail --> R2["Reject request (401)"]
+  C -- Pass --> D["Validate timestamp + freshness"]
+  D -- Fail --> R3["Reject request (stale/future skew)"]
+  D -- Pass --> E["Resolve delivery/replay identities"]
+  E --> F{"Duplicate event?"}
+  F -- Yes --> G["Link replay chain and short-circuit"]
+  F -- No --> H["Create inbound event (state=draft)"]
+  H --> I["Resolve semantic bindings"]
+  I --> J{"Rules matched?"}
+  J -- No --> K["Mark done or dead-letter by policy"]
+  J -- Yes --> L["Queue job: execute rule actions"]
+  L --> M{"Action outcome"}
+  M -- done --> N["Event state: done"]
+  M -- retry --> O["Reschedule with backoff"]
+  M -- dead_letter --> P["Event state: dead_letter"]
+  O --> L
