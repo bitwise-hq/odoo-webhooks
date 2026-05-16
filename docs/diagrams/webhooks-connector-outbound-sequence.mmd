@@ -1,0 +1,22 @@
+sequenceDiagram
+  participant App as Business Flow
+  participant Backend as Connector Backend
+  participant Endpoint as Outbound Endpoint Resolver
+  participant Delivery as Outbound Delivery
+  participant Queue as Queue Worker
+  participant API as External API
+
+  App->>Backend: queue_outbound_delivery(...)
+  Backend->>Endpoint: get_outbound_endpoint(code_suffix)
+  Endpoint->>Delivery: Create queued delivery
+  Delivery->>Queue: Enqueue send job
+  Queue->>Backend: _handle_outbound_webhook_delivery(...)
+
+  alt Backend allows send
+    Queue->>API: Dispatch HTTP request
+    API-->>Queue: Response or timeout
+    Queue->>Backend: _handle_outbound_webhook_response(...)
+    Queue->>Delivery: Mark done, retry, or dead_letter
+  else Backend returns terminal outcome
+    Queue->>Delivery: Apply done, retry, cancel, or dead_letter
+  end

@@ -1,22 +1,53 @@
-Secure inbound webhook endpoints for Odoo with signatures, replay
-protection, and rule-based processing.
+Secure inbound webhook intake for Odoo teams that need trustworthy
+validation, clear auditability, and smoother day-to-day operations.
 
 **Highlights:**
 
-- Public endpoints with HMAC signature verification (SHA1/256/512, hex/base64).
-- Timestamp and idempotency controls to block replayed events.
-- Declarative rules to create, update, or upsert Odoo records.
-- Semantic bindings to normalize payload fields for consistent rules.
-- Full event audit trail with state, retries, and dead-letter flows.
-- Operator-friendly views for endpoints, rules, and events.
+- Helps teams accept external events with more trust and less manual
+   risk.
+- Keeps failures visible and recoverable instead of buried in custom
+   glue.
+- Turns incoming traffic into structured Odoo actions more quickly.
+- Leaves room for provider-specific behavior without rebuilding the
+   intake layer.
+
+Who It's For
+------------
+
+- Odoo partners connecting SaaS platforms and external systems into
+   Odoo.
+- Operations teams responsible for webhook reliability, traceability,
+   and incident recovery.
+- Integration teams that want safer intake without rebuilding the same
+   protective layer for each project.
+
+Capability Pillars
+------------------
+
+- Clear endpoint management for teams handling multiple inbound flows.
+- Built-in protection against stale, duplicate, and suspicious traffic.
+- Flexible routing that maps incoming events into the right Odoo work.
+- Operator-friendly monitoring for review, reprocessing, and recovery.
+
+How It Works
+------------
+
+Inbound receives the request, verifies that it is trustworthy, filters
+out repeat or stale traffic, and routes the event into the right Odoo
+workflow with less custom plumbing around it.
+
+Technical Validation
+--------------------
+
+The technical section below exposes the deeper request flow, state
+model, and rule-processing contract so evaluators can inspect how
+validation, deduplication, and handler execution behave under
+production conditions.
 
 .. image:: static/description/diagrams/webhooks-inbound-flow.svg
    :alt: Inbound request flow
    :align: center
 
-.. image:: static/description/diagrams/webhooks-inbound-sequence.svg
-   :alt: Inbound processing sequence
-   :align: center
-
-Looking for turnkey integrations? Pair this framework with premium
-connector addons (e.g., Stripe) to launch faster.
+Looking for a faster path to live inbound integrations? Pair the
+framework with premium connector modules such as Stripe when you want a
+more turnkey rollout.

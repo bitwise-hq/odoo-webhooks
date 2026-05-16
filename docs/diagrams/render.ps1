@@ -14,11 +14,19 @@ function Render-Diagram {
 }
 
 $targets = @(
+    @{ input = "webhooks-core-sequence.mmd"; output = "bwt_webhooks_core\static\description\diagrams\webhooks-core-sequence" },
     @{ input = "webhooks-core-entities.mmd"; output = "bwt_webhooks_core\static\description\diagrams\webhooks-core-entities" },
     @{ input = "webhooks-inbound-flow.mmd"; output = "bwt_webhooks_inbound\static\description\diagrams\webhooks-inbound-flow" },
     @{ input = "webhooks-inbound-sequence.mmd"; output = "bwt_webhooks_inbound\static\description\diagrams\webhooks-inbound-sequence" },
     @{ input = "webhooks-outbound-flow.mmd"; output = "bwt_webhooks_outbound\static\description\diagrams\webhooks-outbound-flow" },
-    @{ input = "webhooks-outbound-sequence.mmd"; output = "bwt_webhooks_outbound\static\description\diagrams\webhooks-outbound-sequence" }
+    @{ input = "webhooks-outbound-sequence.mmd"; output = "bwt_webhooks_outbound\static\description\diagrams\webhooks-outbound-sequence" },
+    @{ input = "webhooks-outbound-pipeline.mmd"; output = "bwt_webhooks_outbound\static\description\diagrams\webhooks-outbound-pipeline" },
+    @{ input = "webhooks-connector-core-sequence.mmd"; output = "bwt_connector_webhooks_core\static\description\diagrams\webhooks-connector-core-sequence" },
+    @{ input = "webhooks-connector-backend-linking.mmd"; output = "bwt_connector_webhooks_core\static\description\diagrams\webhooks-connector-backend-linking" },
+    @{ input = "webhooks-connector-inbound-sequence.mmd"; output = "bwt_connector_webhooks_inbound\static\description\diagrams\webhooks-connector-inbound-sequence" },
+    @{ input = "webhooks-connector-backend-linking.mmd"; output = "bwt_connector_webhooks_inbound\static\description\diagrams\webhooks-connector-backend-linking" },
+    @{ input = "webhooks-connector-outbound-sequence.mmd"; output = "bwt_connector_webhooks_outbound\static\description\diagrams\webhooks-connector-outbound-sequence" },
+    @{ input = "webhooks-connector-outbound-routing.mmd"; output = "bwt_connector_webhooks_outbound\static\description\diagrams\webhooks-connector-outbound-routing" }
 )
 
 foreach ($item in $targets) {
