@@ -41,6 +41,7 @@
 }
 .bwt-app .bwt-highlights li {
     margin: 0;
+    margin-bottom: 12px;
     padding: 18px 18px 20px;
     background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
     border: 1px solid #dddaf4;
@@ -49,6 +50,7 @@
     box-shadow: 0 10px 26px rgba(22,20,43,0.07);
     color: #2f2c52;
 }
+.bwt-app .bwt-highlights li:last-child { margin-bottom: 0; }
 .bwt-app .bwt-proof li {
     background:
         radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%),
@@ -68,12 +70,14 @@
 .bwt-app .bwt-diagram-stack { display: grid; gap: 18px; }
 .bwt-app .bwt-figure {
     margin: 0;
+    margin-bottom: 14px;
     padding: 14px;
     background: #fff;
     border: 1px solid #d9d4fb;
     border-radius: 14px;
     box-shadow: 0 8px 24px rgba(22,20,43,0.08);
 }
+.bwt-app .bwt-figure:last-child { margin-bottom: 0; }
 .bwt-app .bwt-figure.bwt-figure-lead {
     border: 2px solid #5B4FE8;
     box-shadow: 0 12px 28px rgba(91,79,232,0.20);
@@ -204,12 +208,14 @@
 }
 .bwt-app .bwt-audience li {
     margin: 0;
+    margin-bottom: 12px;
     padding: 16px 18px;
     background: #fff;
     border: 1px solid #dddaf4;
     border-radius: 14px;
     box-shadow: 0 6px 18px rgba(22,20,43,0.06);
 }
+.bwt-app .bwt-audience li:last-child { margin-bottom: 0; }
 .bwt-app .bwt-story {
     padding-top: 18px;
     padding-bottom: 32px;
@@ -221,6 +227,7 @@
     align-items: start;
 }
 .bwt-app .bwt-story-copy {
+    margin-bottom: 16px;
     padding: 28px 24px;
     background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
     border: 1px solid #dddaf4;
@@ -235,12 +242,14 @@
 }
 .bwt-app .bwt-story-figure {
     margin: 0;
+    margin-bottom: 16px;
     padding: 18px;
     background: #fff;
     border: 1px solid #d9d4fb;
     border-radius: 16px;
     box-shadow: 0 12px 30px rgba(22,20,43,0.10);
 }
+.bwt-app .bwt-story-figure:last-child { margin-bottom: 0; }
 .bwt-app .bwt-story-figure img {
     width: 100%;
     border-radius: 12px;
@@ -288,12 +297,14 @@
     justify-self: center;
 }
 .bwt-app .bwt-step-panel {
+    margin-bottom: 14px;
     padding: 20px 18px;
     background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
     border: 1px solid #dddaf4;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(22,20,43,0.06);
 }
+.bwt-app .bwt-step-panel:last-child { margin-bottom: 0; }
 .bwt-app .bwt-step-panel h3 {
     margin-top: 0;
     margin-bottom: 14px;
@@ -307,10 +318,12 @@
 }
 .bwt-app .bwt-step-list li {
     margin: 0;
+    margin-bottom: 10px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
 }
+.bwt-app .bwt-step-list li:last-child { margin-bottom: 0; }
 .bwt-app .bwt-step-badge {
     flex: 0 0 22px;
     width: 22px;
@@ -369,56 +382,11 @@
 
 <section class="bwt-section bwt-intro" style="box-sizing: border-box; padding: 44px 18px; padding-top: 24px; padding-bottom: 30px">
   <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
-    <p class="bwt-lead" style="box-sizing: border-box; max-width: 860px; margin: 0 auto; text-align: center; color: #2f2c52; font-size: 18px; line-height: 1.72">Shared glue infrastructure for connector backends that need webhook ownership, cleaner rollout patterns, and a stronger operational base.</p>
+    <p class="bwt-lead" style="box-sizing: border-box; max-width: 860px; margin: 0 auto; text-align: center; color: #2f2c52; font-size: 18px; line-height: 1.72">Shared base for connector backends that own webhook endpoints.</p>
   </div>
 </section>
 
-<section class="bwt-section bwt-highlights bwt-proof" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px">
-  <div class="bwt-wrap" style="box-sizing: border-box; margin: 0 auto; width: 100%; max-width: 1080px">
-    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
-      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
-      <span style="box-sizing: border-box">Outcomes</span>
-    </p>
-    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Why Teams Choose It</h2>
-    <ul style="box-sizing: border-box; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-left: 24px">
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Gives connector teams one shared ownership model across webhook flows.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Keeps rollout and refresh work more predictable over time.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Helps endpoint naming and routing stay consistent as connector scope grows.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; background: radial-gradient(135% 120% at 100% 0%, rgba(91,79,232,0.10) 0%, rgba(91,79,232,0) 55%), linear-gradient(180deg, #ffffff 0%, #fbfaff 100%); margin-bottom: 6px">Supports inbound-only, outbound-only, or combined connector rollouts.</li>
-    </ul>
-  </div>
-</section>
 
-<section class="bwt-section bwt-highlights bwt-audience bwt-alt" style="box-sizing: border-box; padding: 44px 18px; background: #F5F4FF; padding-top: 18px">
-  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
-    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
-      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
-      <span style="box-sizing: border-box">Audience</span>
-    </p>
-    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Who It's For</h2>
-    <ul style="box-sizing: border-box; padding-left: 24px; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px">
-        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Teams productising connector backends that need webhook ownership to live on backend records.</li>
-        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Integration teams that want one shared glue layer before expanding into inbound and outbound behavior.</li>
-        <li style="box-sizing: border-box; border-top: 4px solid #5B4FE8; color: #2f2c52; margin-bottom: 6px; margin: 0; padding: 16px 18px; background: #fff; border: 1px solid #dddaf4; border-radius: 14px; box-shadow: 0 6px 18px rgba(22,20,43,0.06)">Odoo partners standardising connector-backed rollout patterns across multiple addons.</li>
-    </ul>
-  </div>
-</section>
-
-<section class="bwt-section bwt-highlights bwt-capabilities" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px">
-  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
-    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
-      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
-      <span style="box-sizing: border-box">Capabilities</span>
-    </p>
-    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Capability Pillars</h2>
-    <ul style="box-sizing: border-box; list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-left: 24px">
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">One shared foundation for backend-owned webhook rollout.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Clear backend linkage that keeps ownership and routing aligned.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Stable naming and provisioning patterns that reduce drift over time.</li>
-        <li style="box-sizing: border-box; margin: 0; padding: 18px 18px 20px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-top: 4px solid #5B4FE8; border-radius: 16px; box-shadow: 0 10px 26px rgba(22,20,43,0.07); color: #2f2c52; margin-bottom: 6px">Directional expansion paths so teams only add the behavior they need.</li>
-    </ul>
-  </div>
-</section>
 
 <section class="bwt-section bwt-story" style="box-sizing: border-box; padding: 44px 18px; padding-top: 18px; padding-bottom: 32px">
   <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
@@ -428,10 +396,9 @@
     </p>
     <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">How It Works</h2>
     <div class="bwt-story-shell" style="box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); gap: 24px; align-items: start">
-      <div class="bwt-story-copy" style="box-sizing: border-box; padding: 28px 24px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-radius: 16px; box-shadow: 0 10px 28px rgba(22,20,43,0.08)">
-      <p class="bwt-story-lead" style="box-sizing: border-box; margin: 0 0 12px; margin-bottom: 0; color: #2f2c52; font-size: 18px; line-height: 1.72">Glue Core establishes the shared ownership model first, then the directional glue addons layer inbound and outbound behavior on top so connector teams can grow without rebuilding the same foundation for each flow.</p>
+      <div class="bwt-story-copy" style="box-sizing: border-box; margin-bottom: 16px; padding: 28px 24px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-radius: 16px; box-shadow: 0 10px 28px rgba(22,20,43,0.08)">
       </div>
-      <figure class="bwt-story-figure" style="box-sizing: border-box; margin: 0; padding: 18px; background: #fff; border: 1px solid #d9d4fb; border-radius: 16px; box-shadow: 0 12px 30px rgba(22,20,43,0.10)">
+      <figure class="bwt-story-figure" style="box-sizing: border-box; margin: 0; padding: 18px; background: #fff; border: 1px solid #d9d4fb; border-radius: 16px; box-shadow: 0 12px 30px rgba(22,20,43,0.10); margin-bottom: 0">
         <img src="diagrams/webhooks-connector-backend-linking.svg" alt="Connector backend linking flow" style="box-sizing: border-box; max-width: 100%; height: auto; display: block; width: 100%; border-radius: 12px; background: #fff" />
         <p class="bwt-caption" style="box-sizing: border-box; color: #4f4b72; font-size: 13px; font-style: normal; text-align: left; margin: 10px 0 2px">Connector backend linking flow</p>
       </figure>
@@ -446,9 +413,8 @@
       <span style="box-sizing: border-box">Technical proof</span>
     </p>
     <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Technical Validation</h2>
-    <p class="bwt-technical-intro" style="box-sizing: border-box; max-width: 760px; color: #38355c; margin: 0 0 22px">The technical section below surfaces backend linking flow and orchestration details so evaluators can inspect how backend records, endpoint references, and directional glue pieces fit together.</p>
     <div class="bwt-technical-grid" style="box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start">
-      <figure class="bwt-figure" style="box-sizing: border-box; margin: 0; padding: 14px; background: #fff; border: 1px solid #d9d4fb; border-radius: 14px; box-shadow: 0 8px 24px rgba(22,20,43,0.08); width: 100%; max-width: 760px; justify-self: center">
+      <figure class="bwt-figure" style="box-sizing: border-box; margin: 0; padding: 14px; background: #fff; border: 1px solid #d9d4fb; border-radius: 14px; box-shadow: 0 8px 24px rgba(22,20,43,0.08); margin-bottom: 0; width: 100%; max-width: 760px; justify-self: center">
         <img src="diagrams/webhooks-connector-core-sequence.svg" alt="Connector backend orchestration sequence" style="box-sizing: border-box; max-width: 100%; height: auto; display: block; width: 100%; border-radius: 10px; background: #fff" />
         <p class="bwt-caption" style="box-sizing: border-box; color: #4f4b72; font-size: 13px; font-style: normal; text-align: left; margin: 10px 0 2px">Connector backend orchestration sequence</p>
       </figure>
@@ -456,45 +422,6 @@
   </div>
 </section>
 
-<section class="bwt-section bwt-implementation" style="box-sizing: border-box; padding: 44px 18px; padding-top: 28px">
-  <div class="bwt-wrap" style="box-sizing: border-box; margin: 0 auto; width: 100%; max-width: 1080px">
-    <p class="bwt-section-kicker" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #453f74; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase">
-      <span class="bwt-section-kicker-line" aria-hidden="true" style="box-sizing: border-box; display: block; width: 26px; height: 1px; font-size: 0; line-height: 0; overflow: hidden; background: #a69ff6"> </span>
-      <span style="box-sizing: border-box">Rollout</span>
-    </p>
-    <h2 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; color: #5B4FE8; font-size: clamp(26px, 2.2vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid #d9d4fb">Rollout Path</h2>
-    <p class="bwt-lead bwt-implementation-lead" style="box-sizing: border-box; color: #2f2c52; font-size: 18px; line-height: 1.72; max-width: 760px; margin: 0; text-align: left">Start with Glue Core when the backend record should be the place where webhook ownership and rollout decisions live.</p>
-    <div class="bwt-implementation-grid" style="box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 18px; align-items: start">
-      <div class="bwt-step-panel" style="box-sizing: border-box; width: 100%; max-width: 760px; justify-self: center; padding: 20px 18px; background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%); border: 1px solid #dddaf4; border-radius: 16px; box-shadow: 0 8px 24px rgba(22,20,43,0.06)">
-        <h3 style="box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; line-height: 1.3; margin: 0 0 16px; color: #1f1b3f; font-size: clamp(19px, 1.5vw, 23px); font-weight: 700; padding-left: 12px; border-left: 4px solid #7b70f0; margin-top: 0; margin-bottom: 14px">Rollout Steps</h3>
-        <ol class="bwt-step-list" style="box-sizing: border-box; padding-left: 24px; list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; margin-bottom: 0">
-          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
-            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">1</span>
-            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Install <code style="box-sizing: border-box; background-color: #16142B !important; color: #F5F4FF !important; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'IBM Plex Mono', Menlo, Consolas, monospace; word-break: break-word">bwt_connector_webhooks_core</code> to give backend records a shared ownership layer.</span>
-          </li>
-          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
-            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">2</span>
-            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Add inbound glue where the backend needs to receive provider traffic.</span>
-          </li>
-          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
-            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">3</span>
-            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Add outbound glue where the backend needs to send deliveries.</span>
-          </li>
-          <li style="box-sizing: border-box; margin-bottom: 6px; margin: 0; display: flex; gap: 12px; align-items: flex-start">
-            <span class="bwt-step-badge" aria-hidden="true" style="box-sizing: border-box; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 10px; border-radius: 999px; background: #5B4FE8; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1">4</span>
-            <span class="bwt-step-copy" style="box-sizing: border-box; display: block; flex: 1 1 auto; padding: 12px 14px; background: #fff; border: 1px solid #dddaf4; border-radius: 12px">Link each endpoint to the backend record it belongs to.</span>
-          </li>
-        </ol>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="bwt-section bwt-cta" style="box-sizing: border-box; padding: 44px 18px; background: #5B4FE8; text-align: center">
-  <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%">
-    <p style="box-sizing: border-box; color: #fff; font-size: 16px; margin: 0">Looking for a faster path from glue layer to live integration? Pair this foundation with premium connector modules such as Stripe when you want a more turnkey rollout.</p>
-  </div>
-</section>
 
 <section class="bwt-section bwt-guide bwt-alt" style="box-sizing: border-box; padding: 44px 18px; background: #F5F4FF; border-top: 1px solid #dcd8f6">
   <div class="bwt-wrap" style="box-sizing: border-box; max-width: 1024px; margin: 0 auto; width: 100%; background: #fff; border: 1px solid #e2def8; border-radius: 14px; padding: 26px 22px">
