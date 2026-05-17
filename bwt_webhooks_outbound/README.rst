@@ -19,28 +19,57 @@ Webhooks Framework - Outbound Delivery
 
 |badge1| |badge2|
 
-Reliable outbound webhook delivery for Odoo with templated requests,
-retries, and detailed diagnostics.
+Reliable outbound webhook delivery for Odoo teams that need dependable
+dispatch, visible recovery paths, and clearer delivery operations.
 
 **Highlights:**
 
-- Endpoint registry with method, body mode, and timeout controls.
-- Tokenized paths plus header and payload rules for dynamic requests.
-- Queue-backed delivery with retry and dead-letter handling.
-- Per-attempt response logging for diagnostics and SLAs.
-- Delivery context lines to map Odoo data into requests.
-- Designed to plug into connector-backed integrations.
+- Keeps outbound delivery moving even when downstream systems are not.
+- Gives teams visibility into what happened, what failed, and what to do
+   next.
+- Supports more flexible delivery patterns without rebuilding the same
+   outbound plumbing per integration.
+- Fits connector-backed rollouts as well as custom webhook projects.
+
+Who It's For
+------------
+
+- Odoo partners pushing Odoo changes into partner APIs and SaaS
+   platforms.
+- Operations teams that need delivery visibility, error recovery, and
+   clean audit trails.
+- Integration teams that want reusable outbound delivery without
+   rebuilding the same dispatch layer for every project.
+
+Capability Pillars
+------------------
+
+- Clear endpoint control for teams managing multiple outbound routes.
+- Flexible delivery shaping for APIs with different request needs.
+- Guardrails for retry, cancellation, and recovery before work is lost.
+- Delivery monitoring with the context teams need to troubleshoot fast.
+
+How It Works
+------------
+
+Outbound prepares the delivery, applies the right controls before it is
+sent, records each attempt, and gives teams the visibility they need to
+retry, recover, or investigate without losing track of what happened.
+
+Technical Validation
+--------------------
+
+The technical section below exposes the delivery pipeline, state
+transitions, and transport primitives so evaluators can inspect how
+request composition, retries, and response handling behave in practice.
 
 .. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/18.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-flow.svg
    :alt: Outbound delivery flow
    :align: center
 
-.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/18.0/bwt_webhooks_outbound/static/description/diagrams/webhooks-outbound-sequence.svg
-   :alt: Outbound delivery sequence
-   :align: center
-
-Looking for turnkey integrations? Pair this framework with premium
-connector addons (e.g., Stripe) to launch faster.
+Looking for a faster path to live outbound integrations? Pair the
+framework with premium connector modules such as Stripe when you want a
+more turnkey rollout.
 
 **Table of contents**
 
@@ -50,21 +79,23 @@ connector addons (e.g., Stripe) to launch faster.
 Configuration
 =============
 
-To configure outbound webhooks:
+A good outbound rollout starts with one clearly scoped delivery target
+and a request shape the team can support confidently.
 
 1. Go to ``Webhooks > Outbound Endpoints`` and create an endpoint.
-2. Set the target host/path, method, body mode, and timeout.
-3. Configure header and payload rules plus context lines.
-4. Attach a handler and outbound rule set.
+2. Define the target path, request format, and timing expectations.
+3. Shape the delivery with headers, payload rules, and context values.
+4. Connect the endpoint to the delivery logic you want live.
 
 Usage
 =====
 
-To use outbound webhooks:
+Once live, teams mostly watch delivery health, review failures, and
+step in when retries or investigation are needed.
 
 1. Trigger outbound rules from your business flow or connector backend.
 2. Monitor deliveries in ``Webhooks > Outbound Deliveries``.
-3. Review attempts and retry or dead-letter as needed.
+3. Review attempts and retry or dead-letter when follow-up is required.
 
 Bug Tracker
 ===========
