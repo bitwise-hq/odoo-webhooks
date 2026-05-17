@@ -19,28 +19,59 @@ Webhooks Framework - Inbound Gateway
 
 |badge1| |badge2|
 
-Secure inbound webhook endpoints for Odoo with signatures, replay
-protection, and rule-based processing.
+Secure inbound webhook intake for Odoo teams that need trustworthy
+validation, clear auditability, and smoother day-to-day operations.
 
 **Highlights:**
 
-- Public endpoints with HMAC signature verification (SHA1/256/512, hex/base64).
-- Timestamp and idempotency controls to block replayed events.
-- Declarative rules to create, update, or upsert Odoo records.
-- Semantic bindings to normalize payload fields for consistent rules.
-- Full event audit trail with state, retries, and dead-letter flows.
-- Operator-friendly views for endpoints, rules, and events.
+- Helps teams accept external events with more trust and less manual
+   risk.
+- Keeps failures visible and recoverable instead of buried in custom
+   glue.
+- Turns incoming traffic into structured Odoo actions more quickly.
+- Leaves room for provider-specific behavior without rebuilding the
+   intake layer.
+
+Who It's For
+------------
+
+- Odoo partners connecting SaaS platforms and external systems into
+   Odoo.
+- Operations teams responsible for webhook reliability, traceability,
+   and incident recovery.
+- Integration teams that want safer intake without rebuilding the same
+   protective layer for each project.
+
+Capability Pillars
+------------------
+
+- Clear endpoint management for teams handling multiple inbound flows.
+- Built-in protection against stale, duplicate, and suspicious traffic.
+- Flexible routing that maps incoming events into the right Odoo work.
+- Operator-friendly monitoring for review, reprocessing, and recovery.
+
+How It Works
+------------
+
+Inbound receives the request, verifies that it is trustworthy, filters
+out repeat or stale traffic, and routes the event into the right Odoo
+workflow with less custom plumbing around it.
+
+Technical Validation
+--------------------
+
+The technical section below exposes the deeper request flow, state
+model, and rule-processing contract so evaluators can inspect how
+validation, deduplication, and handler execution behave under
+production conditions.
 
 .. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/17.0/bwt_webhooks_inbound/static/description/diagrams/webhooks-inbound-flow.svg
    :alt: Inbound request flow
    :align: center
 
-.. image:: https://raw.githubusercontent.com/BitwiseHQ/odoo-webhooks/17.0/bwt_webhooks_inbound/static/description/diagrams/webhooks-inbound-sequence.svg
-   :alt: Inbound processing sequence
-   :align: center
-
-Looking for turnkey integrations? Pair this framework with premium
-connector addons (e.g., Stripe) to launch faster.
+Looking for a faster path to live inbound integrations? Pair the
+framework with premium connector modules such as Stripe when you want a
+more turnkey rollout.
 
 **Table of contents**
 
@@ -50,21 +81,23 @@ connector addons (e.g., Stripe) to launch faster.
 Configuration
 =============
 
-To configure inbound webhooks:
+A typical inbound rollout starts with one clearly scoped endpoint and a
+trust policy the team can operate with confidence.
 
 1. Go to ``Webhooks > Inbound Endpoints`` and create an endpoint.
-2. Set the path, signature mode, and shared secret(s).
-3. Define identity and timestamp policies to control replays.
-4. Attach a handler and configure rule conditions and actions.
+2. Set the path and trust settings the provider will use.
+3. Decide how duplicate and stale requests should be handled.
+4. Connect the endpoint to the handling logic you want live.
 
 Usage
 =====
 
-To use inbound webhooks:
+Once live, teams mainly watch incoming traffic, review event history,
+and step in only when recovery is needed.
 
-1. Send requests to the endpoint path.
-2. Review events in ``Webhooks > Inbound Events``.
-3. Reprocess or dead-letter events as needed.
+1. Send provider traffic to the endpoint.
+2. Review event history and status changes in ``Webhooks > Inbound Events``.
+3. Reprocess or move events to dead-letter when follow-up is needed.
 
 Bug Tracker
 ===========
